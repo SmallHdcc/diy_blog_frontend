@@ -1,5 +1,5 @@
 <script setup>
-import { VueElement, reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import router from '@/router';
 import { ElMessage } from 'element-plus'
 import { login } from '../api'
@@ -60,11 +60,6 @@ const submitForm = (formEl) => {
     })
 }
 
-//reset the form
-const resetForm = (formEl) => {
-    if (!formEl) return
-    formEl.resetFields()
-}
 
 // about wow.js
 const wow = new WOW({
@@ -89,10 +84,10 @@ document.addEventListener('keydown', function (event) {
         // 回车键被按下
         submitForm(ruleFormRef.value);
     }
-});
+})
 
 
-onMounted(() => {
+onMounted(async () => {
     wow.init()
 })
 

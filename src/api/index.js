@@ -1,6 +1,14 @@
 import service from '../Service.js'
 import md5 from 'js-md5'
 
+//测试与服务器通信
+export function pingServer() {
+    return service({
+        method: 'GET',
+        url: '/article/common/ping'
+    })
+}
+
 export function login(originalData) {
     const data = {
         ...originalData,
@@ -137,6 +145,13 @@ export function changeArticleStatus(id, status) {
     })
 }
 
+//获取所有公开的博客
+export function getPublicBlogs() {
+    return service({
+        method: "GET",
+        url: `/article/getPublicArticles`,
+    })
+}
 
 
 
