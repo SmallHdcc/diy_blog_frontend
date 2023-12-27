@@ -2,7 +2,7 @@
 import { pingServer } from '@/api/index.js'
 import { onMounted } from 'vue'
 
-const open4 = () => {
+const notificatServerState = () => {
   ElNotification({
     title: '提示',
     message: '服务器失效',
@@ -13,8 +13,8 @@ const open4 = () => {
 onMounted(async () => {
   setInterval(async () => {
     const result = await pingServer()
-    if (result.data.code != 1) {
-      open4()
+    if (result.status > 400) {
+      notificatServerState()
     }
   }, 6 * 1000)
 })

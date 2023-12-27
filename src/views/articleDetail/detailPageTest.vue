@@ -3,7 +3,6 @@ import { ref, reactive, onMounted } from 'vue'
 // import "highlight.js/styles/github-dark.css";
 import { uploadComment, getComments, likeTheComment, cancelLikeTheComment } from '@/api'
 import WOW from 'wow.js'
-import router from '../../router';
 import { ElMessage } from 'element-plus';
 import thumbsUp from '@/components/icon/thumbsUp.vue';
 // 防抖
@@ -39,11 +38,8 @@ const wow = new WOW({
     scrollContainer: null,      //可选滚动容器选择器，否则使用window
 })
 
-const backToShow = () => {
-    router.push("/personal")
-}
+
 // 与评论有关
-const drawer = ref(false)
 const commentArray = ref([
 ])
 

@@ -5,7 +5,7 @@ import md5 from 'js-md5'
 export function pingServer() {
     return service({
         method: 'GET',
-        url: '/article/common/ping'
+        url: '/common/ping'
     })
 }
 
@@ -39,7 +39,7 @@ export function uploadCover(data) {
 
     return service({
         method: 'POST',
-        url: "/article/common/upload",
+        url: "/common/upload",
         headers: {
             'Content-Type': 'multipart/form-data' // 设置请求头为multipart/form-data  
         },
@@ -138,10 +138,10 @@ export function changeSign(signature, userId) {
     })
 }
 //文章状态修改
-export function changeArticleStatus(id, status) {
+export function changeArticleStatus(id, isPrivate, userId) {
     return service({
         method: "PUT",
-        url: `/article/private?isPrivate=${status}&id=${id}`,
+        url: `/article/private?isPrivate=${isPrivate}&id=${id}&userId=${userId}`,
     })
 }
 
@@ -152,7 +152,13 @@ export function getPublicBlogs() {
         url: `/article/getPublicArticles`,
     })
 }
-
+//获取单个公开博客的细节
+export function getPublicBlogDetail(id) {
+    return service({
+        method: "GET",
+        url: `/article/public/detail?id=${id}`,
+    })
+}
 
 
 

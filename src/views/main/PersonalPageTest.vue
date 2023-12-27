@@ -59,7 +59,6 @@ const checkDetail = async (index) => {
         localStorage.setItem("article", JSON.stringify(result.data.data))
         router.push("/detail")
     }
-
 }
 
 // about article delete
@@ -141,65 +140,40 @@ const handleContent = () => {
     }
 }
 
+const ChangePrivate = (info, data, userId, isPrivate) => {
+    ElMessageBox.confirm(
+        "此操作将会使此条日记变为" + info + "日记,是否继续?",
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(async () => {
+        const result = await changeArticleStatus(data.id, isPrivate, userId)
+        if (result.data.code == 1) {
+            ElMessage.success({ message: "修改成功！！" })
+            articleArray.value[index].isPrivate = !data.isPrivate
+        }
+
+    }).catch((err) => {
+        CancelChangePrivate(err)
+    })
+}
+
 // about article private or public
 const handlePrivate = (event, index) => {
     event.stopPropagation()
     let data = articleArray.value[index]
+    let userId = JSON.parse(localStorage.getItem('baseInfo')).id
     //如果已经是公开的了，那就变为私密
     if (data.isPrivate == 1) {
-        ElMessageBox.confirm(
-
-            '此操作将会使此条日记变为私密日记,是否继续?',
-            '警告',
-            {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-            }
-        ).then(async () => {
-            const result = await changeArticleStatus(data.id, !data.state)
-            if (result.data.code == 1) {
-                ElMessage.success({ message: "修改成功！！" })
-                articleArray.value[index].isPrivate = !data.isPrivate
-            }
-
-        }).catch(() => {
-            ElMessage({
-                type: 'info',
-                message: '取消修改',
-            })
-        })
+        ChangePrivate("公开", data, userId, false)
     } else {
-        ElMessageBox.confirm(
-            '此操作将会使此条日记变为公开日记,是否继续?',
-            '警告',
-            {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-            }
-        ).then(async () => {
-            const result = await changeArticleStatus(data.id, !data.state)
-            if (result.data.code == 1) {
-                ElMessage.success({ message: "修改成功！！" })
-                articleArray.value[index].isPrivate = !data.isPrivate
-
-            }
-
-        }).catch((err) => {
-            console.log(err)
-            ElMessage({
-                type: 'info',
-                message: '取消修改',
-            })
-        })
+        ChangePrivate("私密", data, userId, true)
     }
 
 }
-
-
-
-
 
 
 onMounted(() => {
@@ -219,7 +193,7 @@ onMounted(() => {
                 <div id="left-content">
                     <span v-if="startTips" class="if-no-content">一篇也没有~~~😑</span>
                     <div v-if="!startTips" class="content-bear wow bounceInLeft" data-wow-duration="2s" :index=key
-                        v-for="(item, key) in  articleArray " @click="checkDetail(key)">
+                        v-for="(item, key) in   articleArray  " @click="checkDetail(key)">
                         <div class="title">{{ item.title }}</div>
                         <div class="time">{{ item.date }}</div>
                         <div class="profile">{{ item.profile }}</div>
@@ -232,8 +206,8 @@ onMounted(() => {
                                 <span>{{ item.commentCount }}</span>
                             </div>
                         </div>
-                        <div class="state_pri" v-if="!item.isPrivate" @click="handlePrivate($event, key, state)">未公开</div>
-                        <div class="state_pub" v-if="item.isPrivate" @click="handlePrivate($event, key, state)">已公开</div>
+                        <div class="state_pri" v-if="item.isPrivate" @click="handlePrivate($event, key, state)">未公开</div>
+                        <div class="state_pub" v-if="!item.isPrivate" @click="handlePrivate($event, key, state)">已公开</div>
                         <div class="icon-more">
                             <!-- 这里是点击这个三个点的按钮之后弹出来的 -->
                             <el-popover :visible="visible.key == key && visible.appear == true" :width="160">
@@ -558,3 +532,4 @@ onMounted(() => {
     }
 }
 </style>
+4400 

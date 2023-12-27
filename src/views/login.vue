@@ -39,6 +39,30 @@ const rules = reactive({
     username: [{ validator: usernameCheck, trigger: 'blur' }],
     password: [{ validator: passwordCheck, trigger: 'blur' }]
 })
+//根据时间显示不同的欢迎信息
+const WelcomeMessageBox = new Map()
+WelcomeMessageBox.set(0, "早上好！新的一天开始了，让我们充满活力地迎接挑战吧！")
+WelcomeMessageBox.set(1, "中午好，休息一下，为下午的工作充电！")
+WelcomeMessageBox.set(2, "下午好！希望你的下午充满活力和创造力！")
+WelcomeMessageBox.set(3, "晚上好,在安静的夜晚一起进步吧！")
+const WelcomeMessageInfo = ref()
+const WelcomeUser = (username) => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+        WelcomeMessageInfo.value = WelcomeMessageBox.get(0)
+    } else if (hour < 14) {
+        WelcomeMessageInfo.value = WelcomeMessageBox.get(1)
+    } else if (hour < 18) {
+        WelcomeMessageInfo.value = WelcomeMessageBox.get(2)
+    } else {
+        WelcomeMessageInfo.value = WelcomeMessageBox.get(3)
+    }
+    ElNotification({
+        title: '欢迎您 ' + username,
+        message: WelcomeMessageInfo.value,
+        type: 'success',
+    })
+}
 
 //submit 
 const submitForm = (formEl) => {
@@ -51,6 +75,7 @@ const submitForm = (formEl) => {
                 localStorage.setItem("baseInfo", JSON.stringify(result.data.data))
                 localStorage.setItem("token", result.data.data.token)
                 router.push("/personal")
+                WelcomeUser(result.data.data.username)
             }
 
         } else {

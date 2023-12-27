@@ -47,7 +47,6 @@ const exitAccount = () => {
 
 }
 
-
 </script>
 <template>
     <div id="header">
