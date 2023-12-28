@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import navigation from '@/components/navigation/navigation.vue'
+import banner from "@/components/aboutImg/bannerInHeader.vue"
 import router from '../../router';
 import { getPublicBlogs, getPublicBlogDetail } from '@/api/index.js'
 const community_content = ref([
@@ -40,6 +41,8 @@ onMounted(() => {
 <template>
     <div id="Community">
         <navigation />
+        <banner />
+
         <div class="Community-container">
             <div v-for="(item, index) in community_content" class="Community-content" @click=getBlogDetail(index)>
                 <h2 class="content-title">{{ item.title }}</h2>

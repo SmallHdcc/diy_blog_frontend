@@ -74,7 +74,7 @@ const submitForm = (formEl) => {
                 //将获取的信息存储到localStorage中
                 localStorage.setItem("baseInfo", JSON.stringify(result.data.data))
                 localStorage.setItem("token", result.data.data.token)
-                router.push("/personal")
+                router.push("/community")
                 WelcomeUser(result.data.data.username)
             }
 
@@ -100,7 +100,7 @@ const wow = new WOW({
     scrollContainer: null,      //可选滚动容器选择器，否则使用window
 })
 
-const loginButton = ref(null)
+
 
 // 监听键盘按下事件
 document.addEventListener('keydown', function (event) {
@@ -135,8 +135,8 @@ onMounted(async () => {
                         <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
                     </el-form-item>
                     <el-form-item>
-                        <button class="login-button" style="" ref="loginButton" type="button"
-                            @keydown.enter="submitForm(ruleFormRef)" @click="submitForm(ruleFormRef)">登录</button>
+                        <button class="login-button" type="button" @keydown.enter="submitForm(ruleFormRef)"
+                            @click="submitForm(ruleFormRef)">登录</button>
                         <!-- <el-button @click="resetForm(ruleFormRef)">重置</el-button> -->
                     </el-form-item>
                 </el-form>

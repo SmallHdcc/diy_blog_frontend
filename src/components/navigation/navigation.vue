@@ -1,10 +1,11 @@
 <script setup>
-import { onBeforeMount, onMounted, ref, watch } from 'vue'
+import { onMounted, provide, ref } from 'vue'
+import Login from '@/components/login/Login.vue';
 import router from '@/router';
 const linkList = ref([
     {
         name: '社区',
-        link: "/community",
+        link: "/",
     },
     {
         name: "个人",
@@ -35,15 +36,25 @@ const handleUserInfoOut = () => {
 
 }
 
+const dialogVisable = ref(false)
+provide('dialogVisable', dialogVisable)
+//这里检测是否登录
+const isLogin = ref(false)
+const userAvatar = ref()
 onMounted(() => {
+    if (localStorage.getItem('baseInfo')) {
+        userAvatar.value = JSON.parse(localStorage.getItem('baseInfo')).avatar
+        isLogin.value = true
+    }
 })
 
-const userAvatar = ref(JSON.parse(localStorage.getItem('baseInfo')).avatar)
 const exitAccount = () => {
     localStorage.removeItem('baseInfo')
     localStorage.removeItem('token')
-    router.push('/')
+
     ElMessage.success({ message: "退出登录成功！！" })
+    //强制刷新
+    window.location.reload()
 
 }
 
@@ -53,7 +64,7 @@ const exitAccount = () => {
         <div id="navigation">
             <div id="web-name"><img src="/img/logo.png" alt=""></div>
             <router-link v-for="item in linkList" :to="item.link">{{ item.name }}</router-link>
-            <div id="navigation-user" @mouseover="handleUserInfoEnter" @mouseout="handleUserInfoOut">
+            <div v-if="isLogin" id="navigation-user" @mouseover="handleUserInfoEnter" @mouseout="handleUserInfoOut">
                 <img id="navigation-user-avatar" :src="userAvatar" alt="">
                 <transition name="fade">
                     <div v-show="ShowUserInfo" id="navigation-user-info">
@@ -70,8 +81,11 @@ const exitAccount = () => {
                     </div>
                 </transition>
             </div>
+            <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
+
             <div @click="exitAccount" id="exit-account">退出</div>
         </div>
+        <Login v-if="dialogVisable" />
     </div>
 </template>
 <style lang="less" scoped>
@@ -172,6 +186,16 @@ const exitAccount = () => {
                 }
             }
 
+        }
+
+        #not_login_in {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            border-radius: 100%;
+            line-height: 40px;
+            color: rgb(135, 200, 238);
+            cursor: pointer;
         }
 
         #exit-account {

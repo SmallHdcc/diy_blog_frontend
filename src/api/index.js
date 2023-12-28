@@ -149,7 +149,7 @@ export function changeArticleStatus(id, isPrivate, userId) {
 export function getPublicBlogs() {
     return service({
         method: "GET",
-        url: `/article/getPublicArticles`,
+        url: `/article/public/getArticles`,
     })
 }
 //获取单个公开博客的细节

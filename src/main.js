@@ -14,19 +14,19 @@ import 'wow.js/css/libs/animate.css'
 
 // 这里是设置路由守卫
 
-router.beforeEach((to, from, next) => {
-    if (to.meta.isAuth) {
-        if (localStorage.getItem("token")) {
-            next()
-        } else {
-            alert("请先登录~")
-            next("/")
-        }
-    } else {
-        next()
-    }
+// router.beforeEach((to, from, next) => {
+//     if (to.meta.isAuth) {
+//         if (localStorage.getItem("token")) {
+//             next()
+//         } else {
+//             alert("请先登录~")
+//             next("/")
+//         }
+//     } else {
+//         next()
+//     }
 
-})
+// })
 //全局后置路由守卫————初始化的时候被调用、每次路由切换之后被调用
 router.afterEach((to, from) => {
     document.title = to.meta.title || "该页没取名😀"   //修改网页的title

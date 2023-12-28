@@ -1,7 +1,7 @@
 <script setup>
 import { pingServer } from '@/api/index.js'
 import { onMounted } from 'vue'
-
+import banner from '@/components/aboutImg/bannerInHeader.vue'
 const notificatServerState = () => {
   ElNotification({
     title: '提示',
@@ -13,7 +13,7 @@ const notificatServerState = () => {
 onMounted(async () => {
   setInterval(async () => {
     const result = await pingServer()
-    if (result.status > 400) {
+    if (result.status > 400 || result.data.data != "pong") {
       notificatServerState()
     }
   }, 6 * 1000)

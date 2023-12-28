@@ -28,20 +28,25 @@ const wow = new WOW({
     scrollContainer: null,      //可选滚动容器选择器，否则使用window
 })
 
+
+//获得所有个人博客
+let userId = ref()
 async function getBlog() {
     // get all blogs
-    let userId = JSON.parse(localStorage.getItem("baseInfo")).id
-    getBlogs(userId).then(res => {
-        let articles = res.data.data
-        articles.forEach(item => {
-            item.tags = toStringArray(item.tags)
+    if (localStorage.getItem("baseInfo")) {
+        userId.value = JSON.parse(localStorage.getItem("baseInfo")).id
+        getBlogs(userId.value).then(res => {
+            let articles = res.data.data
+            articles.forEach(item => {
+                item.tags = toStringArray(item.tags)
+            })
+            articleArray.value = articles
+            handleContent()
+
         })
-        articleArray.value = articles
-        handleContent()
-
-    })
-
-    user = JSON.parse(localStorage.getItem("baseInfo"))
+        user = JSON.parse(localStorage.getItem("baseInfo"))
+    }
+    return
 }
 
 function toStringArray(source) {
@@ -532,4 +537,3 @@ onMounted(() => {
     }
 }
 </style>
-4400 
