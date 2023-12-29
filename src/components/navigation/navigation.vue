@@ -1,19 +1,21 @@
 <script setup>
-import { onMounted, provide, ref } from 'vue'
+import { onMounted, provide, ref, watch } from 'vue'
 import Login from '@/components/login/Login.vue';
-import router from '@/router';
+import { checkToken } from '@/api/index.js'
+
+//设置常量
+const BASE_INFO_KEY = 'baseInfo'
+const TOKEN_KEY = 'token'
+
+const getBaseInfo = () => {
+    const baseInfo = localStorage.getItem(BASE_INFO_KEY);
+    return baseInfo ? JSON.parse(baseInfo) : null;
+}
+
 const linkList = ref([
     {
         name: '社区',
         link: "/",
-    },
-    {
-        name: "个人",
-        link: "/personal"
-    },
-    {
-        name: "反馈",
-        link: "/feedback"
     },
     {
         name: "添加新帖",
@@ -35,23 +37,38 @@ const handleUserInfoOut = () => {
     ShowUserInfo.value = false
 
 }
-
+//父子组件共同控制登录框的显示与隐藏
 const dialogVisable = ref(false)
 provide('dialogVisable', dialogVisable)
 //这里检测是否登录
 const isLogin = ref(false)
+provide('isLogin', isLogin)
 const userAvatar = ref()
-onMounted(() => {
-    if (localStorage.getItem('baseInfo')) {
-        userAvatar.value = JSON.parse(localStorage.getItem('baseInfo')).avatar
-        isLogin.value = true
+
+watch(isLogin, () => {
+    if (isLogin.value == true) {
+        if (getBaseInfo() != null)
+            userAvatar.value = getBaseInfo().avatar
+        else
+            isLogin.value = false
     }
 })
 
+onMounted(async () => {
+    const result = await checkToken()
+    if (result.data.code == 401) {
+        //过期显示登录按钮
+        isLogin.value = false
+    } else {
+        const baseInfo = getBaseInfo()
+        userAvatar.value = baseInfo ? baseInfo.avatar : null
+        isLogin.value = true
+    }
+})
+//退出登录函数
 const exitAccount = () => {
-    localStorage.removeItem('baseInfo')
-    localStorage.removeItem('token')
-
+    localStorage.removeItem(BASE_INFO_KEY)
+    localStorage.removeItem(TOKEN_KEY)
     ElMessage.success({ message: "退出登录成功！！" })
     //强制刷新
     window.location.reload()
@@ -69,6 +86,7 @@ const exitAccount = () => {
                 <transition name="fade">
                     <div v-show="ShowUserInfo" id="navigation-user-info">
                         <div id="navigation-user-info-message">
+                            <div class="message-personal_center"><router-link :to="'/personal'">个人中心</router-link></div>
                             <div class="message-media">
                                 <div class="flexColunmCenter"><span>粉丝</span>66</div>
                                 <div class="flexColunmCenter"><span>关注</span>66</div>
@@ -82,10 +100,10 @@ const exitAccount = () => {
                 </transition>
             </div>
             <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
-
+            <div id="feedback"><router-link :to="'/feedback'">反馈</router-link></div>
             <div @click="exitAccount" id="exit-account">退出</div>
         </div>
-        <Login v-if="dialogVisable" />
+        <Login />
     </div>
 </template>
 <style lang="less" scoped>
@@ -143,8 +161,7 @@ const exitAccount = () => {
             }
 
             #navigation-user-info {
-                // visibility: hidden;
-                // opacity: 0;
+
                 position: absolute;
                 left: -100px;
                 width: 250px;
@@ -183,6 +200,12 @@ const exitAccount = () => {
                             line-height: 20px;
                         }
                     }
+
+                    .message-personal_center {
+                        width: 100%;
+                        text-align: center;
+                        cursor: pointer;
+                    }
                 }
             }
 
@@ -201,6 +224,13 @@ const exitAccount = () => {
         #exit-account {
             position: absolute;
             right: 10px;
+            cursor: pointer;
+            color: red;
+        }
+
+        #feedback {
+            position: absolute;
+            right: 50px;
             cursor: pointer;
         }
     }

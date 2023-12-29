@@ -160,6 +160,14 @@ export function getPublicBlogDetail(id) {
     })
 }
 
+//检查token是否有效
+export function checkToken() {
+    return service({
+        method: "GET",
+        url: `/common/checkToken`,
+    })
+}
+
 
 
 

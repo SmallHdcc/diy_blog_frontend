@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, provide } from 'vue';
 import { getBlogs, getSingleBlogDetail, deleteSingleBlog, uploadAvatar, changeSign, changeArticleStatus } from "@/api"
 import { encrypt } from "@/utils"
 import WOW from 'wow.js'
@@ -95,6 +95,30 @@ const deleteBlog = (index) => {
                 message: '取消删除',
             })
         })
+}
+
+// 有关博客的顺序 将articleArray中的内容按照id进行顺序排序
+const order_count_time = ref(0)
+const sortBlogByTime = () => {
+    if (order_count_time.value == 0) {
+        order_count_time.value = 1
+        articleArray.value.sort((a, b) => {
+            return a.id - b.id
+        })
+    } else {
+        order_count_time.value = 0
+        articleArray.value.sort((a, b) => {
+            return b.id - a.id
+        })
+    }
+
+}
+//按照热度排序
+const sortBlogByPopularity = () => {
+    ElMessage({
+        type: 'info',
+        message: '暂时不支持按照热度排序',
+    })
 }
 
 
@@ -197,6 +221,10 @@ onMounted(() => {
             <div id="showContent">
                 <div id="left-content">
                     <span v-if="startTips" class="if-no-content">一篇也没有~~~😑</span>
+                    <div class="content-order_way">
+                        <span @click="sortBlogByPopularity()">按热度</span>
+                        <span @click="sortBlogByTime()">按时间</span>
+                    </div>
                     <div v-if="!startTips" class="content-bear wow bounceInLeft" data-wow-duration="2s" :index=key
                         v-for="(item, key) in   articleArray  " @click="checkDetail(key)">
                         <div class="title">{{ item.title }}</div>
@@ -346,6 +374,20 @@ onMounted(() => {
             #left-content {
                 width: 70%;
                 // text-align: center;
+
+                .content-order_way {
+
+                    margin: 10px 40px;
+
+                    span {
+                        margin: 0 10px;
+                        cursor: pointer;
+                    }
+
+                    span:hover {
+                        color: rgb(135, 200, 238);
+                    }
+                }
 
                 .if-no-content {
                     font-size: 30px;

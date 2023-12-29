@@ -16,7 +16,6 @@ const getPublicBlogsInPage = async () => {
 }
 
 
-
 const getBlogDetail = async (index) => {
     console.log(community_content.value[index])
     const result = await getPublicBlogDetail(community_content.value[index].id)
@@ -41,8 +40,7 @@ onMounted(() => {
 <template>
     <div id="Community">
         <navigation />
-        <banner />
-
+        <!-- <banner /> -->
         <div class="Community-container">
             <div v-for="(item, index) in community_content" class="Community-content" @click=getBlogDetail(index)>
                 <h2 class="content-title">{{ item.title }}</h2>
@@ -51,6 +49,7 @@ onMounted(() => {
                 <div class="content-auther">{{ item.username }} </div>
             </div>
         </div>
+
     </div>
 </template>
 <style lang="less" scoped>

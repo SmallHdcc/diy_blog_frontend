@@ -1,7 +1,7 @@
 <script setup>
 import { pingServer } from '@/api/index.js'
-import { onMounted } from 'vue'
-import banner from '@/components/aboutImg/bannerInHeader.vue'
+import { onMounted, onUnmounted } from 'vue'
+import { io } from 'socket.io-client';
 const notificatServerState = () => {
   ElNotification({
     title: '提示',
@@ -10,15 +10,37 @@ const notificatServerState = () => {
   })
 }
 
-onMounted(async () => {
-  setInterval(async () => {
-    const result = await pingServer()
-    if (result.status > 400 || result.data.data != "pong") {
+const socket = new WebSocket('ws://localhost:8081/websocket'); // 替换为你的 Spring Boot 服务器的地址和端口号
+
+onMounted(() => {
+  socket.onopen = () => {
+    console.log('Connected to server');
+  }
+
+  //发送心跳包
+  setInterval(() => {
+    socket.send('heartbeat');
+  }, 10000);
+  //接收消息
+  socket.onmessage = (message) => {
+    if (message.data != "heartbeat") {
       notificatServerState()
     }
-  }, 6 * 1000)
+  }
+
+  socket.onerror = (error) => {
+    notificatServerState();
+  }
+
+  socket.onclose = () => {
+    console.log('Disconnected from server');
+    notificatServerState();
+  }
 })
 
+onUnmounted(() => {
+  socket.close();
+});
 </script>
 
 <template>
