@@ -1,11 +1,8 @@
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { ref, reactive, inject } from 'vue'
 import router from '@/router';
 import { ElMessage } from 'element-plus'
-import { login } from '../api'
-import WOW from 'wow.js'
-
-
+import { login } from '@/api'
 const ruleFormRef = ref()
 
 const ruleForm = reactive({
@@ -39,6 +36,7 @@ const rules = reactive({
     username: [{ validator: usernameCheck, trigger: 'blur' }],
     password: [{ validator: passwordCheck, trigger: 'blur' }]
 })
+
 //根据时间显示不同的欢迎信息
 const WelcomeMessageBox = new Map()
 WelcomeMessageBox.set(0, "早上好！新的一天开始了，让我们充满活力地迎接挑战吧！")
@@ -64,6 +62,9 @@ const WelcomeUser = (username) => {
     })
 }
 
+const dialogVisible = inject('dialogVisable')
+const isLogin = inject('isLogin')
+
 //submit 
 const submitForm = (formEl) => {
     if (!formEl) return
@@ -74,7 +75,9 @@ const submitForm = (formEl) => {
                 //将获取的信息存储到localStorage中
                 localStorage.setItem("baseInfo", JSON.stringify(result.data.data))
                 localStorage.setItem("token", result.data.data.token)
-                router.push("/community")
+                dialogVisible.value = false
+                isLogin.value = true
+                router.push("/")
                 WelcomeUser(result.data.data.username)
             }
 
@@ -84,26 +87,11 @@ const submitForm = (formEl) => {
         }
     })
 }
-
-
-// about wow.js
-const wow = new WOW({
-    boxClass: 'wow',            //动画元素的CSS类(默认为wow)
-    animateClass: 'animated',   // CSS类(默认为animation)
-    offset: 0,                  //触发动画时到元素的距离(默认为0)
-    mobile: true,               //在移动设备上触发动画(默认为true)
-    live: true,                 //异步加载内容(默认为true)
-    callback: function (box) {
-        //每次动画开始时触发回调
-        //传入的参数是正在动画的DOM节点
-    },
-    scrollContainer: null,      //可选滚动容器选择器，否则使用window
-})
-
-
-
 // 监听键盘按下事件
 document.addEventListener('keydown', function (event) {
+    if (!isHaveAccount.value) {
+        return
+    }
     // 监听键盘按下事件
     if (event.key === 'Enter') {
         // 回车键被按下
@@ -111,97 +99,83 @@ document.addEventListener('keydown', function (event) {
     }
 })
 
+const isHaveAccount = inject('isHaveAccount')
+//展示注册页面
+const showRegister = () => {
+    isHaveAccount.value = !isHaveAccount.value
+}
 
-onMounted(async () => {
-    wow.init()
-})
+
 
 </script>
-
 <template>
-    <div id="login-page">
-        <div class="container">
-            <div id="login" class="wow bounceInRight">
-                <div class="head-info" style="margin: 50px; letter-spacing: 10px;">
-                    <img src="/img/logo.png" alt="">
-                    <h1>登录</h1>
-                </div>
-                <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="120px"
-                    class="demo-ruleForm">
-                    <el-form-item label="用户名" prop="username">
-                        <el-input v-model="ruleForm.username" autocomplete="off" />
-                    </el-form-item>
-                    <el-form-item label="密码" prop="password">
-                        <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
-                    </el-form-item>
-                    <el-form-item>
-                        <button class="login-button" type="button" @keydown.enter="submitForm(ruleFormRef)"
-                            @click="submitForm(ruleFormRef)">登录</button>
-                        <!-- <el-button @click="resetForm(ruleFormRef)">重置</el-button> -->
-                    </el-form-item>
-                </el-form>
-                <div>
-                    <p>什么,你还没有注册?</p>
-                    <a href="">注册账号</a>
-                </div>
-
+    <div id="login">
+        <el-dialog title="登 录" :style="{ height: '400px' }" v-model="dialogVisible" center draggable>
+            <div class="head-info" style="letter-spacing: 10px;">
+                <img src="/img/logo.png" alt="">
             </div>
-
-        </div>
+            <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="120px"
+                class="demo-ruleForm">
+                <el-form-item label="用户名" prop="username">
+                    <el-input v-model="ruleForm.username" autocomplete="off" />
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
+                </el-form-item>
+                <el-form-item>
+                    <p>还没有账号？<router-link @click="showRegister()" :to="'#'" style="color: #606266;">注册</router-link></p>
+                </el-form-item>
+                <el-form-item>
+                    <button class="login-button" style="" ref="loginButton" type="button"
+                        @keydown.enter="submitForm(ruleFormRef)" @click="submitForm(ruleFormRef)">登录</button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </div>
 </template>
-
 <style lang="less" scoped>
-#login-page {
-    width: 100vw;
-    height: 100vh;
+#login {
+    position: absolute;
+    width: 100%;
+    overflow-x: hidden;
 
-    .container {
+    .el-dialog {
         display: flex;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        // background-image: url(/img/loginBGI.jpg);
-        background-size: 100%;
+        flex-direction: column;
+        align-items: center;
 
-        #login {
-            position: relative;
-            top: 150px;
+        .demo-ruleForm {
+            margin: auto;
+
+        }
+
+        .head-info {
             display: flex;
-            align-items: center;
-            flex-direction: column;
-            width: 600px;
-            height: 500px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 5%;
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+            justify-content: center;
+            margin-bottom: 20px;
 
-            .head-info {
-                h1 {
-                    text-align: center;
-                }
+            img {
+                width: 150px;
+            }
+        }
 
-                img {
-                    width: 200px;
-                }
+        .el-form {
+            width: 60%;
+
+            .el-input {
+                width: 400px;
             }
 
+            :deep(.el-form-item__label) {
+                width: 80px !important;
+                padding: 0px 10px 0px 0px;
+            }
 
-            .el-form {
-                .el-input {
-                    width: 400px;
-                }
-
-                :deep(.el-form-item__label) {
-                    width: 80px !important;
-                }
-
-                :deep(.el-form-item__content) {
-                    display: flex;
-                    justify-content: center;
-                    margin: 0px !important;
-                    width: 100%;
-                }
+            :deep(.el-form-item__content) {
+                display: flex;
+                justify-content: center;
+                margin: 0px !important;
+                width: 100%;
             }
 
             .login-button {
@@ -217,7 +191,11 @@ onMounted(async () => {
                 cursor: pointer;
             }
         }
+
+
     }
 
 }
-</style>
+</style>  
+
+  

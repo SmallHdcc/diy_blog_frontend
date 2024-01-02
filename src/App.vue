@@ -19,7 +19,8 @@ onMounted(() => {
 
   //发送心跳包
   setInterval(() => {
-    socket.send('heartbeat');
+    if (socket.readyState == WebSocket.OPEN)
+      socket.send('heartbeat');
   }, 10000);
   //接收消息
   socket.onmessage = (message) => {
@@ -31,7 +32,6 @@ onMounted(() => {
   socket.onerror = (error) => {
     notificatServerState();
   }
-
   socket.onclose = () => {
     console.log('Disconnected from server');
     notificatServerState();

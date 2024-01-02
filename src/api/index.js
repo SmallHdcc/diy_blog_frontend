@@ -8,7 +8,7 @@ export function pingServer() {
         url: '/common/ping'
     })
 }
-
+//登录接口
 export function login(originalData) {
     const data = {
         ...originalData,
@@ -20,6 +20,34 @@ export function login(originalData) {
         data
     })
 }
+//注册接口
+export function register(originalData) {
+    const data = {
+        ...originalData,
+        password: md5(originalData.password)
+    }
+    return service({
+        method: 'PUT',
+        url: '/user/register',
+        data
+    })
+}
+
+//检查邮箱是否已经注册
+export function checkEmail(email) {
+    return service({
+        method: 'GET',
+        url: `/user/checkEmail?email=${email}`
+    })
+}
+//发送邮件
+export function sendEmail(email) {
+    return service({
+        method: 'GET',
+        url: `/user/sendEmail?email=${email}`
+    })
+}
+
 
 // 博客文章上传
 export function uploadArticle(data) {

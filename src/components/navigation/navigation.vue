@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, provide, ref, watch } from 'vue'
 import Login from '@/components/login/Login.vue';
+import Register from '@/components/login/Register.vue';
+
 import { checkToken } from '@/api/index.js'
 
 //设置常量
@@ -45,6 +47,7 @@ const isLogin = ref(false)
 provide('isLogin', isLogin)
 const userAvatar = ref()
 
+//监视登录状态
 watch(isLogin, () => {
     if (isLogin.value == true) {
         if (getBaseInfo() != null)
@@ -53,6 +56,21 @@ watch(isLogin, () => {
             isLogin.value = false
     }
 })
+
+
+//退出登录函数
+const exitAccount = () => {
+    localStorage.removeItem(BASE_INFO_KEY)
+    localStorage.removeItem(TOKEN_KEY)
+    ElMessage.success({ message: "退出登录成功！！" })
+    //强制刷新
+    window.location.reload()
+
+}
+
+//根据状态展示注册或者是登录窗口
+const isHaveAccount = ref(true)
+provide('isHaveAccount', isHaveAccount)
 
 onMounted(async () => {
     const result = await checkToken()
@@ -65,15 +83,7 @@ onMounted(async () => {
         isLogin.value = true
     }
 })
-//退出登录函数
-const exitAccount = () => {
-    localStorage.removeItem(BASE_INFO_KEY)
-    localStorage.removeItem(TOKEN_KEY)
-    ElMessage.success({ message: "退出登录成功！！" })
-    //强制刷新
-    window.location.reload()
 
-}
 
 </script>
 <template>
@@ -103,7 +113,8 @@ const exitAccount = () => {
             <div id="feedback"><router-link :to="'/feedback'">反馈</router-link></div>
             <div @click="exitAccount" id="exit-account">退出</div>
         </div>
-        <Login />
+        <Login v-show="isHaveAccount" />
+        <Register v-show="!isHaveAccount" />
     </div>
 </template>
 <style lang="less" scoped>
@@ -112,9 +123,7 @@ const exitAccount = () => {
     justify-content: center;
     width: 100%;
     height: 50px;
-    // background-color: pink;
     overflow: hidden;
-    // padding: 0 24px;
 
     #navigation {
         position: fixed;
@@ -236,12 +245,12 @@ const exitAccount = () => {
     }
 }
 
-.flexColunmCenter {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
+// .flexColunmCenter {
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+// }
 
 .fade-enter-active,
 .fade-leave-active {
