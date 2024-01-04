@@ -31,7 +31,7 @@ const onSubmit = async () => {
         if (form.content != null && form.content.trim() != '') {
             //set userId
             form.userId = JSON.parse(localStorage.getItem("baseInfo") || '').id
-            console.log(form.content)
+
             const result = await uploadArticle(form)
             if (result.data.code == 1) {
                 ElMessage.success({ message: "发布成功" })

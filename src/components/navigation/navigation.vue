@@ -1,13 +1,13 @@
 <script setup>
-import { onMounted, provide, ref, watch } from 'vue'
+import { onMounted, provide, ref, nextTick, watch } from 'vue'
 import Login from '@/components/login/Login.vue';
 import Register from '@/components/login/Register.vue';
-
+import WebFunction from '@/components/navigation/WebFunction.vue';
 import { checkToken } from '@/api/index.js'
+import router from '../../router';
 
 //设置常量
 const BASE_INFO_KEY = 'baseInfo'
-const TOKEN_KEY = 'token'
 
 const getBaseInfo = () => {
     const baseInfo = localStorage.getItem(BASE_INFO_KEY);
@@ -19,26 +19,10 @@ const linkList = ref([
         name: '社区',
         link: "/",
     },
-    {
-        name: "添加新帖",
-        link: "/writeArticle"
-    }
 ])
 
 const ShowUserInfo = ref(false)
-//控制头像显示框的隐藏和重现
-const handleUserInfoEnter = () => {
-    const navigationUserAvatar = document.getElementById('navigation-user-avatar')
-    navigationUserAvatar.style.transform = 'translateY(30px) scale(2)'
-    ShowUserInfo.value = true
-}
 
-const handleUserInfoOut = () => {
-    const navigationUserAvatar = document.getElementById('navigation-user-avatar')
-    navigationUserAvatar.style.transform = 'none'
-    ShowUserInfo.value = false
-
-}
 //父子组件共同控制登录框的显示与隐藏
 const dialogVisable = ref(false)
 provide('dialogVisable', dialogVisable)
@@ -58,16 +42,6 @@ watch(isLogin, () => {
 })
 
 
-//退出登录函数
-const exitAccount = () => {
-    localStorage.removeItem(BASE_INFO_KEY)
-    localStorage.removeItem(TOKEN_KEY)
-    ElMessage.success({ message: "退出登录成功！！" })
-    //强制刷新
-    window.location.reload()
-
-}
-
 //根据状态展示注册或者是登录窗口
 const isHaveAccount = ref(true)
 provide('isHaveAccount', isHaveAccount)
@@ -83,6 +57,13 @@ onMounted(async () => {
         isLogin.value = true
     }
 })
+//控制抽屉的显示与隐藏
+const dialog = ref(false)
+provide('username', getBaseInfo() ? getBaseInfo().username : null)
+provide('userAvatar', getBaseInfo() ? getBaseInfo().avatar : null)
+provide('dialog', dialog)
+
+
 
 
 </script>
@@ -90,28 +71,11 @@ onMounted(async () => {
     <div id="header">
         <div id="navigation">
             <div id="web-name"><img src="/img/logo.png" alt=""></div>
-            <router-link v-for="item in linkList" :to="item.link">{{ item.name }}</router-link>
-            <div v-if="isLogin" id="navigation-user" @mouseover="handleUserInfoEnter" @mouseout="handleUserInfoOut">
-                <img id="navigation-user-avatar" :src="userAvatar" alt="">
-                <transition name="fade">
-                    <div v-show="ShowUserInfo" id="navigation-user-info">
-                        <div id="navigation-user-info-message">
-                            <div class="message-personal_center"><router-link :to="'/personal'">个人中心</router-link></div>
-                            <div class="message-media">
-                                <div class="flexColunmCenter"><span>粉丝</span>66</div>
-                                <div class="flexColunmCenter"><span>关注</span>66</div>
-                            </div>
-                            <div class="message-tips">
-                                <span>消息中心</span>
-                                <div class="message-tips-icon">6</div>
-                            </div>
-                        </div>
-                    </div>
-                </transition>
-            </div>
+            <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">{{ item.name }}</router-link>
+            <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
+            <WebFunction />
+
             <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
-            <div id="feedback"><router-link :to="'/feedback'">反馈</router-link></div>
-            <div @click="exitAccount" id="exit-account">退出</div>
         </div>
         <Login v-show="isHaveAccount" />
         <Register v-show="!isHaveAccount" />
@@ -137,13 +101,16 @@ onMounted(async () => {
         box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.1);
         z-index: 99;
 
-        a {
-            margin: 0px 20px;
+        #navigation-user-avatar {
+            position: absolute;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 100%;
+            transition: all 0.5s;
+            cursor: pointer;
         }
 
-        a:hover {
-            color: black;
-        }
 
         #web-name {
             display: flex;
@@ -157,70 +124,16 @@ onMounted(async () => {
         }
 
         #navigation-user {
-            position: relative;
+            position: absolute;
+            right: 20px;
             width: 40px;
             height: 40px;
             border-radius: 100%;
-
-            #navigation-user-avatar {
-                width: 100%;
-                height: 100%;
-                border-radius: 100%;
-                transition: all 0.5s;
-            }
-
-            #navigation-user-info {
-
-                position: absolute;
-                left: -100px;
-                width: 250px;
-                height: 300px;
-                box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
-                background-color: white;
-                border-radius: 4px;
-                z-index: -1;
-
-                #navigation-user-info-message {
-                    width: 100%;
-                    margin-top: 45px;
-
-                    .message-media {
-                        display: flex;
-                        justify-content: space-around;
-                        align-items: center;
-                        width: 100%;
-                        height: 100%;
-                    }
-
-                    .message-tips {
-                        display: flex;
-                        justify-content: center;
-                        width: 100%;
-                        text-align: center;
-                        cursor: pointer;
-
-                        .message-tips-icon {
-                            width: 20px;
-                            height: 20px;
-                            background-color: red;
-                            border-radius: 100%;
-                            color: white;
-                            font-size: 14px;
-                            line-height: 20px;
-                        }
-                    }
-
-                    .message-personal_center {
-                        width: 100%;
-                        text-align: center;
-                        cursor: pointer;
-                    }
-                }
-            }
-
         }
 
         #not_login_in {
+            position: absolute;
+            right: 20px;
             width: 40px;
             height: 40px;
             font-size: 16px;
@@ -230,27 +143,14 @@ onMounted(async () => {
             cursor: pointer;
         }
 
-        #exit-account {
-            position: absolute;
-            right: 10px;
-            cursor: pointer;
-            color: red;
-        }
-
-        #feedback {
-            position: absolute;
-            right: 50px;
-            cursor: pointer;
-        }
     }
+
 }
 
-// .flexColunmCenter {
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: center;
-//     align-items: center;
-// }
+
+.link-hover {
+    color: rgb(135, 200, 238);
+}
 
 .fade-enter-active,
 .fade-leave-active {

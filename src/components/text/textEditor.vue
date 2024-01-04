@@ -129,7 +129,6 @@ const tinymceInit = () => {
 }
 function activated() {
     if (window.tinymce) {
-        console.log("执行")
         tinymceInit()
     }
 }

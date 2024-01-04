@@ -2,30 +2,24 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'login',
-    //   component: () => import('../views/login.vue'),
-    //   meta: { isAuth: false, title: '登录页面' }
-    // },
     {
       path: '/',
       name: 'community',
       component: () => import('../views/main/Community.vue'),
-      meta: { title: '社区' }
+      meta: { isAuth: true, title: '社区' }
     },
     {
       path: '/personal',
       name: "personal",
       component: () => import('../views/main/PersonalPageTest.vue'),
-      meta: { isAuth: true, title: '个人页' }
+      meta: { title: '个人页' }
     },
     {
       path: '/writeArticle',
       name: "article",
       key: 'article',
       component: () => import('../views/write/writeArticle.vue'),
-      meta: { isAuth: true, title: '记录日记' }
+      meta: { title: '记录日记' }
     },
     {
       path: '/detail',

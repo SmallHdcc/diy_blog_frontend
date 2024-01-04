@@ -1,13 +1,7 @@
 import service from '../Service.js'
 import md5 from 'js-md5'
 
-//测试与服务器通信
-export function pingServer() {
-    return service({
-        method: 'GET',
-        url: '/common/ping'
-    })
-}
+
 //登录接口
 export function login(originalData) {
     const data = {
@@ -32,6 +26,14 @@ export function register(originalData) {
         data
     })
 }
+//检查用户名是否已经注册
+export function checkUsername(username) {
+    return service({
+        method: 'GET',
+        url: `/user/checkUsername?username=${username}`
+    })
+}
+
 
 //检查邮箱是否已经注册
 export function checkEmail(email) {

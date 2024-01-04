@@ -4,17 +4,21 @@ import { getBlogs, getSingleBlogDetail, deleteSingleBlog, uploadAvatar, changeSi
 import { encrypt } from "@/utils"
 import WOW from 'wow.js'
 import router from '@/router'
+import navigation from '@/components/navigation/navigation.vue'
 
-
-let articleArray = ref([])
-
-let user = reactive({
-    id: "",
-    username: "",
-    avatar: "",
-    signature: "",
+//开头定义变量
+const BASE_INFO_KEY = JSON.parse(localStorage.getItem("baseInfo"))
+//初始化博客数组
+let blogArray = ref([])
+//初始化用户信息
+let user = ref({
+    id: BASE_INFO_KEY ? BASE_INFO_KEY.id : "",
+    username: BASE_INFO_KEY ? BASE_INFO_KEY.username : "",
+    avatar: BASE_INFO_KEY ? BASE_INFO_KEY.avatar : "",
+    signature: BASE_INFO_KEY ? BASE_INFO_KEY.signature : "",
 })
 
+//博客的进入动画
 const wow = new WOW({
     boxClass: 'wow',            //动画元素的CSS类(默认为wow)
     animateClass: 'animated',   // CSS类(默认为animation)
@@ -28,45 +32,51 @@ const wow = new WOW({
     scrollContainer: null,      //可选滚动容器选择器，否则使用window
 })
 
+//校验个人博客数量是否为0
+const startTips = ref(true)
+const handleContent = (articles) => {
+    if (articles.length != 0) {
+        startTips.value = false
+        blogArray.value = articles
+    }
+}
 
 //获得所有个人博客
 let userId = ref()
-async function getBlog() {
+const getBlog = async () => {
     // get all blogs
     if (localStorage.getItem("baseInfo")) {
-        userId.value = JSON.parse(localStorage.getItem("baseInfo")).id
-        getBlogs(userId.value).then(res => {
+        userId.value = BASE_INFO_KEY.id
+        getBlogs(BASE_INFO_KEY.id).then(res => {
             let articles = res.data.data
             articles.forEach(item => {
                 item.tags = toStringArray(item.tags)
             })
-            articleArray.value = articles
-            handleContent()
-
+            handleContent(articles)
         })
-        user = JSON.parse(localStorage.getItem("baseInfo"))
+        user.value = BASE_INFO_KEY
     }
     return
 }
 
+//处理字符串
 function toStringArray(source) {
     return source.substring(1, source.length - 1).split(',')
 }
 
-// about article detail
+// 博客细节
 const checkDetail = async (index) => {
-    let id = articleArray.value[index].id
-    let userId = JSON.parse(localStorage.getItem("baseInfo")).id
-    let originString = `id=${id}&userId=${userId}`
+    let id = blogArray.value[index].id
+    let originString = `id=${id}&userId=${userId.value}`
     let sign = encrypt(originString)
-    const result = await getSingleBlogDetail(id, userId, sign)
+    const result = await getSingleBlogDetail(id, userId.value, sign)
     if (result.data.code == 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
         router.push("/detail")
     }
 }
 
-// about article delete
+// 博客删除
 const deleteBlog = (index) => {
     ElMessageBox.confirm(
         // 'proxy will permanently delete the file. Continue?',
@@ -79,7 +89,7 @@ const deleteBlog = (index) => {
         }
     )
         .then(async () => {
-            const result = await deleteSingleBlog(articleArray.value[index].id, JSON.parse(localStorage.getItem("baseInfo")).id)
+            const result = await deleteSingleBlog(blogArray.value[index].id, BASE_INFO_KEY.id)
             if (result.data.code == 1) {
                 router.go(0)
                 ElMessage({
@@ -97,22 +107,23 @@ const deleteBlog = (index) => {
         })
 }
 
-// 有关博客的顺序 将articleArray中的内容按照id进行顺序排序
+// 有关博客的顺序 将blogArray中的内容按照id进行顺序排序
 const order_count_time = ref(0)
 const sortBlogByTime = () => {
     if (order_count_time.value == 0) {
         order_count_time.value = 1
-        articleArray.value.sort((a, b) => {
+        blogArray.value.sort((a, b) => {
             return a.id - b.id
         })
     } else {
         order_count_time.value = 0
-        articleArray.value.sort((a, b) => {
+        blogArray.value.sort((a, b) => {
             return b.id - a.id
         })
     }
 
 }
+
 //按照热度排序
 const sortBlogByPopularity = () => {
     ElMessage({
@@ -122,22 +133,24 @@ const sortBlogByPopularity = () => {
 }
 
 
-// about avatar upload and update
+// 关于头像的上传和修改
 const dialogVisible = ref(false)
 
 const avatar = ref()
 const getSonHander = async () => {
-    user.avatar = avatar.value.avatarPath
-    localStorage.setItem("baseInfo", JSON.stringify(user))
+    user.value.avatar = avatar.value.avatarPath
+    localStorage.setItem("baseInfo", JSON.stringify(user.value))
     dialogVisible.value = false
-    let data = user
+    let data = user.value
     const result = await uploadAvatar(data)
     if (result.data.code == 1) {
         ElMessage.success({ message: "图片上传成功！！" })
+        window.location.reload()
     }
 
 }
 
+// 关于用户信息的显示
 const visible = ref({
     key: "",
     appear: false
@@ -157,19 +170,14 @@ const handleSignature = async (new_signature, userId) => {
     signature.value = !signature.value
     const result = await changeSign(new_signature, userId)
     if (result.data.code == 1) {
-        localStorage.setItem("baseInfo", JSON.stringify(user))
+        localStorage.setItem("baseInfo", JSON.stringify(user.value))
         ElMessage.success({ message: "签名修改成功！！" })
     }
 }
 
-const startTips = ref(true)
-const handleContent = () => {
-    if (articleArray.value.length != 0) {
-        startTips.value = false
-    }
-}
 
-const ChangePrivate = (info, data, userId, isPrivate) => {
+
+const ChangePrivate = (info, data, userId, isPrivate, index) => {
     ElMessageBox.confirm(
         "此操作将会使此条日记变为" + info + "日记,是否继续?",
         '警告',
@@ -182,26 +190,22 @@ const ChangePrivate = (info, data, userId, isPrivate) => {
         const result = await changeArticleStatus(data.id, isPrivate, userId)
         if (result.data.code == 1) {
             ElMessage.success({ message: "修改成功！！" })
-            articleArray.value[index].isPrivate = !data.isPrivate
+            blogArray.value[index].isPrivate = !data.isPrivate
         }
 
     }).catch((err) => {
-        CancelChangePrivate(err)
+        console.log(err.message)
     })
 }
 
-// about article private or public
+// 修改日记的公开状态
 const handlePrivate = (event, index) => {
     event.stopPropagation()
-    let data = articleArray.value[index]
-    let userId = JSON.parse(localStorage.getItem('baseInfo')).id
+    let data = blogArray.value[index]
+    let status = data.isPrivate == 1 ? "公开" : "私密"
+    let isPrivate = data.isPrivate != 1
     //如果已经是公开的了，那就变为私密
-    if (data.isPrivate == 1) {
-        ChangePrivate("公开", data, userId, false)
-    } else {
-        ChangePrivate("私密", data, userId, true)
-    }
-
+    ChangePrivate(status, data, BASE_INFO_KEY.id, isPrivate, index)
 }
 
 
@@ -210,23 +214,27 @@ onMounted(() => {
     getBlog()
 })
 
-
 </script>
 
 <template>
     <div id="PersonalPageTest">
-
         <div id="container">
             <navigation />
             <div id="showContent">
                 <div id="left-content">
-                    <span v-if="startTips" class="if-no-content">一篇也没有~~~😑</span>
-                    <div class="content-order_way">
+                    <div v-if="startTips" class="if-no-content">
+                        <div class="content-bear" id="instruction">
+                            <div class="title">欢迎来到SANLINGJIU!</div>
+                            <div class="time">2024-1-1</div>
+                        </div>
+                        一篇记录也没有~~~😑
+                    </div>
+                    <div class="content-order_way" v-if="!startTips">
                         <span @click="sortBlogByPopularity()">按热度</span>
                         <span @click="sortBlogByTime()">按时间</span>
                     </div>
                     <div v-if="!startTips" class="content-bear wow bounceInLeft" data-wow-duration="2s" :index=key
-                        v-for="(item, key) in   articleArray  " @click="checkDetail(key)">
+                        v-for="(item, key) in   blogArray  " @click="checkDetail(key)">
                         <div class="title">{{ item.title }}</div>
                         <div class="time">{{ item.date }}</div>
                         <div class="profile">{{ item.profile }}</div>
@@ -239,8 +247,8 @@ onMounted(() => {
                                 <span>{{ item.commentCount }}</span>
                             </div>
                         </div>
-                        <div class="state_pri" v-if="item.isPrivate" @click="handlePrivate($event, key, state)">未公开</div>
-                        <div class="state_pub" v-if="!item.isPrivate" @click="handlePrivate($event, key, state)">已公开</div>
+                        <div class="state_pri" v-if="item.isPrivate" @click="handlePrivate($event, key)">未公开</div>
+                        <div class="state_pub" v-if="!item.isPrivate" @click="handlePrivate($event, key)">已公开</div>
                         <div class="icon-more">
                             <!-- 这里是点击这个三个点的按钮之后弹出来的 -->
                             <el-popover :visible="visible.key == key && visible.appear == true" :width="160">
@@ -373,7 +381,6 @@ onMounted(() => {
 
             #left-content {
                 width: 70%;
-                // text-align: center;
 
                 .content-order_way {
 
@@ -390,9 +397,15 @@ onMounted(() => {
                 }
 
                 .if-no-content {
+                    display: block;
+                    width: 100%;
                     font-size: 30px;
                     color: #999;
-                    margin-top: 100px;
+                    text-align: center;
+                }
+
+                #instruction {
+                    justify-content: center;
                 }
 
                 .content-bear {
@@ -479,6 +492,13 @@ onMounted(() => {
 
                     }
 
+                    #instructionDetail {
+                        font-size: 16px;
+                        text-align: left;
+                        //首段缩进
+                        text-indent: 2em;
+
+                    }
                 }
 
                 .content-bear:hover {

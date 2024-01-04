@@ -54,10 +54,7 @@ let uploadImage = async () => {
     let cas = cropper.getCroppedCanvas();
     let base64url = cas.toDataURL('image/jpeg');
     cas.toBlob(function (e) {
-        console.log(typeof (e))// 生成Blob的图片格式
-
     });
-    console.log('图片：', base64url); // 生成base64图片的格式
     let str = fileToFormData(base64url)
     const result = await uploadCover(str)
     avatarPath.value = '' + result.data.data
@@ -74,8 +71,6 @@ function fileToFormData(imageStr) {
     let str = base64toFile(imageStr, "file")
     return str
 }
-
-
 
 
 function base64toFile(data, fileName) {

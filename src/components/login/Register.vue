@@ -2,7 +2,7 @@
 import { ref, reactive, inject } from 'vue'
 import router from '@/router';
 import { ElMessage } from 'element-plus'
-import { register, checkEmail, sendEmail } from '@/api'
+import { register, checkUsername, checkEmail, sendEmail } from '@/api'
 import _ from 'lodash';
 const ruleFormRef = ref()
 
@@ -26,15 +26,27 @@ const passwordCheck = (rule, value, callback) => {
     }
     callback()
 }
-const usernameCheck = (rule, value, callback) => {
+const usernameCheck = async (rule, value, callback) => {
     if (value === '') {
         callback(new Error('请输入用户名'))
     } else if (value.length < 4 || value.length > 10) {
         callback(new Error('用户名太短或太长'))
     }
+    let isUsed = await usernameCheck2(value)
+    if (!isUsed) {
+        return callback(new Error('用户名已被注册'))
+    }
     callback()
     // todo: check the format
 }
+
+const usernameCheck2 = _.throttle(async (username) => {
+    const result = await checkUsername(username)
+    if (result.data.code != 1) {
+        return false;
+    }
+    return true
+}, 1000)
 
 const repasswordCheck = (rule, value, callback) => {
     if (value === '') {
@@ -89,6 +101,10 @@ const submitFormRegister = (formEl) => {
             console.log(result.data)
             if (result.data.code === 1) {
                 ElMessage.success("注册成功！")
+                //ruleForm所有属性置空
+                for (let key in ruleForm) {
+                    ruleForm[key] = ''
+                }
                 isHaveAccount.value = !isHaveAccount.value
             }
         } else {
@@ -129,9 +145,6 @@ const showRegister = () => {
 }
 
 
-
-
-
 </script>
 <template>
     <div id="Register">
@@ -142,7 +155,7 @@ const showRegister = () => {
             <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="120px"
                 class="demo-ruleForm">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="ruleForm.username" autocomplete="off" />
+                    <el-input v-model="ruleForm.username" @input="usernameCheck2(ruleForm.username)" autocomplete="off" />
                 </el-form-item>
                 <el-form-item label="密码" prop="password">
                     <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
@@ -160,7 +173,11 @@ const showRegister = () => {
                     <el-button @click="send_email(ruleForm.email)">点击获取</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <p>已经有账号？<router-link @click="showRegister()" :to="'#'" style="color: #606266;">登录</router-link></p>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <p style="display: block;">已经有账号？<router-link @click="showRegister()" :to="'#'"
+                                style="color: #606266;">登录</router-link></p>
+                        <p>请牢记账号密码,暂不支持找回</p>
+                    </div>
                 </el-form-item>
                 <el-form-item>
                     <button class="register-button" style="" ref="loginButton" type="button"

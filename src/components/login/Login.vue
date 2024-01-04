@@ -79,6 +79,8 @@ const submitForm = (formEl) => {
                 isLogin.value = true
                 router.push("/")
                 WelcomeUser(result.data.data.username)
+            } else {
+                ElMessage.error(result.data.msg)
             }
 
         } else {
@@ -88,24 +90,22 @@ const submitForm = (formEl) => {
     })
 }
 // 监听键盘按下事件
-document.addEventListener('keydown', function (event) {
-    if (!isHaveAccount.value) {
-        return
-    }
-    // 监听键盘按下事件
-    if (event.key === 'Enter') {
-        // 回车键被按下
-        submitForm(ruleFormRef.value);
-    }
-})
+// document.addEventListener('keydown', function (event) {
+//     if (!isHaveAccount.value) {
+//         return
+//     }
+//     // 监听键盘按下事件
+//     if (event.key === 'Enter') {
+//         // 回车键被按下
+//         submitForm(ruleFormRef.value);
+//     }
+// })
 
 const isHaveAccount = inject('isHaveAccount')
 //展示注册页面
 const showRegister = () => {
     isHaveAccount.value = !isHaveAccount.value
 }
-
-
 
 </script>
 <template>

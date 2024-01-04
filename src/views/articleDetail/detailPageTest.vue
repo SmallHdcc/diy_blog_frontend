@@ -1,6 +1,5 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-// import "highlight.js/styles/github-dark.css";
 import { uploadComment, getComments, likeTheComment, cancelLikeTheComment } from '@/api'
 import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
@@ -12,6 +11,7 @@ import Prism from "prismjs"
 import "prismjs/themes/prism-one-dark.css"
 // import "prismjs/components/prism-java.js"
 import "prismjs/components/prism-python.js"
+import Navigation from '../../components/navigation/navigation.vue';
 
 
 
@@ -137,7 +137,7 @@ onMounted(() => {
 <template>
     <div id="detailPage">
         <div id="container">
-
+            <Navigation />
             <div id="main" class="wow bounceInUp">
                 <h1 id="title">{{ article.title }}</h1>
                 <span id="date">{{ article.date }}</span>

@@ -1,7 +1,5 @@
 <script setup>
-import { pingServer } from '@/api/index.js'
 import { onMounted, onUnmounted } from 'vue'
-import { io } from 'socket.io-client';
 const notificatServerState = () => {
   ElNotification({
     title: '提示',
@@ -9,8 +7,7 @@ const notificatServerState = () => {
     type: 'error',
   })
 }
-
-const socket = new WebSocket('ws://localhost:8081/websocket'); // 替换为你的 Spring Boot 服务器的地址和端口号
+const socket = new WebSocket('ws://localhost:8081/websocket') // 替换为你的 Spring Boot 服务器的地址和端口号
 
 onMounted(() => {
   socket.onopen = () => {
@@ -40,7 +37,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   socket.close();
-});
+})
+
 </script>
 
 <template>
@@ -83,12 +81,13 @@ div {
 }
 
 #footer {
+  position: absolute;
   display: flex;
   flex-direction: column;
   justify-content: center;
   // position: absolute;
   // bottom: 0px;
-  width: 100vw;
+  width: 100%;
   height: 100px;
   background-color: rgba(255, 255, 255, 0.5);
   // background-color: pink;
@@ -104,6 +103,5 @@ div {
     height: 16px;
     line-height: 16px;
   }
-
 }
 </style>
