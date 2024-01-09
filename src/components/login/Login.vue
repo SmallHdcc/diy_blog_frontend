@@ -89,17 +89,7 @@ const submitForm = (formEl) => {
         }
     })
 }
-// 监听键盘按下事件
-// document.addEventListener('keydown', function (event) {
-//     if (!isHaveAccount.value) {
-//         return
-//     }
-//     // 监听键盘按下事件
-//     if (event.key === 'Enter') {
-//         // 回车键被按下
-//         submitForm(ruleFormRef.value);
-//     }
-// })
+
 
 const isHaveAccount = inject('isHaveAccount')
 //展示注册页面
@@ -110,7 +100,8 @@ const showRegister = () => {
 </script>
 <template>
     <div id="login">
-        <el-dialog title="登 录" :style="{ height: '400px' }" v-model="dialogVisible" center draggable>
+        <el-dialog title="登 录" :style="{ height: '400px' }" v-model="dialogVisible" center draggable
+            @keydown.enter="submitForm(ruleFormRef)">
             <div class="head-info" style="letter-spacing: 10px;">
                 <img src="/img/logo.png" alt="">
             </div>

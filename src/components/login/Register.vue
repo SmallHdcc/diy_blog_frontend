@@ -57,7 +57,7 @@ const repasswordCheck = (rule, value, callback) => {
     callback()
     // todo: check the format
 }
-
+let isUsed = undefined
 const emailCheck = async (rule, value, callback) => {
     let reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
     if (value === '') {
@@ -65,7 +65,7 @@ const emailCheck = async (rule, value, callback) => {
     } else if (!reg.test(value)) {
         callback(new Error('邮箱格式不正确'))
     }
-    let isUsed = await emailCheck2(value)
+    isUsed = await emailCheck2(value)
     if (!isUsed) {
         return callback(new Error('邮箱已被注册'))
     }
@@ -90,7 +90,7 @@ const rules = reactive({
 })
 
 const dialogVisible = inject('dialogVisable')
-const isLogin = inject('isLogin')
+
 
 //submit 
 const submitFormRegister = (formEl) => {
@@ -120,23 +120,17 @@ const send_email = async email => {
         ElMessage.error('请先输入邮箱！')
         return
     }
-    const result = await sendEmail(email)
-    if (result.data.code === 1) {
-        ElMessage.success(result.data.data)
+    if (isUsed) {
+        const result = await sendEmail(email)
+        if (result.data.code === 1) {
+            ElMessage.success(result.data.data)
+        }
+    } else {
+        ElMessage.error('邮箱已被注册！')
     }
+
 }
 
-// 监听键盘按下事件
-document.addEventListener('keydown', function (event) {
-    if (isHaveAccount.value) {
-        return
-    }
-    // 监听键盘按下事件
-    if (event.key === 'Enter') {
-        // 回车键被按下
-        submitFormRegister(ruleFormRef.value);
-    }
-})
 
 //展示注册页面
 const isHaveAccount = inject('isHaveAccount')
@@ -148,28 +142,30 @@ const showRegister = () => {
 </script>
 <template>
     <div id="Register">
-        <el-dialog title="注 册" :style="{ height: '500px' }" v-model="dialogVisible" center draggable>
+        <el-dialog title="注 册" @keydown.enter="submitFormRegister(ruleFormRef)" :style="{ height: '500px' }"
+            v-model="dialogVisible" center draggable>
             <div class="head-info" style="letter-spacing: 10px;">
                 <img src="/img/logo.png" alt="">
             </div>
             <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="120px"
                 class="demo-ruleForm">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="ruleForm.username" @input="usernameCheck2(ruleForm.username)" autocomplete="off" />
+                    <el-input v-model="ruleForm.username" @input="usernameCheck2(ruleForm.username)" autocomplete="off"
+                        clearable />
                 </el-form-item>
                 <el-form-item label="密码" prop="password">
-                    <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
+                    <el-input v-model="ruleForm.password" type="password" autocomplete="off" clearable />
                 </el-form-item>
                 <el-form-item label="重复密码" prop="repassword">
-                    <el-input v-model="ruleForm.repassword" type="password" autocomplete="off" />
+                    <el-input v-model="ruleForm.repassword" type="password" autocomplete="off" clearable />
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">
                     <el-input v-model="ruleForm.email" @input="emailCheck2(ruleForm.email)" type="pasword"
-                        autocomplete="off" />
+                        autocomplete="off" clearable />
                 </el-form-item>
                 <el-form-item style="display: flex;justify-content: space-between;" label="验证码" prop="captcha">
                     <el-input style="width: 200px;margin-right: 20px;" v-model="ruleForm.captcha" type="pasword"
-                        autocomplete="off" />
+                        autocomplete="off" clearable />
                     <el-button @click="send_email(ruleForm.email)">点击获取</el-button>
                 </el-form-item>
                 <el-form-item>

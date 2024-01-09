@@ -8,6 +8,7 @@ const notificatServerState = () => {
   })
 }
 const socket = new WebSocket('ws://localhost:8081/websocket') // 替换为你的 Spring Boot 服务器的地址和端口号
+// const socket = new WebSocket('ws://82.157.251.19:8081/websocket') // 替换为你的 Spring Boot 服务器的地址和端口号
 
 onMounted(() => {
   socket.onopen = () => {

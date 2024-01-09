@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted, provide, ref, nextTick, watch } from 'vue'
+import { onMounted, provide, ref, inject, watch, computed } from 'vue'
 import Login from '@/components/login/Login.vue';
 import Register from '@/components/login/Register.vue';
 import WebFunction from '@/components/navigation/WebFunction.vue';
-import { checkToken } from '@/api/index.js'
+import { checkToken, search } from '@/api/index.js'
 import router from '../../router';
-
+import { ElMessage } from 'element-plus';
+import { Search } from '@element-plus/icons-vue'
 //设置常量
 const BASE_INFO_KEY = 'baseInfo'
 
@@ -21,7 +22,6 @@ const linkList = ref([
     },
 ])
 
-const ShowUserInfo = ref(false)
 
 //父子组件共同控制登录框的显示与隐藏
 const dialogVisable = ref(false)
@@ -29,15 +29,18 @@ provide('dialogVisable', dialogVisable)
 //这里检测是否登录
 const isLogin = ref(false)
 provide('isLogin', isLogin)
-const userAvatar = ref()
 
+const userAvatar = ref(null)
+const username = ref(null)
 //监视登录状态
 watch(isLogin, () => {
-    if (isLogin.value == true) {
-        if (getBaseInfo() != null)
-            userAvatar.value = getBaseInfo().avatar
-        else
+    if (isLogin.value) {
+        const baseInfo = getBaseInfo()
+        username.value = baseInfo?.username ?? null
+        userAvatar.value = baseInfo?.avatar ?? null
+        if (!baseInfo) {
             isLogin.value = false
+        }
     }
 })
 
@@ -46,24 +49,59 @@ watch(isLogin, () => {
 const isHaveAccount = ref(true)
 provide('isHaveAccount', isHaveAccount)
 
+
+//控制抽屉的显示与隐藏
+const dialog = ref(false)
+//传给抽屉子组件
+provide('dialog', dialog)
+provide('username', username)
+provide('userAvatar', userAvatar)
+
+
+const UNAUTHORIZED = 401
 onMounted(async () => {
-    const result = await checkToken()
-    if (result.data.code == 401) {
+    const { data: { code } } = await checkToken()
+    if (code == UNAUTHORIZED) {
         //过期显示登录按钮
         isLogin.value = false
+        ElMessage.warning("请重新登陆")
     } else {
         const baseInfo = getBaseInfo()
+        username.value = baseInfo ? baseInfo.username : null
         userAvatar.value = baseInfo ? baseInfo.avatar : null
         isLogin.value = true
     }
 })
-//控制抽屉的显示与隐藏
-const dialog = ref(false)
-provide('username', getBaseInfo() ? getBaseInfo().username : null)
-provide('userAvatar', getBaseInfo() ? getBaseInfo().avatar : null)
-provide('dialog', dialog)
+
+//搜索功能
+const search_content = ref('')
+const is_show_article_name = ref(false)
+const select_article_name = ref([])
+
+const blogArray = inject('blogArray')
 
 
+
+const search_article = async (value) => {
+    is_show_article_name.value = true
+    const result = await search(value)
+    if (result.data.code === 1) {
+        select_article_name.value = result.data.data.slice(0, 5)
+    }
+}
+//帮我实现一个搜索功能,
+const show_search_result = (value, index) => {
+    if (value === '') {
+        return
+    }
+    if (index === undefined) {
+        blogArray.value = select_article_name.value
+        console.log('blogArray.value:', blogArray.value);
+        return
+    }
+    //以数组的形式传递
+    blogArray.value = [select_article_name.value[index]]
+}
 
 
 </script>
@@ -75,6 +113,15 @@ provide('dialog', dialog)
             <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
             <WebFunction />
 
+            <div id="Search_input">
+                <el-input @focus="is_show_article_name = true" @blur="is_show_article_name = true"
+                    @input="search_article(search_content)" v-model="search_content" class="w-50 m-2" placeholder="点击搜索..."
+                    :prefix-icon="Search" @keydown.enter="show_search_result(search_content)" />
+                <div class="Search_option" v-if="is_show_article_name">
+                    <span v-for="(item, index) in select_article_name" v-html="item.title"
+                        @click="show_search_result('1', index)"></span>
+                </div>
+            </div>
             <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
         </div>
         <Login v-show="isHaveAccount" />
@@ -143,6 +190,32 @@ provide('dialog', dialog)
             cursor: pointer;
         }
 
+        #Search_input {
+            position: absolute;
+            right: 100px;
+
+            .Search_option {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                width: 100%;
+                background-color: white;
+                border-radius: 4px;
+                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+
+                span {
+                    width: 100%;
+                    padding-left: 20px;
+                    font-size: 14px;
+                    margin-bottom: 10px;
+                }
+
+                span:hover {
+                    background-color: rgb(205, 208, 210);
+                    color: white;
+                }
+            }
+        }
     }
 
 }

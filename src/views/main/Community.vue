@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, provide, watch } from 'vue'
 import navigation from '@/components/navigation/navigation.vue'
 import banner from "@/components/aboutImg/bannerInHeader.vue"
 import router from '../../router';
@@ -7,6 +7,8 @@ import { getPublicBlogs, getPublicBlogDetail } from '@/api/index.js'
 const community_content = ref([
     // { title: "社区模块测试", brief: '测试用例', releaseTime: "2023-12-25", username: "developer" }, { title: "社区模块测试", brief: '测试用例', release_time: "2023-12-25", username: "developer" }, { title: "社区模块测试", brief: '测试用例', release_time: "2023-12-25", username: "developer" }
 ])
+provide('blogArray', community_content)
+
 
 const getPublicBlogsInPage = async () => {
     const result = await getPublicBlogs()
@@ -31,7 +33,6 @@ onMounted(() => {
 })
 
 
-//当用户点击的时候，跳转到详情页
 
 
 
@@ -72,7 +73,6 @@ onMounted(() => {
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-
             cursor: pointer;
 
             .content-release_time {

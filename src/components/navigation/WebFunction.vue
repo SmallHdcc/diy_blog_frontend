@@ -1,5 +1,5 @@
 <script setup>
-import { inject } from 'vue'
+import { inject, nextTick, onMounted } from 'vue'
 import router from '../../router';
 //父组件拿值
 const dialog = inject('dialog')
@@ -22,7 +22,6 @@ const exitAccount = () => {
 }
 
 
-
 //未开发
 const notDefined = () => {
     ElMessage.warning({ message: "该功能暂未开发！" })
@@ -31,6 +30,9 @@ const notDefined = () => {
         router.push("/")
     }, 3000);
 }
+
+onMounted(() => {
+})
 
 </script>
 <template>

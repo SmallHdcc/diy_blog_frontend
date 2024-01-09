@@ -190,6 +190,14 @@ export function getPublicBlogDetail(id) {
     })
 }
 
+//搜索功能
+export function search(keyword) {
+    return service({
+        method: "GET",
+        url: `/article/public/search?keyword=${keyword}`,
+    })
+}
+
 //检查token是否有效
 export function checkToken() {
     return service({

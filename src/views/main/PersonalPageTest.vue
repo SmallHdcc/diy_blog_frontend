@@ -9,7 +9,8 @@ import navigation from '@/components/navigation/navigation.vue'
 //开头定义变量
 const BASE_INFO_KEY = JSON.parse(localStorage.getItem("baseInfo"))
 //初始化博客数组
-let blogArray = ref([])
+const blogArray = ref([])
+
 //初始化用户信息
 let user = ref({
     id: BASE_INFO_KEY ? BASE_INFO_KEY.id : "",
