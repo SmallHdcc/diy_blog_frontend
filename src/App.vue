@@ -1,5 +1,6 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, provide } from 'vue'
+import navigation from '@/components/navigation/navigation.vue';
 const notificatServerState = () => {
   ElNotification({
     title: '提示',
@@ -7,43 +8,52 @@ const notificatServerState = () => {
     type: 'error',
   })
 }
-const socket = new WebSocket('ws://localhost:8081/websocket') // 替换为你的 Spring Boot 服务器的地址和端口号
-// const socket = new WebSocket('ws://82.157.251.19:8081/websocket') // 替换为你的 Spring Boot 服务器的地址和端口号
+
+const socket = ref(null)
+
+socket.value = new WebSocket('ws://localhost:8081/websocket')
+// const socket = new WebSocket('ws://82.157.251.19:8081/websocket')
+provide('socket', socket)
 
 onMounted(() => {
-  socket.onopen = () => {
-    console.log('Connected to server');
+  socket.value.onopen = () => {
+    console.log('Connected to server')
+    //如果userId存在则发送userId
+    const userId = localStorage.getItem("baseInfo") ? JSON.parse(localStorage.getItem("baseInfo")).id : null
+    if (userId) {
+      socket.value.send(userId);
+    }
+    //发送心跳包
+    setInterval(() => {
+      if (socket.value.readyState == WebSocket.OPEN)
+        socket.value.send('heartbeat');
+    }, 10000);
   }
 
-  //发送心跳包
-  setInterval(() => {
-    if (socket.readyState == WebSocket.OPEN)
-      socket.send('heartbeat');
-  }, 10000);
   //接收消息
-  socket.onmessage = (message) => {
+  socket.value.onmessage = (message) => {
     if (message.data != "heartbeat") {
       notificatServerState()
     }
   }
 
-  socket.onerror = (error) => {
+  socket.value.onerror = (error) => {
     notificatServerState();
   }
-  socket.onclose = () => {
+  socket.value.onclose = () => {
     console.log('Disconnected from server');
-    notificatServerState();
   }
 })
 
 onUnmounted(() => {
-  socket.close();
+  socket.value.close();
 })
 
 </script>
 
 <template>
   <div>
+    <navigation />
     <router-view v-slot="{ Component }">
       <transition name="slide-fade">
         <component :is="Component" />

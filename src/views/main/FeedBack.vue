@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import navigation from '@/components/navigation/navigation.vue'
+// import navigation from '@/components/navigation/navigation.vue'
 const feedbackInfo = ref('')
 
 const feedback = () => {
@@ -16,7 +16,7 @@ const feedback = () => {
 
 <template>
     <div id="FeedBack">
-        <navigation />
+        <!-- <navigation /> -->
         <h1>写下你的意见！</h1>
         <div id="feed-back-content">
             <textarea v-model="feedbackInfo" name="" id="" cols="30" rows="10"></textarea>

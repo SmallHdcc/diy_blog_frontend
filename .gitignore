@@ -29,4 +29,4 @@ coverage
 node_modules
 discard
 test
-.zip
+*.zip

@@ -6,15 +6,23 @@ const dialog = inject('dialog')
 const username = inject('username')
 const avatar = inject('userAvatar')
 
+
+const socket = inject('socket')
 //退出登录函数
 const exitAccount = () => {
     // 清空所有 localStorage 中的信息
-    localStorage.clear()
+    localStorage.removeItem('baseInfo')
+    localStorage.removeItem('token')
 
     // 在下一个 "tick" 中更新路由
     nextTick(() => {
         router.push('/')
     })
+
+    // 关闭 WebSocket 连接
+    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+        socket.value.close()
+    }
 
     ElMessage.success({ message: "退出登录成功！！" })
     // 强制刷新

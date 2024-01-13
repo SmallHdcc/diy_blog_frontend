@@ -1,12 +1,14 @@
 <script setup>
-import { onMounted, provide, ref, inject, watch, computed } from 'vue'
+import { onMounted, provide, ref, inject, watch } from 'vue'
 import Login from '@/components/login/Login.vue';
 import Register from '@/components/login/Register.vue';
 import WebFunction from '@/components/navigation/WebFunction.vue';
 import { checkToken, search } from '@/api/index.js'
 import router from '../../router';
 import { ElMessage } from 'element-plus';
-import { Search } from '@element-plus/icons-vue'
+import { useArticleStore } from '@/stores/article.js'
+
+
 //设置常量
 const BASE_INFO_KEY = 'baseInfo'
 
@@ -74,35 +76,33 @@ onMounted(async () => {
 })
 
 //搜索功能
-const search_content = ref('')
-const is_show_article_name = ref(false)
+const input_value = ref('')
 const select_article_name = ref([])
 
-const blogArray = inject('blogArray')
-
-
-
-const search_article = async (value) => {
-    is_show_article_name.value = true
-    const result = await search(value)
+const search_article = async () => {
+    const result = await search(input_value.value)
     if (result.data.code === 1) {
         select_article_name.value = result.data.data.slice(0, 5)
     }
 }
-//帮我实现一个搜索功能,
+
+const emit = defineEmits(['search'])
+
+const blogStore = useArticleStore()
 const show_search_result = (value, index) => {
     if (value === '') {
         return
     }
     if (index === undefined) {
-        blogArray.value = select_article_name.value
-        console.log('blogArray.value:', blogArray.value);
+        //传递给父组件
+        blogStore.setBlogs(select_article_name.value)
         return
     }
     //以数组的形式传递
-    blogArray.value = [select_article_name.value[index]]
-}
+    blogStore.setBlogs([select_article_name.value[index]])
+    router.push("/")
 
+}
 
 </script>
 <template>
@@ -112,15 +112,19 @@ const show_search_result = (value, index) => {
             <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">{{ item.name }}</router-link>
             <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
             <WebFunction />
-
             <div id="Search_input">
-                <el-input @focus="is_show_article_name = true" @blur="is_show_article_name = true"
-                    @input="search_article(search_content)" v-model="search_content" class="w-50 m-2" placeholder="点击搜索..."
-                    :prefix-icon="Search" @keydown.enter="show_search_result(search_content)" />
+                <!-- <el-input @focus="is_show_article_name = true" @input="search_article(search_content)"
+                    v-model="search_content" class="w-50 m-2" placeholder="点击搜索..." :prefix-icon="Search"
+                    @keydown.enter="show_search_result(search_content)" />
                 <div class="Search_option" v-if="is_show_article_name">
                     <span v-for="(item, index) in select_article_name" v-html="item.title"
                         @click="show_search_result('1', index)"></span>
-                </div>
+                </div> -->
+                <el-select v-model="input_value" @keydown.enter="show_search_result(input_value, 0)"
+                    @input="search_article()" filterable placeholder="点击搜索..." style="width: 240px">
+                    <el-option v-for="(item, index) in select_article_name" :key="index" :value="item.title"
+                        v-html="item.title" @click="show_search_result('1', index)" />
+                </el-select>
             </div>
             <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
         </div>

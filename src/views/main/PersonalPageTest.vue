@@ -4,7 +4,7 @@ import { getBlogs, getSingleBlogDetail, deleteSingleBlog, uploadAvatar, changeSi
 import { encrypt } from "@/utils"
 import WOW from 'wow.js'
 import router from '@/router'
-import navigation from '@/components/navigation/navigation.vue'
+// import navigation from '@/components/navigation/navigation.vue'
 
 //开头定义变量
 const BASE_INFO_KEY = JSON.parse(localStorage.getItem("baseInfo"))
@@ -203,7 +203,7 @@ const ChangePrivate = (info, data, userId, isPrivate, index) => {
 const handlePrivate = (event, index) => {
     event.stopPropagation()
     let data = blogArray.value[index]
-    let status = data.isPrivate == 1 ? "公开" : "私密"
+    let status = data.isPrivate == 1 ? "私密" : "公开"
     let isPrivate = data.isPrivate != 1
     //如果已经是公开的了，那就变为私密
     ChangePrivate(status, data, BASE_INFO_KEY.id, isPrivate, index)
@@ -220,7 +220,7 @@ onMounted(() => {
 <template>
     <div id="PersonalPageTest">
         <div id="container">
-            <navigation />
+            <!-- <navigation /> -->
             <div id="showContent">
                 <div id="left-content">
                     <div v-if="startTips" class="if-no-content">
@@ -274,6 +274,7 @@ onMounted(() => {
                             </el-popover>
                         </div>
                     </div>
+
                 </div>
                 <div class="right-userInfo wow bounceInUp">
                     <div class="el-card">
@@ -325,7 +326,6 @@ onMounted(() => {
     width: 100%;
     min-height: 100vh;
     background-color: rgb(242, 243, 245);
-
     overflow-x: hidden;
 
     #container {
@@ -335,43 +335,6 @@ onMounted(() => {
         align-items: center;
         width: 100%;
         height: 100%;
-
-        #header {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            height: 50px;
-            // background-color: pink;
-            overflow: hidden;
-            // padding: 0 24px;
-
-            #navigation {
-                position: fixed;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 99%;
-                height: 50px;
-                background-color: white;
-                font-size: 20px;
-                box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.1);
-                z-index: 99;
-
-                ul {
-                    display: flex;
-
-                    li {
-                        margin: 0px 10px;
-                        cursor: pointer;
-                    }
-                }
-
-                #add-new-blog {
-                    padding-right: 40px;
-                }
-
-            }
-        }
 
 
         #showContent {

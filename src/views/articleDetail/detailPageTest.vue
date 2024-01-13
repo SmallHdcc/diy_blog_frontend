@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { uploadComment, getComments, likeTheComment, cancelLikeTheComment } from '@/api'
 import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
@@ -11,14 +11,32 @@ import Prism from "prismjs"
 import "prismjs/themes/prism-one-dark.css"
 // import "prismjs/components/prism-java.js"
 import "prismjs/components/prism-python.js"
-import Navigation from '../../components/navigation/navigation.vue';
+// import Navigation from '../../components/navigation/navigation.vue';
 
+import { useUserStore } from '@/stores/user.js';
 
+const getBaseInfo = () => {
+    return JSON.parse(localStorage.getItem("baseInfo"))
+}
+
+const userStore = useUserStore()
+let isLogin = userStore.isLogin
+
+watch(() => userStore.isLogin, (newVal, oldVal) => {
+    if (newVal) {
+        userAvatar.value = getBaseInfo().avatar
+        console.log(userAvatar.value)
+    } else {
+        userAvatar.value = null
+    }
+
+})
 
 
 
 const article = ref({
-    title: '测试文章',
+    title: '',
+    username: '',
     date: '',
     content: ''
 })
@@ -45,8 +63,11 @@ const commentArray = ref([
 
 /*here is about commnet*/
 
-const userAvatar = ref(JSON.parse(localStorage.getItem("baseInfo")).avatar)
-
+const userAvatar = ref('')
+if (getBaseInfo()) {
+    userAvatar.value = getBaseInfo().avatar
+    isLogin = true
+}
 
 const commentInput = ref()
 // 这是要提交的data
@@ -77,7 +98,10 @@ const uploadCommentData = async () => {
 let commentNumber = ref()
 
 const getCommentInPage = async () => {
-    const result = await getComments(JSON.parse(localStorage.getItem("article")).id, JSON.parse(localStorage.getItem("baseInfo")).id)
+    const articleId = JSON.parse(localStorage.getItem("article")).id
+    const baseInfo = JSON.parse(localStorage.getItem("baseInfo"))
+    const userId = baseInfo && baseInfo.id ? baseInfo.id : null
+    const result = await getComments(articleId, userId)
     if (result.data.code == 1) {
         // 格式化时间
         result.data.data.forEach((item, key) => {
@@ -106,8 +130,6 @@ const likeTheCommentInPage = async (index) => {
         userId: JSON.parse(localStorage.getItem("baseInfo")).id,
         id: commentArray.value[index].id,
     }
-    //根据
-    console.log(commentArray.value[index].isLiked)
     if (commentArray.value[index].isLiked) {
         // 调用取消点赞接口
         debounceCancelLikeTheComment(data)
@@ -126,7 +148,8 @@ const likeTheCommentInPage = async (index) => {
 onMounted(() => {
     wow.init()
     article.value = JSON.parse(localStorage.getItem("article"))
-    getCommentInPage()
+    if (JSON.parse(localStorage.getItem("baseInfo")))
+        getCommentInPage()
     setTimeout(() => {
         Prism.highlightAll()// 全局代码高亮
     }, 100)
@@ -137,27 +160,34 @@ onMounted(() => {
 <template>
     <div id="detailPage">
         <div id="container">
-            <Navigation />
             <div id="main" class="wow bounceInUp">
                 <h1 id="title">{{ article.title }}</h1>
-                <span id="date">{{ article.date }}</span>
-                <!--  -->
+                <div id="baseInfo">
+                    <span id="date">Date: {{ article.date }}</span>
+                    <span id="username">Auther: {{ article.username }}</span>
+                </div>
+                <!--  柔和分割线-->
+                <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
+
                 <div id="content" style="white-space: pre-wrap;padding: 10px;" v-html="article.content">
                 </div>
                 <div class="comment">
+                    <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
+
                     <div id="comment-font-box">
                         <h2>评论</h2>
                         <span>{{ commentNumber }}</span>
                     </div>
                     <div id="comment-input-box">
                         <div id="username-avatar">
-                            <img :src=userAvatar alt="">
+                            <img v-if="isLogin" :src=userAvatar alt="">
+                            <div v-if="!isLogin">请先登录</div>
                         </div>
                         <div id="input-container">
-                            <textarea v-model="commentInput" style="resize: none;font-family: -apple-system;" name=""
+                            <textarea v-model="commentInput" style=" resize: none;font-family: -apple-system;" name=""
                                 placeholder="发表一条评论吧" cols="30" rows="10"></textarea>
                         </div>
-                        <div id="input-commit-button" @click="uploadCommentData">发布</div>
+                        <div :disabled="isLogin" id="input-commit-button" @click="uploadCommentData">发布</div>
                     </div>
                     <div id="comment-list-box">
                         <div class="comment-list" v-for="(item, key) in commentArray">
@@ -187,12 +217,9 @@ onMounted(() => {
     // height: 100;
     // height: 100%;
     min-height: 100vh;
-    background-image: url(/img/detailBGI.jpg);
+    background-color: rgb(234, 239, 245);
     background-attachment: fixed;
     background-size: 100%;
-
-
-
 
     #container {
         display: flex;
@@ -201,46 +228,52 @@ onMounted(() => {
         width: 100%;
         height: 100%;
 
-        #header {
-            position: fixed;
-            width: 100%;
-            height: 50px;
-            background-color: rgba(100, 227, 155, 0.7);
-        }
-
         #main {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 75%;
+            width: 55%;
             // background-color: rgba(255, 255, 255, 0.5);
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255);
             border-radius: 10px;
-            margin: 60px 0px;
+            margin: 10px 0px 30px 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            z-index: 0;
 
-            #date {
-                font-size: 24px;
-                color: rgb(25, 22, 23)
+            #baseInfo {
+                display: flex;
+                flex-direction: column;
+                font-size: 20px;
+
+                #date {
+                    color: rgb(25, 22, 23)
+                }
+
             }
+
 
             #title {
                 margin: 100px 0px 50px 0px;
             }
 
+
+
             #content {
-                // text-indent: 2rem;
+                width: 85%;
+                height: 100%;
                 margin: 0px 20px;
                 font-size: 20px;
-                width: 100%;
-                height: 100%;
 
+                code {
+                    font-size: 14px;
+                }
             }
 
             .comment {
                 display: flex;
                 flex-direction: column;
                 width: 100%;
+                margin-top: 70px;
 
                 #comment-font-box {
                     display: flex;
@@ -255,7 +288,7 @@ onMounted(() => {
 
                 #comment-input-box {
                     display: flex;
-                    width: 70%;
+                    width: 80%;
                     margin-top: 30px;
 
                     #username-avatar {
@@ -269,6 +302,18 @@ onMounted(() => {
                             width: 100%;
                             height: 100%;
                             border-radius: 100%;
+                        }
+
+                        div {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 100%;
+                            background-color: rgb(99, 204, 131);
+                            color: white;
+                            font-size: 14px;
                         }
                     }
 
@@ -285,7 +330,8 @@ onMounted(() => {
                             border: none;
                             background-color: #E0E0E0;
                             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-
+                            //文字缩进
+                            padding: 10px;
                         }
 
                         textarea:hover {
