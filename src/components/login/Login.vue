@@ -70,28 +70,6 @@ const dialogVisible = inject('dialogVisable')
 const isLogin = inject('isLogin')
 
 
-const socket = inject('socket')
-//关闭旧的websocket连接并建立新的
-const build_new_websocket = (userId) => {
-    // 关闭旧的 WebSocket 连接
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-        socket.value.close()
-    }
-
-    // 建立新的 WebSocket 连接
-    socket.value = new WebSocket('ws://localhost:8081/websocket')
-
-    socket.value.onopen = () => {
-        console.log('Connected to server');
-        // 发送用户 ID
-        socket.value.send(userId);
-    }
-    socket.value.onmessage = (event) => {
-        console.log(event.data)
-    }
-}
-
-
 //submit 
 const submitForm = (formEl) => {
     if (!formEl) return
@@ -102,8 +80,6 @@ const submitForm = (formEl) => {
                 //将获取的信息存储到localStorage中
                 localStorage.setItem("baseInfo", JSON.stringify(result.data.data))
                 localStorage.setItem("token", result.data.data.token)
-
-                build_new_websocket(result.data.data.id)
                 dialogVisible.value = false
                 isLogin.value = true
                 store.login()

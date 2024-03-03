@@ -1,17 +1,18 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
-import { uploadComment, getComments, likeTheComment, cancelLikeTheComment } from '@/api'
+/*--评论相关接口--*/
+import { uploadComment, getComments, likeTheComment, cancelLikeTheComment } from '@/api/comment.js'
+/*--动画相关--*/
 import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
 import thumbsUp from '@/components/icon/thumbsUp.vue';
-// 防抖
+/*--防抖--*/
 import { debounce } from 'lodash'
-// 代码高亮
+/*--代码高亮--*/
 import Prism from "prismjs"
 import "prismjs/themes/prism-one-dark.css"
-// import "prismjs/components/prism-java.js"
 import "prismjs/components/prism-python.js"
-// import Navigation from '../../components/navigation/navigation.vue';
+
 
 import { useUserStore } from '@/stores/user.js';
 
@@ -38,6 +39,7 @@ const article = ref({
     title: '',
     username: '',
     date: '',
+    heat:'',
     content: ''
 })
 
@@ -119,26 +121,24 @@ const getCommentInPage = async () => {
     }
 }
 
-//防抖的使用
+//防抖的使用 点赞
 
-const debounceLikeTheComment = debounce(likeTheComment, 500)
-const debounceCancelLikeTheComment = debounce(cancelLikeTheComment, 500)
+const debounceLikeTheComment = debounce(likeTheComment, 1500)
+const debounceCancelLikeTheComment = debounce(cancelLikeTheComment, 1500)
 
 
 const likeTheCommentInPage = async (index) => {
-    let data = {
-        userId: JSON.parse(localStorage.getItem("baseInfo")).id,
-        id: commentArray.value[index].id,
-    }
     if (commentArray.value[index].isLiked) {
         // 调用取消点赞接口
-        debounceCancelLikeTheComment(data)
         commentArray.value[index].isLiked = false
         commentArray.value[index].likeCount--
+        console.log(commentArray.value[index].likeCount)
+        debounceCancelLikeTheComment(commentArray.value[index].id)
     } else {
-        debounceLikeTheComment(data)
         commentArray.value[index].isLiked = true
         commentArray.value[index].likeCount++
+        console.log(commentArray.value[index].likeCount)
+        debounceLikeTheComment(commentArray.value[index].id)
     }
 
 }
@@ -163,8 +163,24 @@ onMounted(() => {
             <div id="main" class="wow bounceInUp">
                 <h1 id="title">{{ article.title }}</h1>
                 <div id="baseInfo">
-                    <span id="date">Date: {{ article.date }}</span>
-                    <span id="username">Auther: {{ article.username }}</span>
+                    <span id="date">
+                        <el-icon style="margin-right: 10px;">
+                            <Calendar />
+                        </el-icon>
+                        <span>{{ article.date }}</span> 
+                    </span>
+                    <span id="heat">
+                        <el-icon style="margin-right: 10px;">
+                            <View />
+                        </el-icon>
+                        <span>{{ article.views+1 }}</span>
+                    </span>
+                    <span id="username">
+                        <el-icon style="margin-right: 10px;">
+                            <User />
+                        </el-icon>
+                        <span>{{ article.username }}</span>
+                    </span>
                 </div>
                 <!--  柔和分割线-->
                 <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
@@ -242,20 +258,20 @@ onMounted(() => {
 
             #baseInfo {
                 display: flex;
-                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
                 font-size: 20px;
-
-                #date {
-                    color: rgb(25, 22, 23)
+                width: 60%;
+                #heat,#date,#username {
+                    display: flex;
+                    align-items: center;
                 }
-
             }
 
 
             #title {
                 margin: 100px 0px 50px 0px;
             }
-
 
 
             #content {

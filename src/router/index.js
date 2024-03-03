@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/personal',
       name: "personal",
-      component: () => import('../views/main/PersonalPageTest.vue'),
+      component: () => import('../views/main/PersonalPage.vue'),
       meta: { title: '个人页' }
     },
     {
@@ -24,7 +24,7 @@ const router = createRouter({
     {
       path: '/detail',
       name: "detail",
-      component: () => import('../views/articleDetail/detailPageTest.vue'),
+      component: () => import('../views/articleDetail/detailPage.vue'),
       meta: { isAuth: true, title: '日记详情' }
     },
     {

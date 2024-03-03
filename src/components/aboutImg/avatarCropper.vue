@@ -3,7 +3,7 @@ import { nextTick, onMounted, ref } from 'vue';
 import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
 import { ElMessage } from 'element-plus';
-import { uploadCover } from "@/api"
+import { uploadCover } from "@/api/blog.js"
 const props = defineProps({
     // 形状
     shape: {

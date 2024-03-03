@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref, nextTick, onMounted, watch } from 'vue'
-import { uploadArticle, uploadCover } from "@/api"
+import { uploadArticle ,uploadCover} from "@/api/blog.js"
 import textEditor from '../../components/text/textEditor.vue';
 import { ElMessage } from 'element-plus'
 import router from '../../router';
@@ -134,7 +134,7 @@ onMounted(() => {
 
 <template>
     <div id="writeArticle">
-        <navigation />
+        <!-- <navigation /> -->
         <div id="container">
             <h1 id="header-line">写下今天的Blog</h1>
             <el-form :rules="rules" :model="form" label-width="120px" ref="ruleFormRef">

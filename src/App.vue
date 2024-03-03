@@ -1,53 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, provide } from 'vue'
 import navigation from '@/components/navigation/navigation.vue';
-const notificatServerState = () => {
-  ElNotification({
-    title: '提示',
-    message: '服务器失效',
-    type: 'error',
-  })
-}
-
-const socket = ref(null)
-
-socket.value = new WebSocket('ws://localhost:8081/websocket')
-// const socket = new WebSocket('ws://82.157.251.19:8081/websocket')
-provide('socket', socket)
-
-onMounted(() => {
-  socket.value.onopen = () => {
-    console.log('Connected to server')
-    //如果userId存在则发送userId
-    const userId = localStorage.getItem("baseInfo") ? JSON.parse(localStorage.getItem("baseInfo")).id : null
-    if (userId) {
-      socket.value.send(userId);
-    }
-    //发送心跳包
-    setInterval(() => {
-      if (socket.value.readyState == WebSocket.OPEN)
-        socket.value.send('heartbeat');
-    }, 10000);
-  }
-
-  //接收消息
-  socket.value.onmessage = (message) => {
-    if (message.data != "heartbeat") {
-      notificatServerState()
-    }
-  }
-
-  socket.value.onerror = (error) => {
-    notificatServerState();
-  }
-  socket.value.onclose = () => {
-    console.log('Disconnected from server');
-  }
-})
-
-onUnmounted(() => {
-  socket.value.close();
-})
 
 </script>
 

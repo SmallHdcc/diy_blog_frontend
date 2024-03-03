@@ -1,10 +1,15 @@
 <script setup>
 import { ref, onMounted, reactive, provide } from 'vue';
-import { getBlogs, getSingleBlogDetail, deleteSingleBlog, uploadAvatar, changeSign, changeArticleStatus } from "@/api"
+/*--引入博客相关接口--*/
+import { getBlogs, getSingleBlogDetail, deleteSingleBlog, changeArticleStatus } from "@/api/blog.js"
+/*--引入用户相关接口--*/
+import { uploadAvatar, changeSign } from "@/api/index.js"
 import { encrypt } from "@/utils"
+/*--动画相关--*/
 import WOW from 'wow.js'
+/*--路由器--*/
 import router from '@/router'
-// import navigation from '@/components/navigation/navigation.vue'
+
 
 //开头定义变量
 const BASE_INFO_KEY = JSON.parse(localStorage.getItem("baseInfo"))
@@ -48,7 +53,7 @@ const getBlog = async () => {
     // get all blogs
     if (localStorage.getItem("baseInfo")) {
         userId.value = BASE_INFO_KEY.id
-        getBlogs(BASE_INFO_KEY.id).then(res => {
+        getBlogs().then(res => {
             let articles = res.data.data
             articles.forEach(item => {
                 item.tags = toStringArray(item.tags)
@@ -122,15 +127,21 @@ const sortBlogByTime = () => {
             return b.id - a.id
         })
     }
-
 }
-
+const order_count_heat = ref(0)
 //按照热度排序
 const sortBlogByPopularity = () => {
-    ElMessage({
-        type: 'info',
-        message: '暂时不支持按照热度排序',
-    })
+    if (order_count_heat.value == 0) {
+        order_count_heat.value = 1
+        blogArray.value.sort((a, b) => {
+            return a.heat - b.heat
+        })
+    } else {
+        order_count_heat.value = 0
+        blogArray.value.sort((a, b) => {
+            return b.heat - a.heat
+        })
+    }
 }
 
 
@@ -178,7 +189,7 @@ const handleSignature = async (new_signature, userId) => {
 
 
 
-const ChangePrivate = (info, data, userId, isPrivate, index) => {
+const ChangePrivate = (info, data, isPrivate, index) => {
     ElMessageBox.confirm(
         "此操作将会使此条日记变为" + info + "日记,是否继续?",
         '警告',
@@ -188,7 +199,7 @@ const ChangePrivate = (info, data, userId, isPrivate, index) => {
             type: 'warning',
         }
     ).then(async () => {
-        const result = await changeArticleStatus(data.id, isPrivate, userId)
+        const result = await changeArticleStatus(data.id, isPrivate)
         if (result.data.code == 1) {
             ElMessage.success({ message: "修改成功！！" })
             blogArray.value[index].isPrivate = !data.isPrivate
@@ -206,7 +217,7 @@ const handlePrivate = (event, index) => {
     let status = data.isPrivate == 1 ? "私密" : "公开"
     let isPrivate = data.isPrivate != 1
     //如果已经是公开的了，那就变为私密
-    ChangePrivate(status, data, BASE_INFO_KEY.id, isPrivate, index)
+    ChangePrivate(status, data, isPrivate, index)
 }
 
 
@@ -303,6 +314,7 @@ onMounted(() => {
                     </div>
                     <el-dialog v-model="dialogVisible" title="更换头像" width="30%">
                         <avatarCropper style="display: flex; justify-content: center;" ref='avatar'></avatarCropper>
+
                         <template #footer>
                             <span class="dialog-footer">
                                 <el-button @click="dialogVisible = false">取消</el-button>
