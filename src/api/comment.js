@@ -39,3 +39,15 @@ export function isLikeTheComment(id, userId) {
         url: `/comment/like?id=${id}&userId=${userId}`,
     })
 }
+
+//根据id删除评论
+export function deleteComment(id) {
+    return service({
+        method: "DELETE",
+        url: `/comment?id=${id}`
+    })
+
+
+}
+
+

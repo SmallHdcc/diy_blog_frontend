@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
 /*--评论相关接口--*/
-import { uploadComment, getComments, likeTheComment, cancelLikeTheComment } from '@/api/comment.js'
+import { uploadComment, getComments, likeTheComment, cancelLikeTheComment, deleteComment } from '@/api/comment.js'
 /*--动画相关--*/
 import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
@@ -39,7 +39,7 @@ const article = ref({
     title: '',
     username: '',
     date: '',
-    heat:'',
+    heat: '',
     content: ''
 })
 
@@ -143,6 +143,15 @@ const likeTheCommentInPage = async (index) => {
 
 }
 
+const deleteCommentInPage = async (index) => {
+    const result = await deleteComment(commentArray.value[index].id)
+    if (result.data.code == 1) {
+        //从数组中删除元素
+        commentArray.value.splice(index, 1)
+        ElMessage.success("删除成功")
+    }
+
+}
 
 
 onMounted(() => {
@@ -157,6 +166,7 @@ onMounted(() => {
 
 
 </script>
+
 <template>
     <div id="detailPage">
         <div id="container">
@@ -167,13 +177,13 @@ onMounted(() => {
                         <el-icon style="margin-right: 10px;">
                             <Calendar />
                         </el-icon>
-                        <span>{{ article.date }}</span> 
+                        <span>{{ article.date }}</span>
                     </span>
                     <span id="heat">
                         <el-icon style="margin-right: 10px;">
                             <View />
                         </el-icon>
-                        <span>{{ article.views+1 }}</span>
+                        <span>{{ article.views + 1 }}</span>
                     </span>
                     <span id="username">
                         <el-icon style="margin-right: 10px;">
@@ -218,6 +228,7 @@ onMounted(() => {
                                             style="width: 100%;height: 100%; color: green;" />
                                         <span>{{ item.likeCount }}</span>
                                     </div>
+                                    <div class="delete-btn" @click="deleteCommentInPage(key)">删除</div>
                                 </div>
                             </div>
                         </div>
@@ -227,6 +238,7 @@ onMounted(() => {
         </div>
     </div>
 </template>
+
 <style lang="less" scoped>
 #detailPage {
     width: 100%;
@@ -262,7 +274,10 @@ onMounted(() => {
                 justify-content: space-between;
                 font-size: 20px;
                 width: 60%;
-                #heat,#date,#username {
+
+                #heat,
+                #date,
+                #username {
                     display: flex;
                     align-items: center;
                 }
@@ -410,15 +425,26 @@ onMounted(() => {
 
                             .comment-interaction {
                                 display: flex;
+                                position: relative;
                                 // justify-content: space-between;
                                 font-size: 16px;
                                 color: rgba(0, 0, 0, 0.5);
+                                box-sizing: border-box;
 
                                 .thumbs {
                                     display: flex;
                                     align-items: center;
+                                    position: absolute;
+                                    right: 100px;
                                     width: 40px;
                                     height: 25px;
+                                    cursor: pointer;
+                                }
+
+
+                                .delete-btn {
+                                    position: absolute;
+                                    right: 0;
                                     cursor: pointer;
                                 }
                             }

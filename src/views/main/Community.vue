@@ -70,35 +70,39 @@ onMounted(() => {
 
 <template>
     <div id="Community">
-        <div class="Community-container">
-            <div v-for="(item, index) in community_content" class="Community-content" @click=getBlogDetail(index)>
-                <h2 class="content-title">{{ item.title }}</h2>
-                <div class="content-brief">{{ item.brief }}</div>
-                <div class="content-release_time">{{ item.releaseTime }}</div>
-                <div class="content-auther">
-                    <el-icon style="margin-right: 5px;">
-                        <View />
-                    </el-icon>
-                    <span style="margin-right: 10px;">{{ item.views }}</span>
-                    <span>{{ item.username }} </span>
+        <div class="container">
+            <div class="container-center-content">
+                <div v-for="(item, index) in community_content" class="Community-content" @click=getBlogDetail(index)>
+                    <div class="content-image"><img src="/img/mainPageBGI.jpg" alt=""></div>
+                    <div class="content-info">
+                        <h2 class="content-title">{{ item.title }}</h2>
+                        <div class="content-brief">{{ item.brief }}</div>
+                        <div class="content-release_time">{{ item.releaseTime }}</div>
+                        <div class="content-auther">
+                            <el-icon style="margin-right: 5px;">
+                                <View />
+                            </el-icon>
+                            <span style="margin-right: 10px;">{{ item.views }}</span>
+                            <span>{{ item.username }} </span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="Community-side-list">
-            <div class="side-bar side-common">
-                <h2>希望今天是美好的😂</h2>
-            </div>
-            <div class="side-list side-common">
-                <h2>热门帖🔥</h2>
-                <div v-for="(item, index) in heat_list">
-                    <div class="side-list-element">
-                        <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
-                        {{ item.articleTitle }}
+            <div class="container-side-list">
+                <div class="side-bar side-common">
+                    <h2>希望今天是美好的😂</h2>
+                </div>
+                <div class="side-list side-common">
+                    <h2>热门帖🔥</h2>
+                    <div v-for="(item, index) in heat_list">
+                        <div class="side-list-element">
+                            <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
+                            {{ item.articleTitle }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -109,88 +113,133 @@ onMounted(() => {
     width: 100vw;
     background-color: rgb(234, 239, 245);
 
-    .Community-side-list {
-        width: 20%;
-        margin: 10px 30px 0px 20px;
 
-        .side-common {
-            border-radius: 5px;
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+    .container {
+        display: flex;
+        justify-content: center;
+        width: 70%;
+
+        .container-side-list {
+            position: static;
+            top: 0;
+            width: 29%;
+            margin: 10px 30px 0px 20px;
+
+            .side-common {
+                border-radius: 5px;
+                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+            }
+
+            .side-bar {
+                width: 100%;
+                height: 20vh;
+                background-color: white;
+                margin-bottom: 40px;
+                text-align: center;
+                line-height: 20vh;
+            }
+
+            .side-list {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                width: 100%;
+                height: 40vh;
+                background-color: white;
+                overflow-y: hidden;
+                padding-left: 20px;
+
+                .side-list-element {
+                    width: 100%;
+                    cursor: pointer;
+                }
+            }
         }
 
-        .side-bar {
-            width: 100%;
-            height: 20vh;
-            background-color: white;
-            margin-bottom: 40px;
-            text-align: center;
-            line-height: 20vh;
-        }
-
-        .side-list {
+        .container-center-content {
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
-            width: 100%;
-            height: 40vh;
-            background-color: white;
-            overflow-y: hidden;
-            padding-left: 20px;
-
-            .side-list-element {
-                width: 100%;
-                cursor: pointer;
-            }
-        }
-    }
+            align-items: center;
+            width: 71%;
+            min-height: 100vh;
 
 
-    .Community-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 50%;
-        min-height: 100vh;
-
-
-        .Community-content {
-            position: relative;
-            width: 100%;
-            height: 150px;
-            // background-color: pink;
-            margin: 10px 0px;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-            background-color: white;
-            transition: all 0.5s;
-            cursor: pointer;
-
-            .content-release_time {
-                position: absolute;
-                bottom: 20px;
-                right: 0px;
-                padding: 0 15px 0 0;
-
-            }
-
-            .content-auther {
+            .Community-content {
+                position: relative;
                 display: flex;
                 align-items: center;
-                position: absolute;
-                bottom: 0px;
-                right: 0px;
-                padding: 0 15px 0 0;
+                width: 100%;
+                height: 200px;
+                // background-color: pink;
+                margin: 10px 0px;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+                background-color: white;
+                transition: all 0.5s;
+                cursor: pointer;
+
+                .content-info {
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    width: 65%;
+                    height: 100%;
+                    margin-left: 10px;
+
+                    .content-title {
+                        text-align: center;
+                        font-weight: 700;
+                    }
+
+                    .content-brief {
+                        text-align: center;
+                    }
+
+                    .content-release_time {
+                        position: absolute;
+                        bottom: 20px;
+                        right: 0px;
+                        padding: 0 15px 0 0;
+
+                    }
+
+                    .content-auther {
+                        display: flex;
+                        align-items: center;
+                        position: absolute;
+                        bottom: 0px;
+                        right: 0px;
+                        padding: 0 15px 0 0;
+                    }
+                }
+
+
+                .content-image {
+                    width: 40%;
+                    height: 70%;
+                    background-color: skyblue;
+                    border-radius: 10px;
+
+                    img {
+                        width: 100%;
+                        border-radius: 10px;
+                    }
+                }
+            }
+
+            .Community-content:hover {
+
+                //放大为原来的1.1倍
+                transform: scale(1.1);
+
             }
         }
 
-        .Community-content:hover {
 
-            //放大为原来的1.1倍
-            transform: scale(1.1);
-
-        }
     }
+
+
 }
 
 .gold-color {
