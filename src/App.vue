@@ -53,7 +53,7 @@ div {
   // bottom: 0px;
   width: 100%;
   height: 100px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgb(236, 236, 236);
   // background-color: pink;
   // margin-top: 10px;
   text-align: center;

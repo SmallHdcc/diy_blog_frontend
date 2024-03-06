@@ -12,12 +12,20 @@ watch(() => blogStore.blogArray, () => {
 const community_content = ref([])
 const heat_list = ref([])
 
-
+//处理字符串
+function toStringArray(source) {
+    return source.substring(1, source.length - 1).split(',')
+}
 const getPublicBlogsInPage = async () => {
     const result = await getPublicBlogs()
     if (result.data.code === 1) {
-        community_content.value = result.data.data
-        console.log(community_content.value)
+        let articles = result.data.data
+        //将字符串 转化为数组
+        articles.forEach(item => {
+            item.tags = toStringArray(item.tags)
+        })
+        community_content.value = articles
+        console.log(articles)
     }
 }
 
@@ -31,21 +39,13 @@ const getBlogDetail = async (index) => {
 }
 const getHeatListInPage = async () => {
     const result = await getHeatList()
+    console.log(result.data.data)
     if (result.data.code === 1) {
         //获取前5个
         heat_list.value = result.data.data.slice(0, 5)
     }
 }
 
-const isGold = (index) => {
-    return index + 1 === 1
-}
-const isSliver = (index) => {
-    return index + 1 === 2
-}
-const isCopper = (index) => {
-    return index + 1 === 3
-}
 function getColor(index) {
     const rank = index + 1;
     if (rank === 1) {
@@ -73,17 +73,33 @@ onMounted(() => {
         <div class="container">
             <div class="container-center-content">
                 <div v-for="(item, index) in community_content" class="Community-content" @click=getBlogDetail(index)>
-                    <div class="content-image"><img src="/img/mainPageBGI.jpg" alt=""></div>
+                    <div class="content-image">
+                        <img :src="item.filePath" alt="">
+                    </div>
                     <div class="content-info">
-                        <h2 class="content-title">{{ item.title }}</h2>
-                        <div class="content-brief">{{ item.brief }}</div>
-                        <div class="content-release_time">{{ item.releaseTime }}</div>
-                        <div class="content-auther">
-                            <el-icon style="margin-right: 5px;">
-                                <View />
-                            </el-icon>
-                            <span style="margin-right: 10px;">{{ item.views }}</span>
-                            <span>{{ item.username }} </span>
+                        <div class="info-top">
+                            <div class="info-top-left">
+                                <h2 class="content-title">{{ item.title }}</h2>
+                                <div class="content-brief">{{ item.brief }}</div>
+                                <div class="content-tags">
+                                    <el-tag style="margin-right: 5px;" v-for="(tag) in item.tags">{{ tag }}</el-tag>
+                                </div>
+                            </div>
+                            <div class="content-tip-off">
+                                <el-icon size="25px" style="position: absolute;top: 10px; color:rgba(0, 0, 0, 0.2) ">
+                                    <Warning />
+                                </el-icon>
+                            </div>
+                        </div>
+                        <div class="info-bottom">
+                            <div class="content-release_time">{{ item.releaseTime }}</div>
+                            <div class="content-auther">
+                                <el-icon style="margin-right: 5px;">
+                                    <View />
+                                </el-icon>
+                                <span style="margin-right: 10px;">{{ item.views }}</span>
+                                <span>{{ item.username }} </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,7 +111,7 @@ onMounted(() => {
                 <div class="side-list side-common">
                     <h2>热门帖🔥</h2>
                     <div v-for="(item, index) in heat_list">
-                        <div class="side-list-element">
+                        <div class="side-list-element" :class="getColor(index)">
                             <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
                             {{ item.articleTitle }}
                         </div>
@@ -172,53 +188,75 @@ onMounted(() => {
                 height: 200px;
                 // background-color: pink;
                 margin: 10px 0px;
-                padding: 10px;
+                padding: 5px;
                 border-radius: 5px;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
                 background-color: white;
                 transition: all 0.5s;
                 cursor: pointer;
+                overflow: hidden;
 
                 .content-info {
                     position: relative;
                     display: flex;
                     flex-direction: column;
-                    width: 65%;
+                    justify-content: space-between;
+                    width: 55%;
                     height: 100%;
-                    margin-left: 10px;
+                    padding-left: 10px;
 
-                    .content-title {
-                        text-align: center;
-                        font-weight: 700;
-                    }
-
-                    .content-brief {
-                        text-align: center;
-                    }
-
-                    .content-release_time {
-                        position: absolute;
-                        bottom: 20px;
-                        right: 0px;
-                        padding: 0 15px 0 0;
-
-                    }
-
-                    .content-auther {
+                    .info-top {
                         display: flex;
-                        align-items: center;
-                        position: absolute;
-                        bottom: 0px;
-                        right: 0px;
-                        padding: 0 15px 0 0;
+                        justify-content: space-around;
+                        position: relative;
+
+                        .info-top-left {
+                            .content-title {
+                                text-align: center;
+                                font-weight: 700;
+                            }
+
+                            .content-brief {
+                                text-align: center;
+                            }
+
+                            .content-tags {
+                                display: flex;
+                                justify-content: center;
+                            }
+
+                        }
+
+                        .content-tip-off {
+                            position: absolute;
+                            top: 0px;
+                            right: 5px;
+                        }
                     }
+
+                    .info-bottom {
+                        display: flex;
+                        flex-direction: column;
+                        position: relative;
+                        padding: 0 10px 0 0;
+                        text-align: right;
+
+                        .content-auther {
+                            display: flex;
+                            justify-content: right;
+                            align-items: center;
+                        }
+                    }
+
+
                 }
 
 
                 .content-image {
+                    display: flex;
+                    align-items: center;
                     width: 40%;
                     height: 70%;
-                    background-color: skyblue;
                     border-radius: 10px;
 
                     img {
@@ -226,10 +264,11 @@ onMounted(() => {
                         border-radius: 10px;
                     }
                 }
+
+
             }
 
             .Community-content:hover {
-
                 //放大为原来的1.1倍
                 transform: scale(1.1);
 
@@ -247,7 +286,7 @@ onMounted(() => {
 }
 
 .sliver-color {
-    color: rgb(139, 134, 134);
+    color: rgb(71, 69, 69);
 }
 
 .copper-color {

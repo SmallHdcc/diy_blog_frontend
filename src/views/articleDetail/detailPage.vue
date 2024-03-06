@@ -132,12 +132,10 @@ const likeTheCommentInPage = async (index) => {
         // 调用取消点赞接口
         commentArray.value[index].isLiked = false
         commentArray.value[index].likeCount--
-        console.log(commentArray.value[index].likeCount)
         debounceCancelLikeTheComment(commentArray.value[index].id)
     } else {
         commentArray.value[index].isLiked = true
         commentArray.value[index].likeCount++
-        console.log(commentArray.value[index].likeCount)
         debounceLikeTheComment(commentArray.value[index].id)
     }
 
@@ -228,7 +226,12 @@ onMounted(() => {
                                             style="width: 100%;height: 100%; color: green;" />
                                         <span>{{ item.likeCount }}</span>
                                     </div>
-                                    <div class="delete-btn" @click="deleteCommentInPage(key)">删除</div>
+                                    <el-popconfirm title="你确定你要删除吗?" confirm-button-text="确认" cancel-button-text="取消"
+                                        @confirm="deleteCommentInPage(key)">
+                                        <template #reference>
+                                            <div>删除</div>
+                                        </template>
+                                    </el-popconfirm>
                                 </div>
                             </div>
                         </div>
@@ -441,6 +444,11 @@ onMounted(() => {
                                     cursor: pointer;
                                 }
 
+                                .el-tooltip__trigger {
+                                    position: absolute;
+                                    right: 0;
+                                    cursor: pointer;
+                                }
 
                                 .delete-btn {
                                     position: absolute;

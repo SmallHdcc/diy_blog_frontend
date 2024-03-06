@@ -9,6 +9,9 @@ import { encrypt } from "@/utils"
 import WOW from 'wow.js'
 /*--路由器--*/
 import router from '@/router'
+//element-plus
+import { ElMessage } from 'element-plus'
+import { ArrowDown } from '@element-plus/icons-vue'
 
 
 //开头定义变量
@@ -253,7 +256,7 @@ onMounted(() => {
                         <div class="tags">
                             <el-tag v-for="(son) in item.tags">{{ son }}</el-tag>
                             <div class="comment">
-                                <el-icon size="25px">
+                                <el-icon style="margin-right: 5px;" size="25px">
                                     <ChatLineRound />
                                 </el-icon>
                                 <span>{{ item.commentCount }}</span>
@@ -262,27 +265,18 @@ onMounted(() => {
                         <div class="state_pri" v-if="item.isPrivate" @click="handlePrivate($event, key)">未公开</div>
                         <div class="state_pub" v-if="!item.isPrivate" @click="handlePrivate($event, key)">已公开</div>
                         <div class="icon-more">
-                            <!-- 这里是点击这个三个点的按钮之后弹出来的 -->
-                            <el-popover :visible="visible.key == key && visible.appear == true" :width="160">
-                                <!-- <p>Are you sure to delete this?</p> -->
-                                <div class="icon-operation" @click="deleteBlog(key)">
-                                    <span>删除</span>
-                                    <el-icon size="25px">
-                                        <Delete />
-                                    </el-icon>
-                                </div>
-                                <div class="icon-operation">
-                                    <span>更新</span>
-                                    <el-icon size="25px">
-                                        <Edit />
-                                    </el-icon>
-                                </div>
-                                <template #reference>
-                                    <el-icon size="30px" color="#2C3E50">
-                                        <MoreFilled @click.stop="handleDisapper(key)" />
-                                    </el-icon>
+                            <el-dropdown @command="handleCommand">
+                                <el-icon style="border: none;outline: none;" size="30px" color="#2C3E50">
+                                    <MoreFilled @click.stop="handleDisapper(key)" />
+                                </el-icon>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item command="更新">更新</el-dropdown-item>
+                                        <el-dropdown-item command="删除成功" @click="deleteBlog(key)">删除</el-dropdown-item>
+                                    </el-dropdown-menu>
                                 </template>
-                            </el-popover>
+                            </el-dropdown>
+
                         </div>
                     </div>
 
@@ -573,5 +567,12 @@ onMounted(() => {
             padding-right: 10px;
         }
     }
+}
+
+.example-showcase .el-dropdown-link {
+    cursor: pointer;
+    color: var(--el-color-primary);
+    display: flex;
+    align-items: center;
 }
 </style>

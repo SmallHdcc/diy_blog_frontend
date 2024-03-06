@@ -4,7 +4,7 @@ import service from '../Service.js'
 export function uploadArticle(data) {
     return service({
         method: 'POST',
-        url: "/article/upload",
+        url: "/article",
         data
     })
 }

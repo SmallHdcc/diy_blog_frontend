@@ -118,3 +118,5 @@ a {
 a:hover {
   color: rgb(135, 200, 238);
 }
+
+/* 为所有 Element Plus 组件取消轮廓 */
