@@ -12,6 +12,7 @@ import navigation from '@/components/navigation/navigation.vue';
         <component :is="Component" />
       </transition>
     </router-view>
+
     <div id="footer">
       <a href="https://beian.miit.gov.cn/#/Integrated/index">鄂ICP备2023017019号</a>
       <a href="https://beian.mps.gov.cn/#/query/webSearch?code=42018502006927" rel="noreferrer" target="_blank">

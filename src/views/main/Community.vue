@@ -3,38 +3,22 @@ import { ref, onMounted, provide, watch } from 'vue'
 import router from '../../router';
 import { getPublicBlogs, getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import { useArticleStore } from '@/stores/article.js'
+import showArticle from '@/components/article/showArticle.vue';
+
 
 const blogStore = useArticleStore()
 watch(() => blogStore.blogArray, () => {
     community_content.value = blogStore.blogArray
 })
 
-const community_content = ref([])
 const heat_list = ref([])
-
-//处理字符串
-function toStringArray(source) {
-    return source.substring(1, source.length - 1).split(',')
-}
-const getPublicBlogsInPage = async () => {
-    const result = await getPublicBlogs()
-    if (result.data.code === 1) {
-        let articles = result.data.data
-        //将字符串 转化为数组
-        articles.forEach(item => {
-            item.tags = toStringArray(item.tags)
-        })
-        community_content.value = articles
-        console.log(articles)
-    }
-}
-
 
 const getBlogDetail = async (index) => {
     const result = await getPublicBlogDetail(community_content.value[index].id)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
         router.push("/detail")
+
     }
 }
 const getHeatListInPage = async () => {
@@ -59,9 +43,13 @@ function getColor(index) {
     }
 }
 
+//滚动加载
+const load = () => {
+    console.log("滚动加载")
+}
+
 
 onMounted(() => {
-    getPublicBlogsInPage()
     getHeatListInPage()
 })
 
@@ -71,39 +59,6 @@ onMounted(() => {
 <template>
     <div id="Community">
         <div class="container">
-            <div class="container-center-content">
-                <div v-for="(item, index) in community_content" class="Community-content" @click=getBlogDetail(index)>
-                    <div class="content-image">
-                        <img :src="item.filePath" alt="">
-                    </div>
-                    <div class="content-info">
-                        <div class="info-top">
-                            <div class="info-top-left">
-                                <h2 class="content-title">{{ item.title }}</h2>
-                                <div class="content-brief">{{ item.brief }}</div>
-                                <div class="content-tags">
-                                    <el-tag style="margin-right: 5px;" v-for="(tag) in item.tags">{{ tag }}</el-tag>
-                                </div>
-                            </div>
-                            <div class="content-tip-off">
-                                <el-icon size="25px" style="position: absolute;top: 10px; color:rgba(0, 0, 0, 0.2) ">
-                                    <Warning />
-                                </el-icon>
-                            </div>
-                        </div>
-                        <div class="info-bottom">
-                            <div class="content-release_time">{{ item.releaseTime }}</div>
-                            <div class="content-auther">
-                                <el-icon style="margin-right: 5px;">
-                                    <View />
-                                </el-icon>
-                                <span style="margin-right: 10px;">{{ item.views }}</span>
-                                <span>{{ item.username }} </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="container-side-list">
                 <div class="side-bar side-common">
                     <h2>希望今天是美好的😂</h2>
@@ -118,6 +73,10 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
+            <div v-infinite-scroll="load" class="container-center-content">
+                <showArticle></showArticle>
+            </div>
+
         </div>
     </div>
 </template>
@@ -126,9 +85,9 @@ onMounted(() => {
 #Community {
     display: flex;
     justify-content: center;
-    width: 100vw;
+    width: 100%;
+    height: 100%;
     background-color: rgb(234, 239, 245);
-
 
     .container {
         display: flex;
@@ -173,111 +132,10 @@ onMounted(() => {
         }
 
         .container-center-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             width: 71%;
-            min-height: 100vh;
-
-
-            .Community-content {
-                position: relative;
-                display: flex;
-                align-items: center;
-                width: 100%;
-                height: 200px;
-                // background-color: pink;
-                margin: 10px 0px;
-                padding: 5px;
-                border-radius: 5px;
-                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-                background-color: white;
-                transition: all 0.5s;
-                cursor: pointer;
-                overflow: hidden;
-
-                .content-info {
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    width: 55%;
-                    height: 100%;
-                    padding-left: 10px;
-
-                    .info-top {
-                        display: flex;
-                        justify-content: space-around;
-                        position: relative;
-
-                        .info-top-left {
-                            .content-title {
-                                text-align: center;
-                                font-weight: 700;
-                            }
-
-                            .content-brief {
-                                text-align: center;
-                            }
-
-                            .content-tags {
-                                display: flex;
-                                justify-content: center;
-                            }
-
-                        }
-
-                        .content-tip-off {
-                            position: absolute;
-                            top: 0px;
-                            right: 5px;
-                        }
-                    }
-
-                    .info-bottom {
-                        display: flex;
-                        flex-direction: column;
-                        position: relative;
-                        padding: 0 10px 0 0;
-                        text-align: right;
-
-                        .content-auther {
-                            display: flex;
-                            justify-content: right;
-                            align-items: center;
-                        }
-                    }
-
-
-                }
-
-
-                .content-image {
-                    display: flex;
-                    align-items: center;
-                    width: 40%;
-                    height: 70%;
-                    border-radius: 10px;
-
-                    img {
-                        width: 100%;
-                        border-radius: 10px;
-                    }
-                }
-
-
-            }
-
-            .Community-content:hover {
-                //放大为原来的1.1倍
-                transform: scale(1.1);
-
-            }
+            height: 100%;
         }
-
-
     }
-
 
 }
 

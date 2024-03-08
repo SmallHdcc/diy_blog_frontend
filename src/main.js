@@ -11,6 +11,8 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 // about wow.js
 import 'wow.js/css/libs/animate.css'
 
+const app = createApp(App)
+
 
 // 这里是设置路由守卫
 router.beforeEach((to, from, next) => {
@@ -29,10 +31,6 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
     document.title = to.meta.title || "该页没取名😀"   //修改网页的title
 })
-
-
-const app = createApp(App)
-
 
 app.use(createPinia())
 app.use(router)

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref, nextTick, onMounted, watch } from 'vue'
-import { uploadArticle ,uploadCover} from "@/api/blog.js"
-import textEditor from '../../components/text/textEditor.vue';
+import { uploadArticle, uploadCover } from "@/api/blog.js"
+import textEditor from '../../components/article/editorArticle.vue';
 import { ElMessage } from 'element-plus'
 import router from '../../router';
 
@@ -188,6 +188,7 @@ onMounted(() => {
         </div>
     </div>
 </template>
+
 <style lang="less" scoped>
 #writeArticle {
     position: relative;

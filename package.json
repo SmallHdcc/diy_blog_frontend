@@ -10,9 +10,9 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.5.0",
+    "clipboard": "^2.0.11",
     "cropperjs": "^1.6.1",
     "element-plus": "^2.3.12",
-    "highlight.js": "^11.8.0",
     "less": "^4.2.0",
     "lodash": "^4.17.21",
     "pinia": "^2.1.6",

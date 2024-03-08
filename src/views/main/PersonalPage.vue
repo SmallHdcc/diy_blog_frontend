@@ -265,14 +265,14 @@ onMounted(() => {
                         <div class="state_pri" v-if="item.isPrivate" @click="handlePrivate($event, key)">未公开</div>
                         <div class="state_pub" v-if="!item.isPrivate" @click="handlePrivate($event, key)">已公开</div>
                         <div class="icon-more">
-                            <el-dropdown @command="handleCommand">
+                            <el-dropdown>
                                 <el-icon style="border: none;outline: none;" size="30px" color="#2C3E50">
                                     <MoreFilled @click.stop="handleDisapper(key)" />
                                 </el-icon>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item command="更新">更新</el-dropdown-item>
-                                        <el-dropdown-item command="删除成功" @click="deleteBlog(key)">删除</el-dropdown-item>
+                                        <el-dropdown-item>更新</el-dropdown-item>
+                                        <el-dropdown-item @click="deleteBlog(key)">删除</el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
