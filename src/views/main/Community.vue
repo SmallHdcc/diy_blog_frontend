@@ -1,10 +1,9 @@
 <script setup>
 import { ref, onMounted, provide, watch } from 'vue'
-import router from '../../router';
 import { getPublicBlogs, getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import { useArticleStore } from '@/stores/article.js'
 import showArticle from '@/components/article/showArticle.vue';
-
+import showDeatil from '@/components/article/showArticleDeatil.vue'
 
 const blogStore = useArticleStore()
 watch(() => blogStore.blogArray, () => {
@@ -13,17 +12,8 @@ watch(() => blogStore.blogArray, () => {
 
 const heat_list = ref([])
 
-const getBlogDetail = async (index) => {
-    const result = await getPublicBlogDetail(community_content.value[index].id)
-    if (result.data.code === 1) {
-        localStorage.setItem("article", JSON.stringify(result.data.data))
-        router.push("/detail")
-
-    }
-}
 const getHeatListInPage = async () => {
     const result = await getHeatList()
-    console.log(result.data.data)
     if (result.data.code === 1) {
         //获取前5个
         heat_list.value = result.data.data.slice(0, 5)
@@ -43,10 +33,12 @@ function getColor(index) {
     }
 }
 
-//滚动加载
-const load = () => {
-    console.log("滚动加载")
-}
+
+/*---控制详情页与主页---*/
+const showDetailVisible = ref(false); // Flag to control visibility
+
+provide('showDetailVisible', showDetailVisible); // Provide the flag to all children components
+
 
 
 onMounted(() => {
@@ -73,10 +65,13 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
-            <div v-infinite-scroll="load" class="container-center-content">
-                <showArticle></showArticle>
-            </div>
-
+            <!-- <div v-infinite-scroll="load" class="container-center-content"> -->
+            <!-- <showArticle></showArticle> -->
+            <!-- </div> -->
+            <el-scrollbar class="container-center-content">
+                <showArticle v-if="!showDetailVisible"></showArticle>
+                <showDeatil v-if="showDetailVisible"></showDeatil>
+            </el-scrollbar>
         </div>
     </div>
 </template>
@@ -86,7 +81,7 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: rgb(234, 239, 245);
 
     .container {
@@ -132,8 +127,8 @@ onMounted(() => {
         }
 
         .container-center-content {
-            width: 71%;
-            height: 100%;
+            width: 81%;
+            height: 80%;
         }
     }
 

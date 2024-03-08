@@ -1,14 +1,24 @@
 <script setup>
 import { ref } from 'vue'
+import { submitFeedback } from '@/api/feedback.js';
 
-const feedbackInfo = ref('')
+const feedbackInfo = ref({
+    content: "",
+    type: "页面太丑了"
+})
 
-const feedback = () => {
-    if (feedbackInfo.value.length < 10) {
+const feedback = async () => {
+    if (feedbackInfo.value.content.length < 10) {
         ElMessage.error("反馈内容太短！")
         return
     }
-    ElMessage.success("感谢您的反馈！")
+    const result = await submitFeedback(feedbackInfo.value)
+    if (result.data.code === 1) {
+        feedbackInfo.value.content = ""
+        ElMessage.success("感谢您的反馈！")
+    } else {
+        ElMessage.error("反馈失败！")
+    }
 }
 
 
@@ -19,7 +29,7 @@ const feedback = () => {
         <!-- <navigation /> -->
         <h1>写下你的意见！</h1>
         <div id="feed-back-content">
-            <textarea v-model="feedbackInfo" name="" id="" cols="30" rows="10"></textarea>
+            <textarea v-model="feedbackInfo.content" name="" id="" cols="30" rows="10"></textarea>
         </div>
         <el-button @click="feedback" type="primary">提交</el-button>
 

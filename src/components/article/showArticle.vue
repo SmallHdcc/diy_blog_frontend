@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted, provide, watch } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import router from '../../router';
 import { getPublicBlogs, getPublicBlogDetail, getHeatList } from '@/api/blog.js'
-import { useArticleStore } from '@/stores/article.js'
+import WOW from 'wow.js'
 
 const article_content = ref()
 
@@ -18,7 +18,6 @@ const getBlogInPage = async () => {
             item.tags = toStringArray(item.tags)
         })
         article_content.value = articles
-        console.log(articles)
     }
 }
 
@@ -27,16 +26,23 @@ function toStringArray(source) {
     return source.substring(1, source.length - 1).split(',')
 }
 
+const showArticleDeatil = inject('showDetailVisible')
+
 /*---获取文章细节 ---*/
 const getBlogDetail = async (index) => {
     const result = await getPublicBlogDetail(article_content.value[index].id)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
-        // router.push("/test08")
-        router.push("/detail")
-
+        // router.push("/detail")
+        showArticleDeatil.value = true
     }
 }
+/*---滚动加载---*/
+const load = () => {
+    console.log("滚动加载")
+}
+
+
 
 
 onMounted(() => {
@@ -48,53 +54,56 @@ onMounted(() => {
 </script>
 
 <template>
-    <div id="showArticle">
-        <div class="article" v-for="(article, index) in article_content" @click="getBlogDetail(index)">
-            <div class="article-cover"><img :src=article.filePath alt=""></div>
-            <div class="article-info">
-                <div class="article-info-top">
-                    <div class="article-info-top-left">
-                        <h2 class="info-title">{{ article.title }}</h2>
-                        <span class="info-profile">{{ article.profile }}</span>
-                        <div class="info-tags">
-                            <el-tag style="margin-right: 5px;" v-for="(tag) in article.tags">
-                                {{ tag }}
-                            </el-tag>
+    <transition name="fade">
+        <div id="showArticle" v-infinite-scroll="load">
+            <div class="article" v-for="(article, index) in article_content" @click="getBlogDetail(index)">
+                <div class="article-cover"><img :src=article.filePath alt=""></div>
+                <div class="article-info">
+                    <div class="article-info-top">
+                        <div class="article-info-top-left">
+                            <h2 class="info-title">{{ article.title }}</h2>
+                            <span class="info-profile">{{ article.profile }}</span>
+                            <div class="info-tags">
+                                <el-tag style="margin-right: 5px;" v-for="(tag) in article.tags">
+                                    {{ tag }}
+                                </el-tag>
+                            </div>
+                        </div>
+                        <div class="article-info-top-right">
+                            undo module
                         </div>
                     </div>
-                    <div class="article-info-top-right">
-                        undo module
-                    </div>
-                </div>
-                <div class="article-info-bottom">
-                    <div class="info-date">{{ article.date }}</div>
-                    <div class="info-author">
-                        <div class="article-views">
-                            <el-icon style="margin-right: 5px;" size="20px">
-                                <View />
-                            </el-icon>
-                            <span>
-                                {{ article.views }}
-                            </span>
+                    <div class="article-info-bottom">
+                        <div class="info-date">{{ article.date }}</div>
+                        <div class="info-author">
+                            <div class="article-views">
+                                <el-icon style="margin-right: 5px;" size="20px">
+                                    <View />
+                                </el-icon>
+                                <span>
+                                    {{ article.views }}
+                                </span>
+                            </div>
+                            <div class="author-avatar"><img :src="article.avatar" alt=""></div>
+                            <div class="author-username">{{ article.username }}</div>
                         </div>
-                        <div class="author-avatar"><img :src="article.avatar" alt=""></div>
-                        <div class="author-username">{{ article.username }}</div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </transition>
 </template>
 
 <style lang="less" scoped>
 #showArticle {
     width: 100%;
     height: 100%;
+    transition: all 0.5s;
 
     .article {
         display: flex;
         align-items: center;
-        width: 100%;
+        width: 89%;
         height: 200px;
         margin: 20px auto;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
@@ -190,5 +199,15 @@ onMounted(() => {
         //放大为原来的1.1倍
         transform: scale(1.1);
     }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

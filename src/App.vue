@@ -26,6 +26,9 @@ import navigation from '@/components/navigation/navigation.vue';
 @import './assets/font/font.css';
 
 div {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
   font-family: xiawu;
   overflow: hidden;
 }
@@ -47,16 +50,13 @@ div {
 
 #footer {
   position: absolute;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  // position: absolute;
-  // bottom: 0px;
   width: 100%;
-  height: 100px;
+  height: 10%;
   background-color: rgb(236, 236, 236);
-  // background-color: pink;
-  // margin-top: 10px;
   text-align: center;
 
   a:hover {
