@@ -5,7 +5,7 @@ import navigation from '@/components/navigation/navigation.vue';
 </script>
 
 <template>
-  <div>
+  <div id="app">
     <navigation />
     <router-view v-slot="{ Component }">
       <transition name="slide-fade">
@@ -25,13 +25,34 @@ import navigation from '@/components/navigation/navigation.vue';
 <style lang="less" scoped>
 @import './assets/font/font.css';
 
-div {
+#app {
   position: relative;
   width: 100vw;
   height: 100vh;
   font-family: xiawu;
-  overflow: hidden;
 }
+
+#footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 13%;
+  background-color: rgb(236, 236, 236);
+
+  a:hover {
+    color: rgb(64, 158, 255);
+  }
+
+  img {
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+}
+
+
 
 .slide-fade-enter-active {
   transition: all 0.4s ease-out;
@@ -46,27 +67,5 @@ div {
   position: absolute;
   transform: translateX(20px);
   opacity: 0;
-}
-
-#footer {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  height: 10%;
-  background-color: rgb(236, 236, 236);
-  text-align: center;
-
-  a:hover {
-    color: rgb(64, 158, 255);
-  }
-
-  img {
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-  }
 }
 </style>

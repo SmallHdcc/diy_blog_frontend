@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, inject } from 'vue'
+import { ref, onMounted, inject, watch } from 'vue'
 import router from '../../router';
 import { getPublicBlogs, getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import WOW from 'wow.js'
@@ -29,7 +29,7 @@ function toStringArray(source) {
 const showArticleDeatil = inject('showDetailVisible')
 
 /*---获取文章细节 ---*/
-const getBlogDetail = async (index) => {
+const getBlogDetailByIndex = async (index) => {
     const result = await getPublicBlogDetail(article_content.value[index].id)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
@@ -37,13 +37,15 @@ const getBlogDetail = async (index) => {
         showArticleDeatil.value = true
     }
 }
+
+
+
+
+
 /*---滚动加载---*/
 const load = () => {
     console.log("滚动加载")
 }
-
-
-
 
 onMounted(() => {
     getBlogInPage()
@@ -56,12 +58,12 @@ onMounted(() => {
 <template>
     <transition name="fade">
         <div id="showArticle" v-infinite-scroll="load">
-            <div class="article" v-for="(article, index) in article_content" @click="getBlogDetail(index)">
+            <div class="article" v-for="(article, index) in article_content" @click="getBlogDetailByIndex(index)">
                 <div class="article-cover"><img :src=article.filePath alt=""></div>
                 <div class="article-info">
                     <div class="article-info-top">
                         <div class="article-info-top-left">
-                            <h2 class="info-title">{{ article.title }}</h2>
+                            <h3 class="info-title">{{ article.title }}</h3>
                             <span class="info-profile">{{ article.profile }}</span>
                             <div class="info-tags">
                                 <el-tag style="margin-right: 5px;" v-for="(tag) in article.tags">
@@ -96,7 +98,7 @@ onMounted(() => {
 
 <style lang="less" scoped>
 #showArticle {
-    width: 100%;
+    width: 75%;
     height: 100%;
     transition: all 0.5s;
 
@@ -126,7 +128,6 @@ onMounted(() => {
                 .article-info-top-left {
                     display: flex;
                     flex-direction: column;
-                    justify-content: space-around;
                     align-items: center;
                     width: 70%;
 
@@ -138,6 +139,12 @@ onMounted(() => {
                         display: flex;
                         justify-content: center;
                         flex-wrap: wrap;
+                    }
+
+                    .info-profile {
+                        font-size: 14px;
+                        color: #666;
+                        margin: 10px, 0;
                     }
                 }
 
@@ -187,6 +194,7 @@ onMounted(() => {
             width: 40%;
             height: 70%;
             border-radius: 10px;
+            overflow: hidden;
 
             img {
                 width: 100%;

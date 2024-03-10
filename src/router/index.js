@@ -6,20 +6,6 @@ const router = createRouter({
       path: '/',
       component: () => import('../views/main/Community.vue'),
       meta: { isAuth: true, title: '社区' },
-      children: [
-        {
-          path: '', // 新增路由
-          name: "article",
-          component: () => import('@/components/article/showArticle.vue'),
-          meta: { isAuth: true, title: '日记' }
-        },
-        {
-          path: 'detail',
-          name: "detail",
-          component: () => import('@/components/article/showArticleDeatil.vue'),
-          meta: { isAuth: true, title: '日记详情' }
-        },
-      ]
     },
     {
       path: '/personal',
@@ -34,7 +20,6 @@ const router = createRouter({
       component: () => import('../views/write/writeArticle.vue'),
       meta: { title: '记录日记' }
     },
-
     {
       path: '/feedback',
       name: "feedback",
@@ -46,7 +31,6 @@ const router = createRouter({
       component: () => import('../views/test/test08.vue'),
       meta: { isAuth: false, title: '测试页面' }
     },
-
     {
       path: "/:pathMatch(.*)*", // 必备
       component: () => import("@/views/error/404.vue"),

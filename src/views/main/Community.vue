@@ -21,23 +21,36 @@ const getHeatListInPage = async () => {
 }
 
 function getColor(index) {
-    const rank = index + 1;
+    const rank = index + 1
     if (rank === 1) {
-        return 'gold-color';
+        return 'gold-color'
     } else if (rank === 2) {
-        return 'silver-color';
+        return 'silver-color'
     } else if (rank === 3) {
-        return 'copper-color';
+        return 'copper-color'
     } else {
-        return '';
+        return ''
     }
 }
 
 
 /*---控制详情页与主页---*/
-const showDetailVisible = ref(false); // Flag to control visibility
+const showDetailVisible = ref(false) // Flag to control visibility
 
-provide('showDetailVisible', showDetailVisible); // Provide the flag to all children components
+provide('showDetailVisible', showDetailVisible) // Provide the flag to all children components
+
+const handleArticleShow = ref(false)
+provide('handleArticleShow', handleArticleShow)
+
+const getBlogDetailById = async (id) => {
+    const result = await getPublicBlogDetail(id)
+    if (result.data.code === 1) {
+        localStorage.setItem("article", JSON.stringify(result.data.data))
+        // router.push("/detail")
+        showDetailVisible.value = true
+        handleArticleShow.value = !handleArticleShow.value
+    }
+}
 
 
 
@@ -57,7 +70,7 @@ onMounted(() => {
                 </div>
                 <div class="side-list side-common">
                     <h2>热门帖🔥</h2>
-                    <div v-for="(item, index) in heat_list">
+                    <div v-for="(item, index) in heat_list" @click="getBlogDetailById(item.articleId)">
                         <div class="side-list-element" :class="getColor(index)">
                             <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
                             {{ item.articleTitle }}
@@ -65,9 +78,6 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
-            <!-- <div v-infinite-scroll="load" class="container-center-content"> -->
-            <!-- <showArticle></showArticle> -->
-            <!-- </div> -->
             <el-scrollbar class="container-center-content">
                 <showArticle v-if="!showDetailVisible"></showArticle>
                 <showDeatil v-if="showDetailVisible"></showDeatil>
@@ -79,20 +89,20 @@ onMounted(() => {
 <style lang="less" scoped>
 #Community {
     display: flex;
-    justify-content: center;
+    justify-content: right;
     width: 100%;
-    height: 100vh;
+    height: 80%;
     background-color: rgb(234, 239, 245);
 
     .container {
         display: flex;
         justify-content: center;
-        width: 70%;
+        width: 90%;
 
         .container-side-list {
             position: static;
             top: 0;
-            width: 29%;
+            width: 25%;
             margin: 10px 30px 0px 20px;
 
             .side-common {
@@ -123,12 +133,16 @@ onMounted(() => {
                     width: 100%;
                     cursor: pointer;
                 }
+
+                .side-list-element:hover {
+                    background-color: rgb(228, 233, 239);
+                }
             }
         }
 
         .container-center-content {
-            width: 81%;
-            height: 80%;
+            width: 75%;
+            height: 100%;
         }
     }
 

@@ -33,8 +33,6 @@ watch(() => userStore.isLogin, (newVal, oldVal) => {
 
 })
 
-
-
 const article = ref({
     title: '',
     username: '',
@@ -42,6 +40,14 @@ const article = ref({
     heat: '',
     content: ''
 })
+
+const handleArticleShow = inject('handleArticleShow')
+
+watch(handleArticleShow, () => {
+    article.value = JSON.parse(localStorage.getItem("article"))
+})
+
+
 
 
 // 关于动画
@@ -254,7 +260,7 @@ onMounted(() => {
 
 <style lang="less" scoped>
 #detailPage {
-    width: 100%;
+    width: 90%;
     min-height: 100vh;
     background-color: rgb(234, 239, 245);
     background-attachment: fixed;
@@ -303,7 +309,7 @@ onMounted(() => {
 
 
             #title {
-                margin: 100px 0px 50px 0px;
+                margin: 50px 0px 50px 0px;
             }
 
 

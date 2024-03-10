@@ -109,7 +109,8 @@ const show_search_result = (value, index) => {
     <div id="header">
         <div id="navigation">
             <div id="web-name"><img src="/img/logo.png" alt=""></div>
-            <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">{{ item.name }}</router-link>
+            <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">{{ item.name
+                }}</router-link>
             <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
             <WebFunction />
             <div id="Search_input">
@@ -149,7 +150,8 @@ const show_search_result = (value, index) => {
         height: 50px;
         background-color: white;
         font-size: 20px;
-        box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+
         z-index: 99;
 
         #navigation-user-avatar {
@@ -205,7 +207,7 @@ const show_search_result = (value, index) => {
                 width: 100%;
                 background-color: white;
                 border-radius: 4px;
-                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+                // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
 
                 span {
                     width: 100%;

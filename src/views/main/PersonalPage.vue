@@ -11,7 +11,6 @@ import WOW from 'wow.js'
 import router from '@/router'
 //element-plus
 import { ElMessage } from 'element-plus'
-import { ArrowDown } from '@element-plus/icons-vue'
 
 
 //开头定义变量
@@ -103,6 +102,7 @@ const deleteBlog = (index) => {
                 router.go(0)
                 ElMessage({
                     type: 'success',
+                    showClose: true,
                     message: '成功删除',
                 })
             }
@@ -111,6 +111,7 @@ const deleteBlog = (index) => {
         .catch(() => {
             ElMessage({
                 type: 'info',
+                showClose: true,
                 message: '取消删除',
             })
         })
@@ -159,7 +160,7 @@ const getSonHander = async () => {
     let data = user.value
     const result = await uploadAvatar(data)
     if (result.data.code == 1) {
-        ElMessage.success({ message: "图片上传成功！！" })
+        ElMessage.success({ showClose: true, message: "图片上传成功！！" })
         window.location.reload()
     }
 
@@ -186,7 +187,7 @@ const handleSignature = async (new_signature, userId) => {
     const result = await changeSign(new_signature, userId)
     if (result.data.code == 1) {
         localStorage.setItem("baseInfo", JSON.stringify(user.value))
-        ElMessage.success({ message: "签名修改成功！！" })
+        ElMessage.success({ showClose: true, message: "签名修改成功！！" })
     }
 }
 
@@ -204,7 +205,7 @@ const ChangePrivate = (info, data, isPrivate, index) => {
     ).then(async () => {
         const result = await changeArticleStatus(data.id, isPrivate)
         if (result.data.code == 1) {
-            ElMessage.success({ message: "修改成功！！" })
+            ElMessage.success({ showClose: true, message: "修改成功！！" })
             blogArray.value[index].isPrivate = !data.isPrivate
         }
 
@@ -234,94 +235,50 @@ onMounted(() => {
 <template>
     <div id="PersonalPageTest">
         <div id="container">
-            <!-- <navigation /> -->
             <div id="showContent">
                 <div id="left-content">
-                    <div v-if="startTips" class="if-no-content">
-                        <div class="content-bear" id="instruction">
-                            <div class="title">欢迎来到SANLINGJIU!</div>
-                            <div class="time">2024-1-1</div>
-                        </div>
-                        一篇记录也没有~~~😑
-                    </div>
-                    <div class="content-order_way" v-if="!startTips">
-                        <span @click="sortBlogByPopularity()">按热度</span>
-                        <span @click="sortBlogByTime()">按时间</span>
-                    </div>
-                    <div v-if="!startTips" class="content-bear wow bounceInLeft" data-wow-duration="2s" :index=key
-                        v-for="(item, key) in   blogArray  " @click="checkDetail(key)">
-                        <div class="title">{{ item.title }}</div>
-                        <div class="time">{{ item.date }}</div>
-                        <div class="profile">{{ item.profile }}</div>
-                        <div class="tags">
-                            <el-tag v-for="(son) in item.tags">{{ son }}</el-tag>
-                            <div class="comment">
-                                <el-icon style="margin-right: 5px;" size="25px">
-                                    <ChatLineRound />
-                                </el-icon>
-                                <span>{{ item.commentCount }}</span>
+                    <div class="right-userInfo wow bounceInUp">
+                        <div class="el-card">
+                            <div id="avatar" @click="dialogVisible = true">
+                                <img :src=user.avatar alt="">
+                            </div>
+                            <div id="userInfo">
+                                <div id="username">
+                                    <el-icon>
+                                        <User />
+                                    </el-icon>
+                                    <span style="padding-left: 10px;">{{ user.username }}</span>
+                                </div>
+                                <div id="signature">
+                                    <!-- I AM A ROOKIE -->
+                                    <span v-if="signature">{{ user.signature }}</span>
+                                    <input @blur="handleSignature(user.signature, user.id)" v-model="user.signature"
+                                        v-if="!signature"
+                                        style="outline: none;border: none;font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+                                        type="text" placeholder="编辑个性签名吧！">
+                                    <el-icon @click="signature = !signature">
+                                        <EditPen />
+                                    </el-icon>
+                                </div>
                             </div>
                         </div>
-                        <div class="state_pri" v-if="item.isPrivate" @click="handlePrivate($event, key)">未公开</div>
-                        <div class="state_pub" v-if="!item.isPrivate" @click="handlePrivate($event, key)">已公开</div>
-                        <div class="icon-more">
-                            <el-dropdown>
-                                <el-icon style="border: none;outline: none;" size="30px" color="#2C3E50">
-                                    <MoreFilled @click.stop="handleDisapper(key)" />
-                                </el-icon>
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                        <el-dropdown-item>更新</el-dropdown-item>
-                                        <el-dropdown-item @click="deleteBlog(key)">删除</el-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template>
-                            </el-dropdown>
+                        <el-dialog v-model="dialogVisible" title="更换头像" width="30%">
+                            <avatarCropper style="display: flex; justify-content: center;" ref='avatar'></avatarCropper>
 
-                        </div>
+                            <template #footer>
+                                <span class="dialog-footer">
+                                    <el-button @click="dialogVisible = false">取消</el-button>
+                                    <el-button type="primary" @click="getSonHander">
+                                        确定
+                                    </el-button>
+                                </span>
+                            </template>
+                        </el-dialog>
                     </div>
-
-                </div>
-                <div class="right-userInfo wow bounceInUp">
-                    <div class="el-card">
-                        <div id="avatar" @click="dialogVisible = true">
-                            <img :src=user.avatar alt="">
-                        </div>
-                        <div id="userInfo">
-                            <div id="username">
-                                <el-icon>
-                                    <User />
-                                </el-icon>
-                                <span style="padding-left: 10px;">{{ user.username }}</span>
-                            </div>
-                            <div id="signature">
-                                <!-- I AM A ROOKIE -->
-                                <span v-if="signature">{{ user.signature }}</span>
-                                <input @blur="handleSignature(user.signature, user.id)" v-model="user.signature"
-                                    v-if="!signature"
-                                    style="outline: none;border: none;font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
-                                    type="text" placeholder="编辑个性签名吧！">
-                                <el-icon @click="signature = !signature">
-                                    <EditPen />
-                                </el-icon>
-                            </div>
-                        </div>
-                    </div>
-                    <el-dialog v-model="dialogVisible" title="更换头像" width="30%">
-                        <avatarCropper style="display: flex; justify-content: center;" ref='avatar'></avatarCropper>
-
-                        <template #footer>
-                            <span class="dialog-footer">
-                                <el-button @click="dialogVisible = false">取消</el-button>
-                                <el-button type="primary" @click="getSonHander">
-                                    确定
-                                </el-button>
-                            </span>
-                        </template>
-                    </el-dialog>
                 </div>
             </div>
-
         </div>
+
     </div>
 </template>
 
@@ -330,7 +287,7 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     width: 100%;
-    min-height: 100vh;
+    height: 80%;
     background-color: rgb(242, 243, 245);
     overflow-x: hidden;
 
@@ -347,135 +304,7 @@ onMounted(() => {
             position: relative;
             display: flex;
             width: 80%;
-            // background-color: pink;
 
-            #left-content {
-                width: 70%;
-
-                .content-order_way {
-
-                    margin: 10px 40px;
-
-                    span {
-                        margin: 0 10px;
-                        cursor: pointer;
-                    }
-
-                    span:hover {
-                        color: rgb(135, 200, 238);
-                    }
-                }
-
-                .if-no-content {
-                    display: block;
-                    width: 100%;
-                    font-size: 30px;
-                    color: #999;
-                    text-align: center;
-                }
-
-                #instruction {
-                    justify-content: center;
-                }
-
-                .content-bear {
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                    width: 90%;
-                    height: 170px;
-                    margin: 10px 40px;
-                    padding: 0 10px;
-                    background-color: white;
-                    border-radius: 5px;
-                    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-                    transition: all 0.5s;
-                    cursor: pointer;
-
-                    .title {
-                        font-size: 24px;
-                        padding: 10px 0;
-                    }
-
-                    .time {
-                        font-size: 16px;
-                        padding-bottom: 10px;
-
-                    }
-
-                    .profile {
-                        font-size: 14px;
-                    }
-
-                    .tags {
-                        position: relative;
-                        display: flex;
-                        align-items: center;
-
-                        .comment {
-                            position: absolute;
-                            right: 0px;
-                            display: flex;
-                            align-items: center;
-                            cursor: pointer;
-                            margin-left: 100px;
-                        }
-
-                        .el-tag {
-                            margin: 10px 10px 5px 0px;
-                        }
-                    }
-
-                    .state_pri {
-                        position: absolute;
-                        top: 10px;
-                        right: 50px;
-                        width: 50px;
-                        height: 20px;
-                        background-color: rgb(104, 228, 55);
-                        text-align: center;
-                        line-height: 20px;
-                        border-radius: 5px;
-                        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-                        font-size: 14px;
-                    }
-
-                    .state_pub {
-                        position: absolute;
-                        top: 10px;
-                        right: 50px;
-                        width: 50px;
-                        height: 20px;
-                        background-color: rgb(245, 32, 71);
-                        text-align: center;
-                        line-height: 20px;
-                        border-radius: 5px;
-                        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-                        font-size: 14px;
-                    }
-
-                    .icon-more {
-                        position: absolute;
-                        right: 10px;
-                        top: 0px;
-                        cursor: pointer;
-
-                    }
-
-                    #instructionDetail {
-                        font-size: 16px;
-                        text-align: left;
-                        //首段缩进
-                        text-indent: 2em;
-
-                    }
-                }
-
-                .content-bear:hover {
-                    background-color: rgb(135, 200, 238);
-                    transform: translateX(5px);
-                }
-            }
 
             //用户信息相对于浏览器定位
             .right-userInfo {

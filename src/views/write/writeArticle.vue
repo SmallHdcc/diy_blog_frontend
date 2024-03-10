@@ -23,35 +23,31 @@ const form = reactive({
 
 let errorClickNumber = ref(0)
 const onSubmit = async () => {
-    console.log('submit!')
-    console.log(form.content.trim().length)
-    if (form.day !== null && form.date !== null) {
-        // set content
-        form.content = localStorage.getItem("content") || ''
-        if (form.content != null && form.content.trim() != '') {
-            //set userId
-            form.userId = JSON.parse(localStorage.getItem("baseInfo") || '').id
+    // set content
+    form.content = localStorage.getItem("content") || ''
+    if (form.content != null && form.content.trim() != '') {
+        //set userId
+        form.userId = JSON.parse(localStorage.getItem("baseInfo") || '').id
 
-            const result = await uploadArticle(form)
-            if (result.data.code == 1) {
-                ElMessage.success({ message: "发布成功" })
-                router.push("/personal")
-                return
-            }
-        } else {
-            if (errorClickNumber.value > 5) {
-                router.push("/sb")
-            }
-            if (errorClickNumber.value == 5) {
-                ElMessage.error({ message: "再乱点封号！！！" })
-            }
-            errorClickNumber.value++
-            console.log(errorClickNumber.value)
-            ElMessage.error({ message: "抖机灵？" })
+        const result = await uploadArticle(form)
+        if (result.data.code == 1) {
+            ElMessage.success({ message: "发布成功" })
+            router.push("/personal")
             return
         }
+    } else {
+        if (errorClickNumber.value > 5) {
+            router.push("/sb")
+        }
+        if (errorClickNumber.value == 5) {
+            ElMessage.error({ message: "再乱点封号！！！" })
+        }
+        errorClickNumber.value++
+        console.log(errorClickNumber.value)
+        ElMessage.error({ message: "抖机灵？" })
+        return
     }
-    ElMessage.error({ message: "时间和内容均不能为空，不然你发布个啥?" })
+    ElMessage.error({ message: "内容不能为空！！！" })
 }
 
 const resetForm = (formEl: any) => {
@@ -79,7 +75,10 @@ const showInput = () => {
 
 const handleInputConfirm = () => {
     if (inputValue.value) {
-        form.tags.push(inputValue.value)
+        if (form.tags.length < 3)
+            form.tags.push(inputValue.value)
+        else
+            ElMessage.error({ showClose: true, message: '最多只能添加3个标签' })
     }
     inputVisible.value = false
     inputValue.value = ''
@@ -141,17 +140,19 @@ onMounted(() => {
                 <el-form-item label="标题">
                     <el-input v-model="form.title" />
                 </el-form-item>
-                <el-form-item label="时间" prop="day">
+                <!-- <el-form-item label="时间" prop="day">
                     <el-col :span="11">
-                        <el-date-picker v-model="form.day" type="date" placeholder="日期" style="width: 100%" />
+                        <el-date-picker :default-value="new Date()" v-model="form.day" type="date" placeholder="日期"
+                            style="width: 100%" />
                     </el-col>
                     <el-col :span="2" class="text-center">
                         <span class="text-gray-500">-</span>
                     </el-col>
                     <el-col :span="11">
-                        <el-time-picker v-model="form.date" placeholder="时间" style="width: 100%" />
+                        <el-time-picker :default-value="new Date()" v-model="form.date" placeholder="时间"
+                            style="width: 100%" />
                     </el-col>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="类型">
                     <el-tag v-for="tag in form.tags" :key="tag" class="mx-1" closable :disable-transitions="false"
                         @close="handleClose(tag)">
@@ -194,15 +195,14 @@ onMounted(() => {
     position: relative;
     display: flex;
     flex-direction: column;
-    // justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 100%;
-    // overflow-x: hidden;
+    height: 80%;
+    overflow-y: scroll;
 
     #navigation {
         position: absolute;
-        top: 0px;
+        top: 0;
     }
 
     #header-line {
