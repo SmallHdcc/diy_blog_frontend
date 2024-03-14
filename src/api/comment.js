@@ -18,25 +18,18 @@ export function getComments(id, userId) {
 }
 
 // 点赞评论
-export function likeTheComment(id) {
+export function toggleLike(id, isLiked) {
     return service({
         method: "PUT",
-        url: `/comment/like?id=${id}`,
+        url: `/comment/like?id=${id}&isLiked=${isLiked} `,
     })
 }
-//取消点赞评论
-export function cancelLikeTheComment(id) {
-    return service({
-        method: "Delete",
-        url: `/comment/like?id=${id}`,
 
-    })
-}
 //根据评论id和用户id判断是否点赞评论
-export function isLikeTheComment(id, userId) {
+export function isLikeTheComment(id) {
     return service({
         method: "GET",
-        url: `/comment/like?id=${id}&userId=${userId}`,
+        url: `/comment/like?id=${id}`,
     })
 }
 

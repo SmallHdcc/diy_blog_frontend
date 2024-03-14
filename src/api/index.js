@@ -58,12 +58,6 @@ export function changeSign(signature, userId) {
     })
 }
 
-
-
-
-
-
-
 // 头像上传
 export function uploadAvatar(data) {
     return service({
@@ -78,7 +72,7 @@ export function uploadAvatar(data) {
 export function search(keyword) {
     return service({
         method: "GET",
-        url: `/article/public/search?keyword=${keyword}`,
+        url: `/article/search?keyword=${keyword}`,
     })
 }
 

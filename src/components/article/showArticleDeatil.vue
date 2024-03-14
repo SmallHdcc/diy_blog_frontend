@@ -1,7 +1,7 @@
 <script setup>
 import { ref, inject, onMounted, watch } from 'vue'
 /*--评论相关接口--*/
-import { uploadComment, getComments, likeTheComment, cancelLikeTheComment, deleteComment } from '@/api/comment.js'
+import { uploadComment, getComments, toggleLike } from '@/api/comment.js'
 /*--动画相关--*/
 import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
@@ -128,34 +128,28 @@ const getCommentInPage = async () => {
 }
 
 //防抖的使用 点赞
-
-const debounceLikeTheComment = debounce(likeTheComment, 1500)
-const debounceCancelLikeTheComment = debounce(cancelLikeTheComment, 1500)
+const debounceToggleLike = debounce(toggleLike, 1500)
 
 
-const likeTheCommentInPage = async (index) => {
-    if (commentArray.value[index].isLiked) {
-        // 调用取消点赞接口
-        commentArray.value[index].isLiked = false
-        commentArray.value[index].likeCount--
-        debounceCancelLikeTheComment(commentArray.value[index].id)
-    } else {
-        commentArray.value[index].isLiked = true
-        commentArray.value[index].likeCount++
-        debounceLikeTheComment(commentArray.value[index].id)
+const toggleLikeInPage = async (index) => {
+    let comment = commentArray.value[index]
+    try {
+        await debounceToggleLike(comment.id, comment.isLiked)
+    } catch (error) {
+        // 如果请求失败，恢复原来的 isLiked 状态和 likeCount
+        comment.isLiked = !comment.isLiked
+        comment.likeCount += comment.isLiked ? 1 : -1
+        console.error(error)
     }
+    // 切换 isLiked 状态
+    comment.isLiked = !comment.isLiked
+    // 根据新的 isLiked 状态增加或减少 likeCount
+    comment.likeCount += comment.isLiked ? 1 : -1
+    // 发送请求到服务器
+    console.log(comment.id, comment.isLiked)
 
 }
 
-const deleteCommentInPage = async (index) => {
-    const result = await deleteComment(commentArray.value[index].id)
-    if (result.data.code == 1) {
-        //从数组中删除元素
-        commentArray.value.splice(index, 1)
-        ElMessage.success("删除成功")
-    }
-
-}
 
 const showArticleDeatil = inject('showDetailVisible')
 
@@ -237,7 +231,7 @@ onMounted(() => {
                                 <div class="commenter-content">{{ item.content }}</div>
                                 <div class="comment-interaction">
                                     <div class="release-time">{{ item.createTime }}</div>
-                                    <div class="thumbs" @click="likeTheCommentInPage(key)">
+                                    <div class="thumbs" @click="toggleLikeInPage(key)">
                                         <thumbsUp :fill="item.isLiked ? 'green' : '#666666'" :id="key + 'like-btn'"
                                             style="width: 100%;height: 100%; color: green;" />
                                         <span>{{ item.likeCount }}</span>

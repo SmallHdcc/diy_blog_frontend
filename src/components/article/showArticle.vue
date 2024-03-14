@@ -1,8 +1,6 @@
 <script setup>
-import { ref, onMounted, inject, watch } from 'vue'
-import router from '../../router';
-import { getPublicBlogs, getPublicBlogDetail, getHeatList } from '@/api/blog.js'
-import WOW from 'wow.js'
+import { ref, onMounted, inject } from 'vue'
+import { getPublicBlogs, getPublicBlogDetail } from '@/api/blog.js'
 
 const article_content = ref()
 
@@ -11,11 +9,13 @@ const article_content = ref()
 /*---获取文章---*/
 const getBlogInPage = async () => {
     const result = await getPublicBlogs()
+    console.log(result.data)
     if (result.data.code === 1) {
         let articles = result.data.data
         //将字符串 转化为数组
         articles.forEach(item => {
             item.tags = toStringArray(item.tags)
+
         })
         article_content.value = articles
     }
@@ -37,9 +37,6 @@ const getBlogDetailByIndex = async (index) => {
         showArticleDeatil.value = true
     }
 }
-
-
-
 
 
 /*---滚动加载---*/
@@ -76,7 +73,8 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="article-info-bottom">
-                        <div class="info-date">{{ article.date }}</div>
+                        <div class="info-date">{{ article.releaseTime }}</div>
+
                         <div class="info-author">
                             <div class="article-views">
                                 <el-icon style="margin-right: 5px;" size="20px">
@@ -89,6 +87,7 @@ onMounted(() => {
                             <div class="author-avatar"><img :src="article.avatar" alt=""></div>
                             <div class="author-username">{{ article.username }}</div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -184,6 +183,11 @@ onMounted(() => {
                     }
                 }
 
+                .info-date {
+                    font-size: 14px;
+                    color: #666;
+                }
+
             }
 
         }
@@ -192,7 +196,7 @@ onMounted(() => {
             display: flex;
             align-items: center;
             width: 40%;
-            height: 70%;
+            height: 100%;
             border-radius: 10px;
             overflow: hidden;
 

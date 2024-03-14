@@ -132,6 +132,7 @@ onMounted(() => {
                 .side-list-element {
                     width: 100%;
                     cursor: pointer;
+                    transition: all 0.5s;
                 }
 
                 .side-list-element:hover {

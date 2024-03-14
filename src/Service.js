@@ -31,7 +31,10 @@ function handleError(error) {
         if (error.response.status >= 500) {
             message = '服务器错误';
         } else if (error.response.status >= 400) {
-            message = '请求错误';
+            if (error.response.status === 401) {
+                message = '异地登陆或登陆失效，请重新登陆';
+            } else
+                message = '请求错误';
         }
     } else if (error.request) {
         // 请求已发送，但没有收到响应

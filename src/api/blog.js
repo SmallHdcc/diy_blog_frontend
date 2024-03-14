@@ -50,26 +50,19 @@ export function deleteSingleBlog(id, userId) {
 }
 
 
-//文章状态修改
-export function changeArticleStatus(id, isPrivate) {
-    return service({
-        method: "PUT",
-        url: `/article/private?isPrivate=${isPrivate}&id=${id}`,
-    })
-}
-
 //获取所有公开的博客
 export function getPublicBlogs() {
     return service({
         method: "GET",
-        url: `/article/public`,
+        url: `/article`,
     })
 }
+
 //获取单个公开博客的细节
 export function getPublicBlogDetail(id) {
     return service({
         method: "GET",
-        url: `/article/public/detail?id=${id}`,
+        url: `/article/detail?id=${id}`,
     })
 }
 
