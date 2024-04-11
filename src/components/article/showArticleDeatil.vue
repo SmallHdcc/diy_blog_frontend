@@ -1,7 +1,7 @@
 <script setup>
 import { ref, inject, onMounted, watch } from 'vue'
 /*--评论相关接口--*/
-import { uploadComment, getComments, toggleLike } from '@/api/comment.js'
+import { uploadComment, getComments, toggleLike, deleteComment } from '@/api/comment.js'
 /*--动画相关--*/
 import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
@@ -111,17 +111,6 @@ const getCommentInPage = async () => {
     const userId = baseInfo && baseInfo.id ? baseInfo.id : null
     const result = await getComments(articleId, userId)
     if (result.data.code == 1) {
-        // 格式化时间
-        result.data.data.forEach((item, key) => {
-            let date = new Date(item.createTime)
-            let year = date.getFullYear()
-            let month = date.getMonth() + 1
-            let day = date.getDate()
-            let hour = date.getHours()
-            let minute = date.getMinutes()
-            let second = date.getSeconds()
-            item.createTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`
-        })
         commentArray.value = result.data.data
         commentNumber.value = commentArray.value.length
     }
@@ -157,9 +146,23 @@ const backToMainPage = () => {
     showArticleDeatil.value = false
 }
 
+//删除评论
+const deleteCommentInPage = async (index) => {
+    const result = await deleteComment(commentArray.value[index].id)
+    if (result.data.code === 1) {
+        ElMessage.success("删除成功")
+        getCommentInPage()
+    } else {
+        ElMessage.error("删除失败")
+    }
+
+}
+
+
 onMounted(() => {
     wow.init()
     article.value = JSON.parse(localStorage.getItem("article"))
+    console.log(article)
     if (JSON.parse(localStorage.getItem("baseInfo")))
         getCommentInPage()
     setTimeout(() => {
@@ -185,7 +188,7 @@ onMounted(() => {
                         <el-icon style="margin-right: 10px;">
                             <Calendar />
                         </el-icon>
-                        <span>{{ article.date }}</span>
+                        <span>{{ article.createTime }}</span>
                     </span>
                     <span id="heat">
                         <el-icon style="margin-right: 10px;">
@@ -236,6 +239,7 @@ onMounted(() => {
                                             style="width: 100%;height: 100%; color: green;" />
                                         <span>{{ item.likeCount }}</span>
                                     </div>
+                                    <div>回复</div>
                                     <el-popconfirm title="你确定你要删除吗?" confirm-button-text="确认" cancel-button-text="取消"
                                         @confirm="deleteCommentInPage(key)">
                                         <template #reference>
@@ -444,7 +448,7 @@ onMounted(() => {
                             .comment-interaction {
                                 display: flex;
                                 position: relative;
-                                // justify-content: space-between;
+                                justify-content: space-between;
                                 font-size: 16px;
                                 color: rgba(0, 0, 0, 0.5);
                                 box-sizing: border-box;
@@ -452,24 +456,15 @@ onMounted(() => {
                                 .thumbs {
                                     display: flex;
                                     align-items: center;
-                                    position: absolute;
-                                    right: 100px;
                                     width: 40px;
                                     height: 25px;
                                     cursor: pointer;
                                 }
 
                                 .el-tooltip__trigger {
-                                    position: absolute;
-                                    right: 0;
                                     cursor: pointer;
                                 }
 
-                                .delete-btn {
-                                    position: absolute;
-                                    right: 0;
-                                    cursor: pointer;
-                                }
                             }
                         }
                     }

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, provide, watch } from 'vue'
-import { getPublicBlogs, getPublicBlogDetail, getHeatList } from '@/api/blog.js'
+import { getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import { useArticleStore } from '@/stores/article.js'
 import showArticle from '@/components/article/showArticle.vue';
 import showDeatil from '@/components/article/showArticleDeatil.vue'
@@ -15,9 +15,12 @@ const heat_list = ref([])
 const getHeatListInPage = async () => {
     const result = await getHeatList()
     if (result.data.code === 1) {
-        //获取前5个
-        heat_list.value = result.data.data.slice(0, 5)
+        //获取前10个
+        heat_list.value = result.data.data.slice(0, 10)
     }
+    heat_list.value.forEach(item => {
+        item.articleTitle = item.articleTitle === null ? '虚位以待' : item.articleTitle
+    });
 }
 
 function getColor(index) {
@@ -122,7 +125,6 @@ onMounted(() => {
             .side-list {
                 display: flex;
                 flex-direction: column;
-                justify-content: space-around;
                 width: 100%;
                 height: 40vh;
                 background-color: white;
@@ -130,8 +132,11 @@ onMounted(() => {
                 padding-left: 20px;
 
                 .side-list-element {
+                    flex-grow: 1;
+                    flex-basis: auto;
                     width: 100%;
                     cursor: pointer;
+                    border-radius: 5px;
                     transition: all 0.5s;
                 }
 

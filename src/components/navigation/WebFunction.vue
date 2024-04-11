@@ -56,7 +56,7 @@ onMounted(() => {
                 <router-link active-class="link-hover" :to="'/personal'">个人中心</router-link>
             </div>
 
-            <div class="after_touch" @click="notDefined">
+            <div class="after_touch">
                 <el-icon>
                     <ChatSquare />
                 </el-icon>

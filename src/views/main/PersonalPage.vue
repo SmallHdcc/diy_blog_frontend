@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive, provide } from 'vue';
 /*--引入博客相关接口--*/
-import { getBlogs, getSingleBlogDetail, deleteSingleBlog, changeArticleStatus } from "@/api/blog.js"
+import { getBlogs, getSingleBlogDetail, deleteSingleBlog } from "@/api/blog.js"
 /*--引入用户相关接口--*/
 import { uploadAvatar, changeSign } from "@/api/index.js"
 import { encrypt } from "@/utils"

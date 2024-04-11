@@ -109,8 +109,9 @@ const show_search_result = (value, index) => {
     <div id="header">
         <div id="navigation">
             <div id="web-name"><img src="/img/logo.png" alt=""></div>
-            <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">{{ item.name
-                }}</router-link>
+            <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">
+                {{ item.name }}
+            </router-link>
             <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
             <WebFunction />
             <div id="Search_input">

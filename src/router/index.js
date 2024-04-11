@@ -26,11 +26,37 @@ const router = createRouter({
       component: () => import('../views/main/Feedback.vue')
     },
     {
-      path: '/test',
-      name: "testPage",
-      component: () => import('../views/test/test08.vue'),
-      meta: { isAuth: false, title: '测试页面' }
+      path: '/message',
+      name: "message",
+      redirect: '/message/reply',
+      meta: { isAuth: false, title: '消息中心' },
+      component: () => import('@/views/main/MessageCenter.vue'),
+      children: [
+        {
+          path: 'reply',
+          name: "reply",
+          component: () => import('@/components/message/ReplyMe.vue')
+        },
+      ],
     },
+    // {
+    //   path: '/test',
+    //   name: "testPage",
+    //   meta: { isAuth: false, title: '测试页面' },
+    //   component: () => import('@/views/test/test08.vue'),
+    //   children: [
+    //     {
+    //       path: 'reply',
+    //       name: "reply",
+    //       component: () => import('@/components/message/ReplyMe.vue')
+    //     },
+    //     {
+    //       path: 'sys',
+    //       name: "sys",
+    //       component: () => import('@/components/message/ReplyMe.vue')
+    //     },
+    //   ],
+    // },
     {
       path: "/:pathMatch(.*)*", // 必备
       component: () => import("@/views/error/404.vue"),

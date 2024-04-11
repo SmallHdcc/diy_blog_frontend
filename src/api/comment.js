@@ -39,8 +39,6 @@ export function deleteComment(id) {
         method: "DELETE",
         url: `/comment?id=${id}`
     })
-
-
 }
 
 

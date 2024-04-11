@@ -50,13 +50,16 @@ export function deleteSingleBlog(id, userId) {
 }
 
 
-//获取所有公开的博客
-export function getPublicBlogs() {
+
+//分页查询博客
+export function getBlogsByPage(page, PageSize) {
     return service({
         method: "GET",
-        url: `/article`,
+        url: `/article?page=${page}&PageSize=${PageSize}`,
     })
+
 }
+
 
 //获取单个公开博客的细节
 export function getPublicBlogDetail(id) {

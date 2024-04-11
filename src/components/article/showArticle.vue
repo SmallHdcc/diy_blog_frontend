@@ -1,21 +1,21 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue'
-import { getPublicBlogs, getPublicBlogDetail } from '@/api/blog.js'
+import { getPublicBlogDetail, getBlogsByPage } from '@/api/blog.js'
 
 const article_content = ref()
+/* 定义每次滚动获取的帖子数目 */
+const PAGE_SIZE = 5
 
 
 
 /*---获取文章---*/
 const getBlogInPage = async () => {
-    const result = await getPublicBlogs()
-    console.log(result.data)
+    const result = await getBlogsByPage(currentPage.value, pageSize.value)
     if (result.data.code === 1) {
-        let articles = result.data.data
+        let articles = result.data.data.records
         //将字符串 转化为数组
         articles.forEach(item => {
             item.tags = toStringArray(item.tags)
-
         })
         article_content.value = articles
     }
@@ -31,6 +31,7 @@ const showArticleDeatil = inject('showDetailVisible')
 /*---获取文章细节 ---*/
 const getBlogDetailByIndex = async (index) => {
     const result = await getPublicBlogDetail(article_content.value[index].id)
+    console.log(result.data)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
         // router.push("/detail")
@@ -38,10 +39,32 @@ const getBlogDetailByIndex = async (index) => {
     }
 }
 
+const currentPage = ref(1)
+const pageSize = ref(PAGE_SIZE)
+
+const loading = ref(false)
+const endOfContent = ref(false)
 
 /*---滚动加载---*/
-const load = () => {
-    console.log("滚动加载")
+const load = async () => {
+    currentPage.value++
+    loading.value = true
+    const result = await getBlogsByPage(currentPage.value, pageSize.value)
+    loading.value = false
+    if (result.data.code === 1) {
+        let articles = result.data.data.records
+        if (articles.length === 0) {
+            endOfContent.value = true
+            return
+        }
+        //将字符串 转化为数组
+        articles.forEach(item => {
+            item.tags = toStringArray(item.tags)
+
+        })
+        //将新的文章添加到原来的文章中
+        article_content.value = article_content.value.concat(articles)
+    }
 }
 
 onMounted(() => {
@@ -56,7 +79,9 @@ onMounted(() => {
     <transition name="fade">
         <div id="showArticle" v-infinite-scroll="load">
             <div class="article" v-for="(article, index) in article_content" @click="getBlogDetailByIndex(index)">
-                <div class="article-cover"><img :src=article.filePath alt=""></div>
+                <div class="article-cover">
+                    <img :src=article.filePath alt="">
+                </div>
                 <div class="article-info">
                     <div class="article-info-top">
                         <div class="article-info-top-left">
@@ -73,7 +98,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="article-info-bottom">
-                        <div class="info-date">{{ article.releaseTime }}</div>
+                        <div class="info-date">{{ article.createTime }}</div>
 
                         <div class="info-author">
                             <div class="article-views">
@@ -87,10 +112,16 @@ onMounted(() => {
                             <div class="author-avatar"><img :src="article.avatar" alt=""></div>
                             <div class="author-username">{{ article.username }}</div>
                         </div>
-
                     </div>
                 </div>
             </div>
+            <div v-if="loading" class="bottom-content">
+                <el-icon size="20px" class="is-loading">
+                    <Loading />
+                </el-icon>
+                <span>加载中...</span>
+            </div>
+            <div v-if="endOfContent" class="bottom-content">已经到底了...</div>
         </div>
     </transition>
 </template>
@@ -210,6 +241,12 @@ onMounted(() => {
     .article:hover {
         //放大为原来的1.1倍
         transform: scale(1.1);
+    }
+
+    .bottom-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 
