@@ -11,6 +11,7 @@ const PAGE_SIZE = 5
 /*---获取文章---*/
 const getBlogInPage = async () => {
     const result = await getBlogsByPage(currentPage.value, pageSize.value)
+    console.log(result.data)
     if (result.data.code === 1) {
         let articles = result.data.data.records
         //将字符串 转化为数组
@@ -18,6 +19,7 @@ const getBlogInPage = async () => {
             item.tags = toStringArray(item.tags)
         })
         article_content.value = articles
+        console.log(article_content.value)
     }
 }
 
@@ -45,9 +47,12 @@ const pageSize = ref(PAGE_SIZE)
 const loading = ref(false)
 const endOfContent = ref(false)
 
+
 /*---滚动加载---*/
 const load = async () => {
-    currentPage.value++
+    if (article_content.value === null) {
+        return
+    }
     loading.value = true
     const result = await getBlogsByPage(currentPage.value, pageSize.value)
     loading.value = false
@@ -77,7 +82,8 @@ onMounted(() => {
 
 <template>
     <transition name="fade">
-        <div id="showArticle" v-infinite-scroll="load">
+        <!-- v-infinite-scroll="load" -->
+        <div id="showArticle">
             <div class="article" v-for="(article, index) in article_content" @click="getBlogDetailByIndex(index)">
                 <div class="article-cover">
                     <img :src=article.filePath alt="">
@@ -98,7 +104,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="article-info-bottom">
-                        <div class="info-date">{{ article.createTime }}</div>
+                        <div class="info-date">{{ article.time }}</div>
 
                         <div class="info-author">
                             <div class="article-views">

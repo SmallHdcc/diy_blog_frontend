@@ -76,6 +76,7 @@ const submitForm = (formEl) => {
     formEl.validate(async (valid) => {
         if (valid) {
             const result = await login(ruleForm)
+            console.log("reslut: ", result.data)
             if (result.data.code === 1) {
                 //将获取的信息存储到localStorage中
                 localStorage.setItem("baseInfo", JSON.stringify(result.data.data))
@@ -193,6 +194,4 @@ const showRegister = () => {
     }
 
 }
-</style>  
-
-  
+</style>
