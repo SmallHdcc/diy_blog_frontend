@@ -5,11 +5,13 @@ import { getPublicBlogDetail, getBlogsByPage } from '@/api/blog.js'
 const article_content = ref()
 /* 定义每次滚动获取的帖子数目 */
 const PAGE_SIZE = 5
+const currentPage = ref(1)
 
 
-
+const loading = ref(false)
 /*---获取文章---*/
 const getBlogInPage = async () => {
+    loading.value = true
     const result = await getBlogsByPage(currentPage.value, pageSize.value)
     console.log(result.data)
     if (result.data.code === 1) {
@@ -21,6 +23,8 @@ const getBlogInPage = async () => {
         article_content.value = articles
         console.log(article_content.value)
     }
+    loading.value = false
+    currentPage.value++
 }
 
 //处理字符串
@@ -41,35 +45,40 @@ const getBlogDetailByIndex = async (index) => {
     }
 }
 
-const currentPage = ref(1)
 const pageSize = ref(PAGE_SIZE)
 
-const loading = ref(false)
 const endOfContent = ref(false)
 
 
 /*---滚动加载---*/
 const load = async () => {
-    if (article_content.value === null) {
+    if (loading.value || article_content.value === null) {
         return
     }
     loading.value = true
-    const result = await getBlogsByPage(currentPage.value, pageSize.value)
-    loading.value = false
-    if (result.data.code === 1) {
-        let articles = result.data.data.records
-        if (articles.length === 0) {
-            endOfContent.value = true
-            return
-        }
-        //将字符串 转化为数组
-        articles.forEach(item => {
-            item.tags = toStringArray(item.tags)
+    try {
+        const result = await getBlogsByPage(currentPage.value, pageSize.value)
+        loading.value = false
+        if (result.data.code === 1) {
+            let articles = result.data.data.records
+            if (articles.length === 0) {
+                endOfContent.value = true
+                loading.value = false
+                return
+            }
+            //将字符串 转化为数组
+            articles.forEach(item => {
+                item.tags = toStringArray(item.tags)
 
-        })
-        //将新的文章添加到原来的文章中
-        article_content.value = article_content.value.concat(articles)
+            })
+            //将新的文章添加到原来的文章中
+            article_content.value = article_content.value.concat(articles)
+            currentPage.value++
+        }
+    } finally {
+        loading.value = false
     }
+
 }
 
 onMounted(() => {
@@ -83,7 +92,7 @@ onMounted(() => {
 <template>
     <transition name="fade">
         <!-- v-infinite-scroll="load" -->
-        <div id="showArticle">
+        <div v-infinite-scroll="load" id="showArticle">
             <div class="article" v-for="(article, index) in article_content" @click="getBlogDetailByIndex(index)">
                 <div class="article-cover">
                     <img :src=article.filePath alt="">
