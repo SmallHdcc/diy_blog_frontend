@@ -44,7 +44,7 @@ const feedback = async () => {
     align-items: center;
     flex-direction: column;
     width: 100vw;
-    height: 100vh;
+    height: 94vh;
 
     #feed-back-content {
         textarea {

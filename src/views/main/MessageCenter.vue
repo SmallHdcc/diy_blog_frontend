@@ -52,8 +52,8 @@ const message_type = ref(
 #MessageCenter {
     display: flex;
     justify-content: center;
-    width: 100%;
-    height: 80%;
+    width: 100vw;
+    height: 100vh;
 
     #container {
         display: flex;

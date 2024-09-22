@@ -94,7 +94,7 @@ onMounted(() => {
     display: flex;
     justify-content: right;
     width: 100%;
-    height: 80%;
+    height: 94vh;
     background-color: rgb(234, 239, 245);
 
     .container {

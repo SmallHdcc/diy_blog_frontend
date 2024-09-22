@@ -133,26 +133,12 @@ onMounted(() => {
 
 <template>
     <div id="writeArticle">
-        <!-- <navigation /> -->
         <div id="container">
             <h1 id="header-line">写下今天的Blog</h1>
             <el-form :rules="rules" :model="form" label-width="120px" ref="ruleFormRef">
                 <el-form-item label="标题">
                     <el-input v-model="form.title" />
                 </el-form-item>
-                <!-- <el-form-item label="时间" prop="day">
-                    <el-col :span="11">
-                        <el-date-picker :default-value="new Date()" v-model="form.day" type="date" placeholder="日期"
-                            style="width: 100%" />
-                    </el-col>
-                    <el-col :span="2" class="text-center">
-                        <span class="text-gray-500">-</span>
-                    </el-col>
-                    <el-col :span="11">
-                        <el-time-picker :default-value="new Date()" v-model="form.date" placeholder="时间"
-                            style="width: 100%" />
-                    </el-col>
-                </el-form-item> -->
                 <el-form-item label="类型">
                     <el-tag v-for="tag in form.tags" :key="tag" class="mx-1" closable :disable-transitions="false"
                         @close="handleClose(tag)">
@@ -197,7 +183,7 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    height: 80%;
+    height: 94vh;
     overflow-y: scroll;
 
     #navigation {
@@ -226,6 +212,23 @@ onMounted(() => {
         height: 178px;
         display: block;
     }
+
+}
+
+#writeArticle::-webkit-scrollbar {
+    width: 4px;
+}
+
+#writeArticle::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#writeArticle::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.1);
 
 }
 </style>

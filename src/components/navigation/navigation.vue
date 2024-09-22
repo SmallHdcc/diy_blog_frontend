@@ -136,11 +136,7 @@ const show_search_result = (value, index) => {
 </template>
 <style lang="less" scoped>
 #header {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 50px;
-    overflow: hidden;
+    height: 6vh;
 
     #navigation {
         position: fixed;
@@ -148,11 +144,10 @@ const show_search_result = (value, index) => {
         justify-content: center;
         align-items: center;
         width: 100%;
-        height: 50px;
-        background-color: white;
+        height: 6vh;
         font-size: 20px;
+        background-color: white;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-
         z-index: 99;
 
         #navigation-user-avatar {

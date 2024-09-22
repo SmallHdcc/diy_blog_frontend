@@ -258,7 +258,7 @@ onMounted(() => {
 
 <style lang="less" scoped>
 #detailPage {
-    width: 90%;
+    width: 100%;
     min-height: 100vh;
     background-color: rgb(234, 239, 245);
     background-attachment: fixed;

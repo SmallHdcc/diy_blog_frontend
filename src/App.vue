@@ -13,11 +13,6 @@ import navigation from '@/components/navigation/navigation.vue';
       </transition>
     </router-view>
 
-    <div id="footer">
-      <a href="https://beian.miit.gov.cn/#/Integrated/index">鄂ICP备2023017019号</a>
-      <a href="https://beian.mps.gov.cn/#/query/webSearch?code=42018502006927" rel="noreferrer" target="_blank">
-        <span><img src="/img/备案图标.png" alt=""></span>鄂公网安备42018502006927</a>
-    </div>
 
   </div>
 </template>
@@ -26,33 +21,12 @@ import navigation from '@/components/navigation/navigation.vue';
 @import './assets/font/font.css';
 
 #app {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  font-family: xiawu;
-}
-
-#footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  // position: relative;
   width: 100%;
-  height: 13%;
-  background-color: rgb(236, 236, 236);
+  height: 10vh;
+  font-family: xiawu;
 
-  a:hover {
-    color: rgb(64, 158, 255);
-  }
-
-  img {
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-  }
 }
-
-
 
 .slide-fade-enter-active {
   transition: all 0.4s ease-out;
