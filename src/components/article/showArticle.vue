@@ -149,13 +149,12 @@ onMounted(() => {
         width: 100%;
         height: 250px;
         margin: 0 auto;
-        // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
         padding: 20px;
         cursor: pointer;
-        // border-radius: 5px;
         background-color: white;
         transition: all 0.5s;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        z-index: 1;
 
         /* 添加底部边框 */
         .article-info {
@@ -250,11 +249,6 @@ onMounted(() => {
             }
         }
     }
-
-    // .article:hover {
-    //     //放大为原来的1.1倍
-    //     transform: scale(1.1);
-    // }
 
     .bottom-content {
         display: flex;

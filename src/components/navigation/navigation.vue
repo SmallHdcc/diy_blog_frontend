@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, provide, ref, inject, watch } from 'vue'
+import { onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import Login from '@/components/login/Login.vue';
 import Register from '@/components/login/Register.vue';
 import WebFunction from '@/components/navigation/WebFunction.vue';
@@ -104,120 +104,158 @@ const show_search_result = (value, index) => {
 
 }
 
+/* 导航栏颜色控制 */
+const isScrolled = ref(false)
+
+const handleScroll = () => {
+    isScrolled.value = window.scrollY > 10
+}
+
+onMounted(() => {
+    window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+})
+
 </script>
 <template>
     <div id="header">
-        <div id="navigation">
-            <div id="web-name"><img src="/img/logo.png" alt=""></div>
-            <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">
-                {{ item.name }}
-            </router-link>
-            <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
-            <WebFunction />
-            <div id="Search_input">
-                <el-select v-model="input_value" @keydown.enter="show_search_result(input_value, 0)"
-                    @input="search_article()" filterable placeholder="点击搜索..." style="width: 240px">
-                    <el-option v-for="(item, index) in select_article_name" :key="index" :value="item.title"
-                        v-html="item.title" @click="show_search_result('1', index)" />
-                </el-select>
+        <div id="container" :class="{ scrolled: isScrolled }">
+            <div id="setWidth">
+                <div id="navigation">
+                    <div id="web-name"><img src="/img/logo.png" alt=""></div>
+                    <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">
+                        {{ item.name }}
+                    </router-link>
+                    <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
+                    <WebFunction />
+                    <div id="Search_input">
+                        <el-select v-model="input_value" @keydown.enter="show_search_result(input_value, 0)"
+                            @input="search_article()" filterable placeholder="点击搜索..." style="width: 240px">
+                            <el-option v-for="(item, index) in select_article_name" :key="index" :value="item.title"
+                                v-html="item.title" @click="show_search_result('1', index)" />
+                        </el-select>
+                    </div>
+                    <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
+                </div>
+                <Login v-show="isHaveAccount" />
+                <Register v-show="!isHaveAccount" />
             </div>
-            <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
         </div>
-        <Login v-show="isHaveAccount" />
-        <Register v-show="!isHaveAccount" />
     </div>
 </template>
 <style lang="less" scoped>
 #header {
+    position: relative;
     height: 6vh;
+    z-index: 1;
 
-    #navigation {
+    #container {
         position: fixed;
         display: flex;
         justify-content: center;
-        align-items: center;
         width: 100%;
         height: 6vh;
-        font-size: 20px;
-        background-color: white;
+        background-color: rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-        z-index: 99;
+        transition: all 0.5s;
 
-        #navigation-user-avatar {
-            position: absolute;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 100%;
-            transition: all 0.5s;
-            cursor: pointer;
-        }
+        #setWidth {
+            position: relative;
+            width: 80%;
+            height: 100%;
 
-
-        #web-name {
-            display: flex;
-            align-items: center;
-            position: absolute;
-            left: 10px;
-
-            img {
-                width: 100px;
-            }
-        }
-
-        #navigation-user {
-            position: absolute;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 100%;
-        }
-
-        #not_login_in {
-            position: absolute;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-            border-radius: 100%;
-            line-height: 40px;
-            color: rgb(135, 200, 238);
-            cursor: pointer;
-        }
-
-        #Search_input {
-            position: absolute;
-            right: 100px;
-
-            .Search_option {
+            #navigation {
                 display: flex;
-                flex-direction: column;
-                position: absolute;
-                width: 100%;
-                background-color: white;
-                border-radius: 4px;
-                // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+                justify-content: center;
+                align-items: center;
+                width: 80%;
+                height: 6vh;
+                font-size: 20px;
 
-                span {
-                    width: 100%;
-                    padding-left: 20px;
-                    font-size: 14px;
-                    margin-bottom: 10px;
+                #navigation-user-avatar {
+                    position: absolute;
+                    right: 20px;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 100%;
+                    transition: all 0.5s;
+                    cursor: pointer;
                 }
 
-                span:hover {
-                    background-color: rgb(205, 208, 210);
-                    color: white;
+
+                #web-name {
+                    display: flex;
+                    align-items: center;
+                    position: absolute;
+                    left: 10px;
+
+                    img {
+                        width: 150px;
+                    }
+                }
+
+                #navigation-user {
+                    position: absolute;
+                    right: 20px;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 100%;
+                }
+
+                #not_login_in {
+                    position: absolute;
+                    right: 20px;
+                    width: 40px;
+                    height: 40px;
+                    font-size: 16px;
+                    border-radius: 100%;
+                    line-height: 40px;
+                    color: rgb(135, 200, 238);
+                    cursor: pointer;
+                }
+
+                #Search_input {
+                    position: absolute;
+                    right: 100px;
+
+                    .Search_option {
+                        display: flex;
+                        flex-direction: column;
+                        position: absolute;
+                        width: 100%;
+                        background-color: white;
+                        border-radius: 4px;
+                        // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+
+                        span {
+                            width: 100%;
+                            padding-left: 20px;
+                            font-size: 14px;
+                            margin-bottom: 10px;
+                        }
+
+                        span:hover {
+                            background-color: rgb(205, 208, 210);
+                            color: white;
+                        }
+                    }
                 }
             }
         }
+    }
+
+    #container.scrolled {
+        background-color: white;
     }
 
 }
 
 
 .link-hover {
-    color: rgb(135, 200, 238);
+    color: rgb(0, 161, 214);
 }
 
 .fade-enter-active,

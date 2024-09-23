@@ -161,7 +161,7 @@ onMounted(() => {
                 </el-form-item>
                 <el-form-item label="内容">
                     <keep-alive>
-                        <textEditor ref="contents" />
+                        <textEditor ref="contents" style="resize: none;" />
                     </keep-alive>
                 </el-form-item>
                 <el-form-item label="简介">
@@ -184,23 +184,23 @@ onMounted(() => {
     align-items: center;
     width: 100%;
     height: 94vh;
-    overflow-y: scroll;
-
-    #navigation {
-        position: absolute;
-        top: 0;
-    }
-
-    #header-line {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 10px;
-    }
 
     #container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
         width: 1000px;
-        height: 80%;
         margin-top: 50px;
+        background-color: white;
+        padding: 20px;
+
+        #header-line {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+            background-color: white;
+            overflow: hidden;
+        }
 
         .mx-1 {
             margin-right: 10px;
@@ -212,23 +212,6 @@ onMounted(() => {
         height: 178px;
         display: block;
     }
-
-}
-
-#writeArticle::-webkit-scrollbar {
-    width: 4px;
-}
-
-#writeArticle::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#writeArticle::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    border-radius: 0;
-    background: rgba(0, 0, 0, 0.1);
 
 }
 </style>

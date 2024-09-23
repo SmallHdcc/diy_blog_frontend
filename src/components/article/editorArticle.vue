@@ -7,7 +7,7 @@ import tinymce from 'tinymce/tinymce'; //tinymce核心文件
 import 'tinymce/models/dom'; // 引入dom模块。从 Tinymce6，开始必须有此模块导入
 import 'tinymce/themes/silver'; //默认主题
 import 'tinymce/icons/default'; //引入编辑器图标icon，不引入则不显示对应图标
-import 'tinymce/langs/zh-Hans.js'; //引入编辑器语言包
+import 'tinymce/langs/zh_CN.js'; //引入编辑器语言包
 
 /* 引入编辑器插件
  * 位于 ./node_modules/tinymce/plugins 目录下，版本不同，插件会有所差异。根据自己版本来导入，若不存在的，不能导入，会报错。
@@ -48,8 +48,9 @@ import 'tinymce/plugins/wordcount'; //字数统计
 const tinymceInit = () => {
     tinymce.remove('#tinydemo')
     tinymce.init({
+        license_key: 'gpl',
         selector: '#tinydemo',
-        language: 'zh-Hans',
+        language: 'zh_CN', //语言
         promotion: false, //Upgrade是否开启
         branding: false, //tiny技术支持信息是否显示
         plugins: 'codesample preview searchreplace autolink directionality visualblocks visualchars image link media table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount autosave', //使用image插件
@@ -80,29 +81,14 @@ const tinymceInit = () => {
             input.click()
             input.onchange = function () {
                 let file = this.files[0]
-                // console.log(this.files)//文件 整体列表
-                // console.log(file) //文件的五种类型
-                // console.log(file.name) //文件的name名
                 // 下方被注释掉的是官方的一个例子
                 // 放到下面给大家参考
                 let reader = new FileReader()
                 reader.onload = function () {
-                    // console.log(window.tinymce) //打印tinymce编辑器里面的参数
-                    // Note: Now we need to register the blob in TinyMCEs image blob
-                    // registry. In the next release this part hopefully won't be
-                    // necessary, as we are looking to handle it internally.
                     let id = 'blobid' + (new Date()).getTime()
                     let blobCache = window.tinymce.activeEditor.editorUpload.blobCache
                     let base64 = reader.result.split(',')[1]
                     let blobInfo = blobCache.create(id, file, base64)
-                    // console.log(id) //获取时间
-                    // console.log(file) //文件的五种类型
-                    // console.log(base64) //解码bese64
-                    // console.log(file.name) //文件的name名
-                    // console.log(blobInfo) //创造 blob缓存总结（id、file、base64）
-                    // console.log(blobInfo.blobUri()) //
-                    // blobCache.add(blobInfo) //
-
                     // call the callback and populate the Title field with the file name
                     callback(blobInfo.blobUri(), { text: file.name, title: file.name })
                 }

@@ -89,11 +89,15 @@ onMounted(() => {
 </template>
 <style lang="less" scoped>
 #WebFunction {
+    position: relative;
+    z-index: 2;
+
     .el-drawer.rtl {
         .el-drawer__header {
             height: 40px !important;
             margin-bottom: 0px !important;
             padding-top: 20px;
+            z-index: 1;
 
             .el-drawer__title {
                 display: flex;

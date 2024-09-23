@@ -4,6 +4,9 @@ import { getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import { useArticleStore } from '@/stores/article.js'
 import showArticle from '@/components/article/showArticle.vue';
 import showDeatil from '@/components/article/showArticleDeatil.vue'
+/* 引入日历组件 */
+
+
 
 const blogStore = useArticleStore()
 watch(() => blogStore.blogArray, () => {
@@ -67,6 +70,12 @@ const handleMouseOver = (index) => {
 const text = ref(null)
 const textarea = ref(null)
 
+/* 日期相关*/
+//获得当前月份
+const month = new Date().getMonth() + 1
+//获得当前日期
+const day = new Date().getDate()
+
 
 onMounted(() => {
     getHeatListInPage()
@@ -118,7 +127,24 @@ onMounted(() => {
                         </div>
                     </div>
                     <div id="container-top-right">
-                        <h2 style="text-align: center;">希望今天是美好的😂</h2>
+                        <div style="width: 100%;
+                            height: 50px;
+                            font-size: 30px; 
+                            line-height: 50px;
+                            border-radius:10px 10px 0 0;
+                            background-color: rgb(0, 161, 214);
+                            text-align: center;">
+                            {{ month }}月
+                        </div>
+                        <div style="width: 100%;
+                                height: 200px;
+                                font-size: 60px;
+                                line-height: 200px;
+                                text-align: center;
+                                border-radius:0 0 10px 10px;">
+                            {{ day }}
+                        </div>
+                        <!-- <h2 style="text-align: center;">希望今天是美好的😂</h2> -->
                     </div>
                 </div>
                 <div id="container-bottom">
@@ -126,6 +152,7 @@ onMounted(() => {
                         <div id="left-top-wrapper">
                             <div class="top-wrapper-header">
                                 <div class="top-wrapper-header-element">发动态</div>
+                                <router-link to="/writeArticle" class="top-wrapper-header-element">写文章</router-link>
                             </div>
                             <div class="top-wrapper-input">
                                 <el-input v-model="text" style="width: 100%; border: none;" maxlength="10"
@@ -136,7 +163,8 @@ onMounted(() => {
                                     placeholder="分享一下你的想法吧" show-word-limit type="textarea" />
                             </div>
                             <div class="more-element">
-                                <div class="more-element-send_btn"></div>
+                                <el-button type="primary" color="rgb(0, 161, 214)">发布</el-button>
+                                <!-- <div class="more-element-send_btn"></div> -->
                             </div>
                         </div>
                         <div id="left-bottom-wrapper">
@@ -163,35 +191,18 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
-            <!-- <div class="container-side-list">
-                <div class="side-bar side-common">
-                    <h2>希望今天是美好的😂</h2>
-                </div>
-                <div class="side-list side-common">
-                    <h2>热门帖🔥</h2>
-                    <div v-for="(item, index) in heat_list" @click="getBlogDetailById(item.articleId)">
-                        <div class="side-list-element" :class="getColor(index)">
-                            <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
-                            {{ item.articleTitle }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <el-scrollbar class="container-center-content">
-                <showArticle v-if="!showDetailVisible"></showArticle>
-                <showDeatil v-if="showDetailVisible"></showDeatil>
-            </el-scrollbar> -->
         </div>
     </div>
 </template>
 
 <style lang="less" scoped>
 #Community {
+    position: relative;
     display: flex;
     justify-content: center;
     width: 100%;
     height: 94vh;
-    // background-color: rgb(234, 239, 245);
+    z-index: 0;
 
     .container {
         width: 100%;
@@ -207,7 +218,6 @@ onMounted(() => {
                 display: flex;
                 justify-content: space-between;
                 width: 100%;
-                background-color: white;
                 height: 300px;
                 border-radius: 10px;
 
@@ -217,6 +227,7 @@ onMounted(() => {
                     height: 100%;
                     border-radius: 10px;
                     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    background-color: white;
 
                     .top-left-list {
                         display: flex;
@@ -262,6 +273,7 @@ onMounted(() => {
                     height: 100%;
                     border-radius: 10px;
                     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    background-color: white;
 
                 }
             }
@@ -270,8 +282,6 @@ onMounted(() => {
                 display: flex;
                 justify-content: space-between;
                 width: 100%;
-                // background-color: aquamarine;
-                height: 2000px;
                 border-radius: 10px;
                 margin: 20px 0;
 
@@ -289,19 +299,27 @@ onMounted(() => {
 
 
                         .top-wrapper-header {
+                            display: flex;
                             width: 100%;
 
                             .top-wrapper-header-element {
                                 width: 70px;
                                 height: 30px;
-                                margin-bottom: 10px;
+                                margin: 0 10px 10px 0;
                                 color: white;
                                 line-height: 30px;
                                 text-align: center;
                                 border-radius: 5px;
                                 background-color: rgb(0, 161, 214);
                                 cursor: pointer;
+
                             }
+                        }
+
+                        .more-element {
+                            display: flex;
+                            justify-content: flex-end;
+                            margin: 10px 0;
                         }
                     }
 
@@ -320,22 +338,21 @@ onMounted(() => {
                             height: 50px;
                             border-radius: 10px 10px 0 0;
                             border-bottom: 1px solid rgba(146, 139, 139, 0.1);
+                            background-color: white;
 
                             .bottom-wrapper-header-element {
                                 flex: 1;
-                                background-color: blue;
                             }
                         }
                     }
                 }
 
                 #right-wrapper {
+                    position: sticky;
                     width: 30%;
                     height: 300px;
-                    position: -webkit-sticky;
-                    /* Safari */
-                    position: sticky;
                     top: 7vh;
+                    z-index: 0;
 
                     .side-common {
                         border-radius: 5px;
@@ -419,8 +436,6 @@ onMounted(() => {
     }
 
 }
-
-
 
 .gold-color {
     color: gold;

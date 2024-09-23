@@ -6,6 +6,7 @@ import navigation from '@/components/navigation/navigation.vue';
 <template>
   <div id="app">
     <navigation />
+    <video src="/img/ghibliLofiCoffee.mp4" autoplay="autoplay" loop="loop" muted="muted"></video>
     <router-view v-slot="{ Component }">
       <transition name="slide-fade">
         <component :is="Component" />
@@ -15,13 +16,21 @@ import navigation from '@/components/navigation/navigation.vue';
 </template>
 
 <style lang="less" scoped>
-@import './assets/font/font.css';
-
 #app {
   width: 100%;
   height: 10vh;
-  font-family: xiawu;
+}
 
+video {
+  position: fixed;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  background-attachment: fixed;
+  background-size: cover;
+  z-index: -1;
 }
 
 .slide-fade-enter-active {
