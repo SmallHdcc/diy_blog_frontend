@@ -90,7 +90,6 @@ onMounted(() => {
 <style lang="less" scoped>
 #WebFunction {
     .el-drawer.rtl {
-
         .el-drawer__header {
             height: 40px !important;
             margin-bottom: 0px !important;

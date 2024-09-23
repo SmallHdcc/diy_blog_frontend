@@ -55,6 +55,17 @@ const getBlogDetailById = async (id) => {
     }
 }
 
+/* 控制最上方元素切换 */
+const currentHoverIndex = ref(0)
+const lastHoverIndex = ref(null)
+
+const handleMouseOver = (index) => {
+    currentHoverIndex.value = index
+    lastHoverIndex.value = index
+}
+/* 控制动态输入框输入元素 */
+const text = ref(null)
+const textarea = ref(null)
 
 
 onMounted(() => {
@@ -67,7 +78,92 @@ onMounted(() => {
 <template>
     <div id="Community">
         <div class="container">
-            <div class="container-side-list">
+            <div class="middle">
+                <div id="container-top">
+                    <div id="container-top-left">
+                        <ul class="top-left-list">
+                            <li @mouseover="handleMouseOver(index)" v-for="(item, index) in ['更新公告', '关于作者', '关于网站']"
+                                :key="index"
+                                :class="{ 'hovered': currentHoverIndex === index || lastHoverIndex === index }">
+                                {{ item }}
+                            </li>
+                        </ul>
+                        <div class="left-content">
+                            <template v-if="currentHoverIndex === 0">
+                                <p style="text-indent: 2em;">
+                                    更新社区的布局，添加更多的元素，避免了首页太过单调.
+                                </p>
+                                <br />
+                                <p style="text-indent: 2em;">
+                                    新UI持续更新中......
+                                </p>
+                            </template>
+                            <template v-else-if="currentHoverIndex === 1">
+                                <ul>
+                                    <li>昵称:smallhdcc</li>
+                                    <li>院校:武汉工程大学</li>
+                                    <li>专业:数据科学与大数据技术专业</li>
+                                </ul>
+                                <ul>
+                                    <li>籍贯:河南新乡人</li>
+                                    <li>学院:光能数理学院</li>
+                                    <li>QQ:804678776</li>
+                                </ul>
+                            </template>
+                            <template v-else-if="currentHoverIndex === 2">
+                                <p style="text-indent: 2em;">一个前期是博客的论坛项目,因为作者实在是不懂UI设计,所以只能阉割一些内容,受制于作者的水平,
+                                    网站存在的BUG还希望大家能见谅,作者会尽快修复,希望大家能够喜欢这个项目,如果有什么问题,可以联系作者.
+                                </p>
+                            </template>
+                        </div>
+                    </div>
+                    <div id="container-top-right">
+                        <h2 style="text-align: center;">希望今天是美好的😂</h2>
+                    </div>
+                </div>
+                <div id="container-bottom">
+                    <div id="left-wrapper">
+                        <div id="left-top-wrapper">
+                            <div class="top-wrapper-header">
+                                <div class="top-wrapper-header-element">发动态</div>
+                            </div>
+                            <div class="top-wrapper-input">
+                                <el-input v-model="text" style="width: 100%; border: none;" maxlength="10"
+                                    placeholder="标题,最多10个字" show-word-limit type="text" />
+                                <div style="margin: 20px 0" />
+                                <el-input v-model="textarea" maxlength="100" resize="none" rows="6"
+                                    style="width: 100%; height:80%; background-color: rgb(248, 248, 248);"
+                                    placeholder="分享一下你的想法吧" show-word-limit type="textarea" />
+                            </div>
+                            <div class="more-element">
+                                <div class="more-element-send_btn"></div>
+                            </div>
+                        </div>
+                        <div id="left-bottom-wrapper">
+                            <ul class="bottom-wrapper-header">
+                                <!-- <li class="bottom-wrapper-header-element">最新</li> -->
+                            </ul>
+                            <showArticle></showArticle>
+                        </div>
+                        <el-dialog v-model="showDetailVisible" width="900px"
+                            style="display: flex;flex-direction: column;">
+                            <showDeatil v-if="showDetailVisible"></showDeatil>
+                        </el-dialog>
+                    </div>
+                    <div id="right-wrapper">
+                        <div class="side-list side-common">
+                            <h2>热门帖🔥</h2>
+                            <div v-for="(item, index) in heat_list" @click="getBlogDetailById(item.articleId)">
+                                <div class="side-list-element" :class="getColor(index)">
+                                    <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
+                                    {{ item.articleTitle }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="container-side-list">
                 <div class="side-bar side-common">
                     <h2>希望今天是美好的😂</h2>
                 </div>
@@ -84,7 +180,7 @@ onMounted(() => {
             <el-scrollbar class="container-center-content">
                 <showArticle v-if="!showDetailVisible"></showArticle>
                 <showDeatil v-if="showDetailVisible"></showDeatil>
-            </el-scrollbar>
+            </el-scrollbar> -->
         </div>
     </div>
 </template>
@@ -92,15 +188,185 @@ onMounted(() => {
 <style lang="less" scoped>
 #Community {
     display: flex;
-    justify-content: right;
+    justify-content: center;
     width: 100%;
     height: 94vh;
-    background-color: rgb(234, 239, 245);
+    // background-color: rgb(234, 239, 245);
 
     .container {
-        display: flex;
-        justify-content: center;
-        width: 90%;
+        width: 100%;
+
+        .middle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 1200px;
+            margin: 20px auto;
+
+            #container-top {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                background-color: white;
+                height: 300px;
+                border-radius: 10px;
+
+                #container-top-left {
+                    display: flex;
+                    width: 69%;
+                    height: 100%;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+                    .top-left-list {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        width: 20%;
+                        height: 100%;
+                        padding: 0;
+                        margin: 0;
+
+                        li {
+                            display: flex;
+                            align-items: center; //让文字垂直居中
+                            justify-content: center; //让文字水平居中
+                            flex: 1; //是让子元素均分高度
+                            text-align: center;
+                            font-size: 24px;
+                            color: #8c8b8a;
+                            border-radius: 5px 0 0 5px;
+                            background-color: white;
+                            cursor: pointer;
+                        }
+
+                        .hovered {
+                            background: linear-gradient(to right, rgba(0, 161, 214, 0.1), #ffffff);
+                            color: rgb(0, 161, 214);
+                        }
+                    }
+
+                    .left-content {
+                        display: flex;
+                        width: 80%;
+                        height: 100%;
+                        /* 添加内边距 */
+                        padding: 20px;
+                        /* 添加圆角 */
+                        border-radius: 0 5px 5px 0;
+                    }
+                }
+
+                #container-top-right {
+                    width: 30%;
+                    height: 100%;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+                }
+            }
+
+            #container-bottom {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                // background-color: aquamarine;
+                height: 2000px;
+                border-radius: 10px;
+                margin: 20px 0;
+
+                #left-wrapper {
+                    width: 69%;
+
+                    #left-top-wrapper {
+                        width: 100%;
+                        height: 300px;
+                        background-color: white;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+                        padding: 20px;
+
+
+                        .top-wrapper-header {
+                            width: 100%;
+
+                            .top-wrapper-header-element {
+                                width: 70px;
+                                height: 30px;
+                                margin-bottom: 10px;
+                                color: white;
+                                line-height: 30px;
+                                text-align: center;
+                                border-radius: 5px;
+                                background-color: rgb(0, 161, 214);
+                                cursor: pointer;
+                            }
+                        }
+                    }
+
+                    #left-bottom-wrapper {
+                        display: flex;
+                        flex-direction: column;
+                        flex-grow: 1;
+                        width: 100%;
+                        margin: 20px 0;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+                        .bottom-wrapper-header {
+                            display: flex;
+                            width: 100%;
+                            height: 50px;
+                            border-radius: 10px 10px 0 0;
+                            border-bottom: 1px solid rgba(146, 139, 139, 0.1);
+
+                            .bottom-wrapper-header-element {
+                                flex: 1;
+                                background-color: blue;
+                            }
+                        }
+                    }
+                }
+
+                #right-wrapper {
+                    width: 30%;
+                    height: 300px;
+                    position: -webkit-sticky;
+                    /* Safari */
+                    position: sticky;
+                    top: 7vh;
+
+                    .side-common {
+                        border-radius: 5px;
+                        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+                    }
+
+                    .side-list {
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                        height: 100%;
+                        background-color: white;
+                        overflow-y: hidden;
+                        padding-left: 20px;
+
+                        .side-list-element {
+                            flex-grow: 1;
+                            flex-basis: auto;
+                            width: 100%;
+                            cursor: pointer;
+                            border-radius: 5px;
+                            transition: all 0.5s;
+                        }
+
+                        .side-list-element:hover {
+                            background-color: rgb(228, 233, 239);
+                        }
+                    }
+                }
+            }
+        }
 
         .container-side-list {
             position: static;
@@ -153,6 +419,8 @@ onMounted(() => {
     }
 
 }
+
+
 
 .gold-color {
     color: gold;

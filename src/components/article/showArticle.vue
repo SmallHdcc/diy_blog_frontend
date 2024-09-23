@@ -13,7 +13,6 @@ const loading = ref(false)
 const getBlogInPage = async () => {
     loading.value = true
     const result = await getBlogsByPage(currentPage.value, pageSize.value)
-    console.log(result.data)
     if (result.data.code === 1) {
         let articles = result.data.data.records
         //将字符串 转化为数组
@@ -21,7 +20,6 @@ const getBlogInPage = async () => {
             item.tags = toStringArray(item.tags)
         })
         article_content.value = articles
-        console.log(article_content.value)
     }
     loading.value = false
     currentPage.value++
@@ -37,12 +35,10 @@ const showArticleDeatil = inject('showDetailVisible')
 /*---获取文章细节 ---*/
 const getBlogDetailByIndex = async (index) => {
     const result = await getPublicBlogDetail(article_content.value[index].id)
-    console.log(result.data)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
-        // router.push("/detail")
-        showArticleDeatil.value = true
     }
+    showArticleDeatil.value = true
 }
 
 const pageSize = ref(PAGE_SIZE)
@@ -91,7 +87,6 @@ onMounted(() => {
 
 <template>
     <transition name="fade">
-        <!-- v-infinite-scroll="load" -->
         <div v-infinite-scroll="load" id="showArticle">
             <div class="article" v-for="(article, index) in article_content" @click="getBlogDetailByIndex(index)">
                 <div class="article-cover">
@@ -130,6 +125,7 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
+
             <div v-if="loading" class="bottom-content">
                 <el-icon size="20px" class="is-loading">
                     <Loading />
@@ -143,23 +139,25 @@ onMounted(() => {
 
 <style lang="less" scoped>
 #showArticle {
-    width: 75%;
+    width: 100%;
     height: 100%;
     transition: all 0.5s;
 
     .article {
         display: flex;
         align-items: center;
-        width: 89%;
-        height: 200px;
-        margin: 20px auto;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-        padding: 10px;
+        width: 100%;
+        height: 250px;
+        margin: 0 auto;
+        // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+        padding: 20px;
         cursor: pointer;
-        border-radius: 5px;
+        // border-radius: 5px;
         background-color: white;
         transition: all 0.5s;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
+        /* 添加底部边框 */
         .article-info {
             position: relative;
             display: flex;
@@ -253,10 +251,10 @@ onMounted(() => {
         }
     }
 
-    .article:hover {
-        //放大为原来的1.1倍
-        transform: scale(1.1);
-    }
+    // .article:hover {
+    //     //放大为原来的1.1倍
+    //     transform: scale(1.1);
+    // }
 
     .bottom-content {
         display: flex;

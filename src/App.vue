@@ -1,5 +1,4 @@
 <script setup>
-import { ref, onMounted, onUnmounted, provide } from 'vue'
 import navigation from '@/components/navigation/navigation.vue';
 
 </script>
@@ -12,8 +11,6 @@ import navigation from '@/components/navigation/navigation.vue';
         <component :is="Component" />
       </transition>
     </router-view>
-
-
   </div>
 </template>
 
@@ -21,7 +18,6 @@ import navigation from '@/components/navigation/navigation.vue';
 @import './assets/font/font.css';
 
 #app {
-  // position: relative;
   width: 100%;
   height: 10vh;
   font-family: xiawu;

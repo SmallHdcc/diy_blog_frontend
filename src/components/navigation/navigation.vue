@@ -115,13 +115,6 @@ const show_search_result = (value, index) => {
             <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
             <WebFunction />
             <div id="Search_input">
-                <!-- <el-input @focus="is_show_article_name = true" @input="search_article(search_content)"
-                    v-model="search_content" class="w-50 m-2" placeholder="点击搜索..." :prefix-icon="Search"
-                    @keydown.enter="show_search_result(search_content)" />
-                <div class="Search_option" v-if="is_show_article_name">
-                    <span v-for="(item, index) in select_article_name" v-html="item.title"
-                        @click="show_search_result('1', index)"></span>
-                </div> -->
                 <el-select v-model="input_value" @keydown.enter="show_search_result(input_value, 0)"
                     @input="search_article()" filterable placeholder="点击搜索..." style="width: 240px">
                     <el-option v-for="(item, index) in select_article_name" :key="index" :value="item.title"

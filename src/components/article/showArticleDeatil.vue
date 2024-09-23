@@ -47,27 +47,8 @@ watch(handleArticleShow, () => {
     article.value = JSON.parse(localStorage.getItem("article"))
 })
 
-
-
-
-// 关于动画
-const wow = new WOW({
-    boxClass: 'wow',            //动画元素的CSS类(默认为wow)
-    animateClass: 'animated',   // CSS类(默认为animation)
-    offset: 0,                  //触发动画时到元素的距离(默认为0)
-    mobile: true,               //在移动设备上触发动画(默认为true)
-    live: true,                 //异步加载内容(默认为true)
-    callback: function (box) {
-        //每次动画开始时触发回调
-        //传入的参数是正在动画的DOM节点
-    },
-    scrollContainer: null,      //可选滚动容器选择器，否则使用window
-})
-
-
 // 与评论有关
-const commentArray = ref([
-])
+const commentArray = ref([])
 
 /*here is about commnet*/
 
@@ -140,11 +121,10 @@ const toggleLikeInPage = async (index) => {
 }
 
 
-const showArticleDeatil = inject('showDetailVisible')
 
-const backToMainPage = () => {
-    showArticleDeatil.value = false
-}
+// const backToMainPage = () => {
+//     showArticleDeatil.value = false
+// }
 
 //删除评论
 const deleteCommentInPage = async (index) => {
@@ -157,12 +137,20 @@ const deleteCommentInPage = async (index) => {
     }
 
 }
+const showDetailVisible = inject('showDetailVisible')
+const flag = inject('flag')
+//当updateArticle变化时，更新article
+watch(flag, () => {
+    article.value = JSON.parse(localStorage.getItem("article"))
+    if (JSON.parse(localStorage.getItem("baseInfo")))
+        getCommentInPage()
+    console.log("文章更新")
+    showDetailVisible.value = true;
+})
 
 
 onMounted(() => {
-    wow.init()
     article.value = JSON.parse(localStorage.getItem("article"))
-    console.log(article)
     if (JSON.parse(localStorage.getItem("baseInfo")))
         getCommentInPage()
     setTimeout(() => {
@@ -176,12 +164,7 @@ onMounted(() => {
 <template>
     <div id="detailPage">
         <div id="container">
-            <div id="main" class="wow bounceInUp">
-                <div @click="backToMainPage" class="arrow-back">
-                    <el-icon style="font-weight: 700;" size="30px">
-                        <Back />
-                    </el-icon>
-                </div>
+            <div id="main">
                 <h1 id="title">{{ article.title }}</h1>
                 <div id="baseInfo">
                     <span id="date">
@@ -209,7 +192,8 @@ onMounted(() => {
                 <div id="content" style="white-space: pre-wrap;padding: 10px;" v-html="article.content">
                 </div>
                 <div class="comment">
-                    <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
+                    <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;">
+                    </div>
 
                     <div id="comment-font-box">
                         <h2>评论</h2>
@@ -254,13 +238,16 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
 </template>
 
 <style lang="less" scoped>
 #detailPage {
+    position: relative;
     width: 100%;
-    min-height: 100vh;
-    background-color: rgb(234, 239, 245);
+    height: 100%;
+    // min-height: 100vh;
+    // background-color: rgb(234, 239, 245);
     background-attachment: fixed;
     background-size: 100%;
 
@@ -279,16 +266,9 @@ onMounted(() => {
             width: 100%;
             background-color: rgba(255, 255, 255);
             border-radius: 10px;
-            margin: 10px 0px 30px 0px;
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            margin: 10px 0 30px 0;
             z-index: 0;
 
-            .arrow-back {
-                position: absolute;
-                top: 0;
-                left: 10px;
-                cursor: pointer;
-            }
 
             #baseInfo {
                 display: flex;
