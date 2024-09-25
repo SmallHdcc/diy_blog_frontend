@@ -121,11 +121,6 @@ const toggleLikeInPage = async (index) => {
 }
 
 
-
-// const backToMainPage = () => {
-//     showArticleDeatil.value = false
-// }
-
 //删除评论
 const deleteCommentInPage = async (index) => {
     const result = await deleteComment(commentArray.value[index].id)

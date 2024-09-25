@@ -131,13 +131,13 @@ onUnmounted(() => {
                     </router-link>
                     <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
                     <WebFunction />
-                    <div id="Search_input">
+                    <!-- <div id="Search_input">
                         <el-select v-model="input_value" @keydown.enter="show_search_result(input_value, 0)"
                             @input="search_article()" filterable placeholder="点击搜索..." style="width: 240px">
                             <el-option v-for="(item, index) in select_article_name" :key="index" :value="item.title"
                                 v-html="item.title" @click="show_search_result('1', index)" />
                         </el-select>
-                    </div>
+                    </div> -->
                     <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
                 </div>
                 <Login v-show="isHaveAccount" />
@@ -178,8 +178,8 @@ onUnmounted(() => {
                 #navigation-user-avatar {
                     position: absolute;
                     right: 20px;
-                    width: 40px;
-                    height: 40px;
+                    width: 2.5vw;
+                    height: 5vh;
                     border-radius: 100%;
                     transition: all 0.5s;
                     cursor: pointer;
@@ -193,7 +193,7 @@ onUnmounted(() => {
                     left: 10px;
 
                     img {
-                        width: 150px;
+                        width: 10vw;
                     }
                 }
 

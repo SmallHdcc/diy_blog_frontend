@@ -1,17 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
+const baseInfo = JSON.parse(localStorage.getItem('baseInfo') || '{}')
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       component: () => import('../views/main/Community.vue'),
-      meta: { isAuth: true, title: '社区' },
+      meta: { isAuth: true, title: '零玖网 - 简单极致论坛' },
     },
     {
       path: '/personal',
       name: "personal",
-      component: () => import('../views/main/PersonalPage.vue'),
-      meta: { title: '个人页' }
+      component: () => import('../views/main/PersonalPageTest.vue'),
+      meta: { title: baseInfo.username + '- 个人主页' }
     },
     {
       path: '/writeArticle',

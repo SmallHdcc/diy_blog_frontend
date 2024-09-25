@@ -12,7 +12,7 @@ const loading = ref(false)
 /*---获取文章---*/
 const getBlogInPage = async () => {
     loading.value = true
-    const result = await getBlogsByPage(currentPage.value, pageSize.value)
+    const result = await getBlogsByPage(currentPage.value, pageSize.value, 0)
     if (result.data.code === 1) {
         let articles = result.data.data.records
         //将字符串 转化为数组
@@ -53,7 +53,7 @@ const load = async () => {
     }
     loading.value = true
     try {
-        const result = await getBlogsByPage(currentPage.value, pageSize.value)
+        const result = await getBlogsByPage(currentPage.value, pageSize.value, 0)
         loading.value = false
         if (result.data.code === 1) {
             let articles = result.data.data.records
@@ -254,6 +254,7 @@ onMounted(() => {
         display: flex;
         justify-content: center;
         align-items: center;
+        color: white;
     }
 }
 

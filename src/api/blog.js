@@ -52,10 +52,10 @@ export function deleteSingleBlog(id, userId) {
 
 
 //分页查询博客
-export function getBlogsByPage(page, PageSize) {
+export function getBlogsByPage(page, PageSize, userId) {
     return service({
         method: "GET",
-        url: `/article?page=${page}&PageSize=${PageSize}`,
+        url: `/article?page=${page}&PageSize=${PageSize}&userId=${userId}`,
     })
 
 }

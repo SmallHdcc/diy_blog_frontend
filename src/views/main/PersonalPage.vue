@@ -237,6 +237,7 @@ onMounted(() => {
         <div id="container">
             <div id="showContent">
                 <div id="left-content">
+                    维护中....
                     <div class="right-userInfo wow bounceInUp">
                         <div class="el-card">
                             <div id="avatar" @click="dialogVisible = true">
@@ -287,8 +288,7 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 80%;
-    background-color: rgb(242, 243, 245);
+    height: 94vh;
     overflow-x: hidden;
 
     #container {
@@ -296,9 +296,11 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 100%;
+        width: 80%;
         height: 100%;
-
+        background-color: white;
+        text-align: center;
+        font-size: 30px;
 
         #showContent {
             position: relative;
