@@ -19,7 +19,7 @@ const getBaseInfo = () => {
 
 const linkList = ref([
     {
-        name: '社区',
+        name: '首页',
         link: "/",
     },
 ])
@@ -213,8 +213,10 @@ onUnmounted(() => {
                     font-size: 16px;
                     border-radius: 100%;
                     line-height: 40px;
-                    color: rgb(135, 200, 238);
+                    color: white;
+                    text-align: center;
                     cursor: pointer;
+                    background-color: rgb(0, 161, 214);
                 }
 
                 #Search_input {

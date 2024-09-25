@@ -4,8 +4,7 @@ import { getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import { useArticleStore } from '@/stores/article.js'
 import showArticle from '@/components/article/showArticle.vue';
 import showDeatil from '@/components/article/showArticleDeatil.vue'
-/* 引入日历组件 */
-
+import router from '../../router';
 
 
 const blogStore = useArticleStore()
@@ -75,6 +74,17 @@ const textarea = ref(null)
 const month = new Date().getMonth() + 1
 //获得当前日期
 const day = new Date().getDate()
+
+/* 检查登录状态 */
+const checkIsLogin = () => {
+
+    const isLogin = JSON.parse(localStorage.getItem("baseInfo")) === null ? false : true
+    if (!isLogin) {
+        ElMessage.warning("请先登录")
+        router.push("/login")
+    }
+}
+
 
 
 onMounted(() => {
@@ -152,7 +162,8 @@ onMounted(() => {
                         <div id="left-top-wrapper">
                             <div class="top-wrapper-header">
                                 <div class="top-wrapper-header-element">发动态</div>
-                                <router-link to="/writeArticle" class="top-wrapper-header-element">写文章</router-link>
+                                <router-link @click="checkIsLogin()" to="/writeArticle"
+                                    class="top-wrapper-header-element">写文章</router-link>
                             </div>
                             <div class="top-wrapper-input">
                                 <el-input v-model="text" style="width: 100%; border: none;" maxlength="10"
@@ -164,12 +175,14 @@ onMounted(() => {
                             </div>
                             <div class="more-element">
                                 <el-button type="primary" color="rgb(0, 161, 214)">发布</el-button>
-                                <!-- <div class="more-element-send_btn"></div> -->
                             </div>
                         </div>
                         <div id="left-bottom-wrapper">
                             <ul class="bottom-wrapper-header">
-                                <!-- <li class="bottom-wrapper-header-element">最新</li> -->
+                                <li v-for="(item, index) in ['关注', '推荐', '最新']" :key="index"
+                                    class="bottom-wrapper-header-element">
+                                    {{ item }}
+                                </li>
                             </ul>
                             <showArticle></showArticle>
                         </div>
@@ -334,15 +347,27 @@ onMounted(() => {
 
                         .bottom-wrapper-header {
                             display: flex;
+                            justify-content: center;
                             width: 100%;
                             height: 50px;
                             border-radius: 10px 10px 0 0;
+                            padding: 0;
                             border-bottom: 1px solid rgba(146, 139, 139, 0.1);
                             background-color: white;
+                            overflow: hidden;
 
                             .bottom-wrapper-header-element {
                                 flex: 1;
+                                font-size: 20px;
+                                line-height: 50px;
+                                text-align: center;
+                                cursor: pointer;
                             }
+
+                            .bottom-wrapper-header-element:hover {
+                                color: rgb(0, 161, 214);
+                            }
+
                         }
                     }
                 }

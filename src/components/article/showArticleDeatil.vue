@@ -344,7 +344,7 @@ onMounted(() => {
                             width: 100%;
                             height: 100%;
                             border-radius: 100%;
-                            background-color: rgb(99, 204, 131);
+                            background-color: rgb(0, 161, 214);
                             color: white;
                             font-size: 14px;
                         }
@@ -375,7 +375,7 @@ onMounted(() => {
                     #input-commit-button {
                         width: 10%;
                         height: 70px;
-                        background-color: rgb(99, 204, 131);
+                        background-color: rgb(0, 161, 214);
                         margin-left: 10px;
                         border-radius: 5px;
                         line-height: 70px;
