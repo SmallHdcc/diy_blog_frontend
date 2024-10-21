@@ -94,7 +94,7 @@ const handleAvatarSuccess = async (
     console.log(response)
 }
 
-
+const username = JSON.parse(localStorage.getItem("baseInfo") || '').username
 
 const beforeAvatarUpload = async (rawFile: any) => {
     if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
@@ -134,7 +134,7 @@ onMounted(() => {
 <template>
     <div id="writeArticle">
         <div id="container">
-            <h1 id="header-line">写下今天的Blog</h1>
+            <h1 id="header-line">你好,{{ username }}</h1>
             <el-form :rules="rules" :model="form" label-width="120px" ref="ruleFormRef">
                 <el-form-item label="标题">
                     <el-input v-model="form.title" />
@@ -193,12 +193,18 @@ onMounted(() => {
         margin-top: 50px;
         background-color: white;
         padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
         #header-line {
             width: 100%;
             text-align: center;
             margin-bottom: 10px;
-            background-color: white;
+            //文字渐变色
+            background: linear-gradient(to right, #409EFF, #FFD700);
+            -webkit-background-clip: text;
+            /* 仅对文字应用背景裁剪 */
+            color: transparent;
             overflow: hidden;
         }
 

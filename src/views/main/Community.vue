@@ -6,6 +6,8 @@ import showArticle from '@/components/article/showArticle.vue';
 import showDeatil from '@/components/article/showArticleDeatil.vue'
 import router from '../../router';
 
+const userId = 0
+provide('userId', userId)
 
 const blogStore = useArticleStore()
 watch(() => blogStore.blogArray, () => {

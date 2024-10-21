@@ -2,8 +2,6 @@
 import { ref, inject, onMounted, watch } from 'vue'
 /*--评论相关接口--*/
 import { uploadComment, getComments, toggleLike, deleteComment } from '@/api/comment.js'
-/*--动画相关--*/
-import WOW from 'wow.js'
 import { ElMessage } from 'element-plus';
 import thumbsUp from '@/components/icon/thumbsUp.vue';
 /*--防抖--*/
@@ -16,7 +14,7 @@ import "prismjs/components/prism-python.js"
 
 import { useUserStore } from '@/stores/user.js';
 
-const getBaseInfo = () => {
+const fetchBaseInfo = () => {
     return JSON.parse(localStorage.getItem("baseInfo"))
 }
 
@@ -25,7 +23,7 @@ let isLogin = userStore.isLogin
 
 watch(() => userStore.isLogin, (newVal, oldVal) => {
     if (newVal) {
-        userAvatar.value = getBaseInfo().avatar
+        userAvatar.value = fetchBaseInfo().avatar
         console.log(userAvatar.value)
     } else {
         userAvatar.value = null
@@ -53,8 +51,8 @@ const commentArray = ref([])
 /*here is about commnet*/
 
 const userAvatar = ref('')
-if (getBaseInfo()) {
-    userAvatar.value = getBaseInfo().avatar
+if (fetchBaseInfo()) {
+    userAvatar.value = fetchBaseInfo().avatar
     isLogin = true
 }
 
@@ -80,13 +78,13 @@ const uploadCommentData = async () => {
     if (result.data.code == 1) {
         ElMessage.success("评论成功")
         commentInput.value = ""
-        getCommentInPage()
+        fetchComments()
     }
 }
 
 let commentNumber = ref()
 
-const getCommentInPage = async () => {
+const fetchComments = async () => {
     const articleId = JSON.parse(localStorage.getItem("article")).id
     const baseInfo = JSON.parse(localStorage.getItem("baseInfo"))
     const userId = baseInfo && baseInfo.id ? baseInfo.id : null
@@ -101,7 +99,7 @@ const getCommentInPage = async () => {
 const debounceToggleLike = debounce(toggleLike, 1500)
 
 
-const toggleLikeInPage = async (index) => {
+const toggleCommentLike = async (index) => {
     let comment = commentArray.value[index]
     try {
         await debounceToggleLike(comment.id, comment.isLiked)
@@ -122,11 +120,11 @@ const toggleLikeInPage = async (index) => {
 
 
 //删除评论
-const deleteCommentInPage = async (index) => {
+const removeComments = async (index) => {
     const result = await deleteComment(commentArray.value[index].id)
     if (result.data.code === 1) {
         ElMessage.success("删除成功")
-        getCommentInPage()
+        fetchComments()
     } else {
         ElMessage.error("删除失败")
     }
@@ -138,7 +136,7 @@ const flag = inject('flag')
 watch(flag, () => {
     article.value = JSON.parse(localStorage.getItem("article"))
     if (JSON.parse(localStorage.getItem("baseInfo")))
-        getCommentInPage()
+        fetchComments()
     console.log("文章更新")
     showDetailVisible.value = true;
 })
@@ -147,7 +145,7 @@ watch(flag, () => {
 onMounted(() => {
     article.value = JSON.parse(localStorage.getItem("article"))
     if (JSON.parse(localStorage.getItem("baseInfo")))
-        getCommentInPage()
+        fetchComments()
     setTimeout(() => {
         Prism.highlightAll()// 全局代码高亮
     }, 100)
@@ -213,14 +211,14 @@ onMounted(() => {
                                 <div class="commenter-content">{{ item.content }}</div>
                                 <div class="comment-interaction">
                                     <div class="release-time">{{ item.createTime }}</div>
-                                    <div class="thumbs" @click="toggleLikeInPage(key)">
+                                    <div class="thumbs" @click="toggleCommentLike(key)">
                                         <thumbsUp :fill="item.isLiked ? 'green' : '#666666'" :id="key + 'like-btn'"
                                             style="width: 100%;height: 100%; color: green;" />
                                         <span>{{ item.likeCount }}</span>
                                     </div>
                                     <div>回复</div>
                                     <el-popconfirm title="你确定你要删除吗?" confirm-button-text="确认" cancel-button-text="取消"
-                                        @confirm="deleteCommentInPage(key)">
+                                        @confirm="removeComments(key)">
                                         <template #reference>
                                             <div>删除</div>
                                         </template>
@@ -418,6 +416,7 @@ onMounted(() => {
                             .commenter-content {
                                 font-size: 20px;
                                 margin-bottom: 10px;
+
                             }
 
                             .comment-interaction {

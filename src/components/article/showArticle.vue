@@ -7,12 +7,36 @@ const article_content = ref()
 const PAGE_SIZE = 5
 const currentPage = ref(1)
 
+//日期格式化函数
+const dateFormat = (date_parm) => {
+    let date = new Date(date_parm)
+    let now = new Date()
+    let time = now - date
+    let day = Math.floor(time / (24 * 3600 * 1000))
+    //如果是今年就省略年份
+    let year = now.getFullYear() - date.getFullYear()
+    if (year === 0) {
+        if (day === 0) {
+            return "今天 " + date.getHours() + ":" + date.getMinutes()
+        } else if (day === 1) {
+            return "昨天 " + date.getHours() + ":" + date.getMinutes()
+        } else {
+            return (date.getMonth() + 1) + "-" + date.getDate()
+        }
+    }
+    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
 
+}
+
+/*--- 控制滚动加载变量 ---*/
 const loading = ref(false)
-/*---获取文章---*/
-const getBlogInPage = async () => {
+const userId = inject('userId')
+
+/*--- 获取文章 ---*/
+const fetchArticles = async () => {
     loading.value = true
-    const result = await getBlogsByPage(currentPage.value, pageSize.value, 0)
+    console.log(userId)
+    const result = await getBlogsByPage(currentPage.value, pageSize.value, userId)
     if (result.data.code === 1) {
         let articles = result.data.data.records
         //将字符串 转化为数组
@@ -20,6 +44,10 @@ const getBlogInPage = async () => {
             item.tags = toStringArray(item.tags)
         })
         article_content.value = articles
+        //将article_content.value中的时间转化为今天昨天+时间,如果不可以再标为具体日期
+        article_content.value.forEach(item => {
+            item.createTime = dateFormat(item.createTime)
+        })
     }
     loading.value = false
     currentPage.value++
@@ -32,8 +60,8 @@ function toStringArray(source) {
 
 const showArticleDeatil = inject('showDetailVisible')
 
-/*---获取文章细节 ---*/
-const getBlogDetailByIndex = async (index) => {
+/*--- 获取文章细节 ---*/
+const fetchArticleDetail = async (index) => {
     const result = await getPublicBlogDetail(article_content.value[index].id)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
@@ -46,14 +74,15 @@ const pageSize = ref(PAGE_SIZE)
 const endOfContent = ref(false)
 
 
-/*---滚动加载---*/
+/*--- 滚动加载 ---*/
 const load = async () => {
+    console.log("开始执行", loading.value)
     if (loading.value || article_content.value === null) {
         return
     }
     loading.value = true
     try {
-        const result = await getBlogsByPage(currentPage.value, pageSize.value, 0)
+        const result = await getBlogsByPage(currentPage.value, pageSize.value, userId)
         loading.value = false
         if (result.data.code === 1) {
             let articles = result.data.data.records
@@ -65,7 +94,9 @@ const load = async () => {
             //将字符串 转化为数组
             articles.forEach(item => {
                 item.tags = toStringArray(item.tags)
-
+            })
+            articles.forEach(item => {
+                item.createTime = dateFormat(item.createTime)
             })
             //将新的文章添加到原来的文章中
             article_content.value = article_content.value.concat(articles)
@@ -74,11 +105,12 @@ const load = async () => {
     } finally {
         loading.value = false
     }
+    console.log("执行结束")
 
 }
 
 onMounted(() => {
-    getBlogInPage()
+    fetchArticles()
 })
 
 
@@ -88,7 +120,7 @@ onMounted(() => {
 <template>
     <transition name="fade">
         <div v-infinite-scroll="load" id="showArticle">
-            <div class="article" v-for="(article, index) in article_content" @click="getBlogDetailByIndex(index)">
+            <div class="article" v-for="(article, index) in article_content" @click="fetchArticleDetail(index)">
                 <div class="article-cover">
                     <img :src=article.filePath alt="">
                 </div>
@@ -104,12 +136,10 @@ onMounted(() => {
                             </div>
                         </div>
                         <div class="article-info-top-right">
-                            undo module
+                            {{ article.createTime }}
                         </div>
                     </div>
                     <div class="article-info-bottom">
-                        <div class="info-date">{{ article.time }}</div>
-
                         <div class="info-author">
                             <div class="article-views">
                                 <el-icon style="margin-right: 5px;" size="20px">
@@ -132,7 +162,7 @@ onMounted(() => {
                 </el-icon>
                 <span>加载中...</span>
             </div>
-            <div v-if="endOfContent" class="bottom-content">已经到底了...</div>
+            <div v-if="endOfContent" class="bottom-content">已经到底了...😓</div>
         </div>
     </transition>
 </template>
@@ -192,6 +222,7 @@ onMounted(() => {
 
                 .article-info-top-right {
                     width: 30%;
+                    text-align: center;
                 }
             }
 
@@ -227,6 +258,7 @@ onMounted(() => {
                 }
 
                 .info-date {
+                    text-align: center;
                     font-size: 14px;
                     color: #666;
                 }

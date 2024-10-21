@@ -71,6 +71,7 @@ const emailCheck = async (rule, value, callback) => {
     }
     callback()
 }
+
 //检查邮箱是否可用
 const emailCheck2 = _.throttle(async (email) => {
     const result = await checkEmail(email)
@@ -249,6 +250,4 @@ const showRegister = () => {
     }
 
 }
-</style>  
-
-  
+</style>
