@@ -6,7 +6,7 @@ import { ElMessage } from 'element-plus';
 const USER_ID = JSON.parse(localStorage.getItem('baseInfo')).id
 const message = ref([])
 
-const getReplyMessageInPage = async () => {
+const fetchReplyMessages = async () => {
     const result = await getReplyMessage(USER_ID)
     if (result.data.code === 1) {
         message.value = result.data.data
@@ -30,7 +30,7 @@ const hideDelBtn = (index) => {
 
 
 onMounted(() => {
-    getReplyMessageInPage()
+    fetchReplyMessages()
 })
 
 

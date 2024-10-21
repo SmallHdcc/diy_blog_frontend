@@ -9,12 +9,15 @@ import { encrypt } from "@/utils"
 import router from '@/router'
 //element-plus
 import { ElMessage } from 'element-plus'
-import personalArticle from '@/components/article/showPersonalArticle.vue'
+// import personalArticle from '@/components/article/showPersonalArticle.vue'
+import showArticle from '@/components/article/showArticle.vue';
 
 
 
 //开头定义变量
 const BASE_INFO_KEY = JSON.parse(localStorage.getItem("baseInfo"))
+provide('userId', BASE_INFO_KEY.id)
+
 //初始化博客数组
 const blogArray = ref([])
 
@@ -29,30 +32,7 @@ let user = ref({
 
 //校验个人博客数量是否为0
 const startTips = ref(true)
-const handleContent = (articles) => {
-    if (articles.length != 0) {
-        startTips.value = false
-        blogArray.value = articles
-    }
-}
 
-//获得所有个人博客
-let userId = ref()
-const getBlog = async () => {
-    // get all blogs
-    if (localStorage.getItem("baseInfo")) {
-        userId.value = BASE_INFO_KEY.id
-        getBlogs().then(res => {
-            let articles = res.data.data
-            articles.forEach(item => {
-                item.tags = toStringArray(item.tags)
-            })
-            handleContent(articles)
-        })
-        user.value = BASE_INFO_KEY
-    }
-    return
-}
 
 //处理字符串
 function toStringArray(source) {
@@ -213,7 +193,6 @@ const handlePrivate = (event, index) => {
 
 
 onMounted(() => {
-    // getBlog()
 })
 
 </script>
@@ -226,7 +205,7 @@ onMounted(() => {
                     <div class="content_type">
                     </div>
                     <div class="content-detail">
-                        <personalArticle></personalArticle>
+                        <showArticle></showArticle>
                     </div>
                 </div>
                 <div class="right-userInfo">
@@ -311,6 +290,7 @@ onMounted(() => {
                     display: flex;
                     width: 100%;
                     flex-grow: 1;
+
                 }
             }
 

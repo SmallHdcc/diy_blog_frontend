@@ -146,6 +146,8 @@ const tinymceFlag = ref()
 </template>
 <style scoped>
 .tinymce-box {
+    position: relative;
     width: 100%;
+    z-index: 0;
 }
 </style>
