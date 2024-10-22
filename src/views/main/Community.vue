@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, provide, watch } from 'vue'
 import { getPublicBlogDetail, getHeatList } from '@/api/blog.js'
+import { getDevLog } from '@/api/index.js'
 import { useArticleStore } from '@/stores/article.js'
 import showArticle from '@/components/article/showArticle.vue';
-import showDeatil from '@/components/article/showArticleDeatil.vue'
+import showDetail from '@/components/article/showArticleDetail.vue'
 import router from '../../router';
 
 const userId = 0
@@ -16,8 +17,9 @@ watch(() => blogStore.blogArray, () => {
 
 const heat_list = ref([])
 
-const getHeatListInPage = async () => {
+const fetchHeatList = async () => {
     const result = await getHeatList()
+    console.log(result.data)
     if (result.data.code === 1) {
         //获取前10个
         heat_list.value = result.data.data.slice(0, 10)
@@ -43,13 +45,11 @@ function getColor(index) {
 
 /*---控制详情页与主页---*/
 const showDetailVisible = ref(false) // Flag to control visibility
-
 provide('showDetailVisible', showDetailVisible) // Provide the flag to all children components
-
 const handleArticleShow = ref(false)
 provide('handleArticleShow', handleArticleShow)
-
-const getBlogDetailById = async (id) => {
+//服务于热门列表的点击事件
+const fetchArticleDetail = async (id) => {
     const result = await getPublicBlogDetail(id)
     if (result.data.code === 1) {
         localStorage.setItem("article", JSON.stringify(result.data.data))
@@ -86,11 +86,18 @@ const checkIsLogin = () => {
         router.push("/login")
     }
 }
-
-
+const devLog = ref('')
+/*--- 获取开发日志 ---*/
+const fetchDevLog = async () => {
+    const result = await getDevLog()
+    if (result.data.code === 1) {
+        devLog.value = result.data.data
+    }
+}
 
 onMounted(() => {
-    getHeatListInPage()
+    fetchHeatList()
+    fetchDevLog()
 })
 
 
@@ -112,7 +119,7 @@ onMounted(() => {
                         <div class="left-content">
                             <template v-if="currentHoverIndex === 0">
                                 <p style="text-indent: 2em;">
-                                    更新社区的布局，添加更多的元素，避免了首页太过单调.
+                                    {{ devLog }}
                                 </p>
                                 <br />
                                 <p style="text-indent: 2em;">
@@ -190,13 +197,13 @@ onMounted(() => {
                         </div>
                         <el-dialog v-model="showDetailVisible" width="900px"
                             style="display: flex;flex-direction: column;">
-                            <showDeatil v-if="showDetailVisible"></showDeatil>
+                            <showDetail v-if="showDetailVisible"></showDetail>
                         </el-dialog>
                     </div>
                     <div id="right-wrapper">
                         <div class="side-list side-common">
                             <h2>热门帖🔥</h2>
-                            <div v-for="(item, index) in heat_list" @click="getBlogDetailById(item.articleId)">
+                            <div v-for="(item, index) in heat_list" @click="fetchArticleDetail(item.articleId)">
                                 <div class="side-list-element" :class="getColor(index)">
                                     <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
                                     {{ item.articleTitle }}
@@ -274,6 +281,7 @@ onMounted(() => {
 
                     .left-content {
                         display: flex;
+                        flex-direction: column;
                         width: 80%;
                         height: 100%;
                         /* 添加内边距 */

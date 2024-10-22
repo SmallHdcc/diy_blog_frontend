@@ -44,6 +44,8 @@ import 'tinymce/plugins/visualchars'; //显示不可见字符
 import 'tinymce/plugins/wordcount'; //字数统计
 
 // eslint-disable-next-line vue/no-export-in-script-setup
+import { uploadCover } from '@/api/blog.js'
+
 
 const tinymceInit = () => {
     tinymce.remove('#tinydemo')
@@ -79,19 +81,23 @@ const tinymceInit = () => {
             // 例如：input.setAttribute('accept', '.jpg,.png')
             input.setAttribute('accept', '.ppt,.pptx,.jpg, .jpeg, .png, .gif,.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx,.mp3, .mp4')
             input.click()
-            input.onchange = function () {
-                let file = this.files[0]
-                // 下方被注释掉的是官方的一个例子
-                // 放到下面给大家参考
-                let reader = new FileReader()
-                reader.onload = function () {
-                    let id = 'blobid' + (new Date()).getTime()
-                    let blobCache = window.tinymce.activeEditor.editorUpload.blobCache
-                    let base64 = reader.result.split(',')[1]
-                    let blobInfo = blobCache.create(id, file, base64)
-                    // call the callback and populate the Title field with the file name
-                    callback(blobInfo.blobUri(), { text: file.name, title: file.name })
+            input.onchange = async () => {
+                let file = input.files[0]
+                let result = await uploadCover(file)
+                if (result.data.code === 1) {
+                    callback(result.data.data, { text: file.name })
                 }
+                // // 下方被注释掉的是官方的一个例子
+                // // 放到下面给大家参考
+                let reader = new FileReader()
+                // reader.onload = function () {
+                //     let id = 'blobid' + (new Date()).getTime()
+                //     let blobCache = window.tinymce.activeEditor.editorUpload.blobCache
+                //     let base64 = reader.result.split(',')[1]
+                //     let blobInfo = blobCache.create(id, file, base64)
+                //     // call the callback and populate the Title field with the file name
+                //     callback(blobInfo.blobUri(), { text: file.name, title: file.name })
+                // }
                 reader.readAsDataURL(file)
             }
         },

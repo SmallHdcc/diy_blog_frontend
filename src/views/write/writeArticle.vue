@@ -13,8 +13,6 @@ const ruleFormRef = ref()
 const form = reactive({
     userId: '',
     title: '',
-    day: null,
-    date: null,
     image: '',
     tags: ["日常"],
     content: '',
@@ -22,16 +20,27 @@ const form = reactive({
 })
 
 let errorClickNumber = ref(0)
+//校验标题与内容是否合规
+const examineBeforeSubmit = () => {
+    if (form.title.trim() === '') {
+        ElMessage.error({ message: "标题不能为空" })
+        return false
+    }
+    if (form.content.trim() === '' || form.content === null) {
+        ElMessage.error({ message: "内容不能为空" })
+        return false
+    }
+    return true
+}
 const onSubmit = async () => {
     // set content
     form.content = localStorage.getItem("content") || ''
-    if (form.content != null && form.content.trim() != '') {
-        //set userId
+    if (examineBeforeSubmit()) {
         form.userId = JSON.parse(localStorage.getItem("baseInfo") || '').id
-
         const result = await uploadArticle(form)
         if (result.data.code == 1) {
             ElMessage.success({ message: "发布成功" })
+            localStorage.setItem("content", '')
             router.push("/personal")
             return
         }
@@ -43,8 +52,6 @@ const onSubmit = async () => {
             ElMessage.error({ message: "再乱点封号！！！" })
         }
         errorClickNumber.value++
-        console.log(errorClickNumber.value)
-        ElMessage.error({ message: "抖机灵？" })
         return
     }
     ElMessage.error({ message: "内容不能为空！！！" })
@@ -58,7 +65,6 @@ const resetForm = (formEl: any) => {
 
 // 标签相关配置
 const inputValue = ref('')
-const dynamicTags = ref(['标签 1', '标签 2', '标签 3'])
 const inputVisible = ref(false)
 const InputRef = ref()
 
@@ -85,6 +91,7 @@ const handleInputConfirm = () => {
 }
 // 封面相关内容
 const imageUrl = ref('')
+
 // : UploadProps['onSuccess'] 
 const handleAvatarSuccess = async (
     response: any,
@@ -105,23 +112,20 @@ const beforeAvatarUpload = async (rawFile: any) => {
         return false
     }
     const result = await uploadCover(rawFile)
-    console.log(result.data)
     imageUrl.value = result.data.data
     form.image = result.data.data
     return true
 }
-// 时间校验
-const validateTime = (rule: any, value: any, callback: any) => {
-    if (value === '') {
-        callback(new Error('请选择时间'))
-    }
-    callback()
 
-}
 
 const rules = reactive({
-    day: [{ validator: validateTime, trigger: 'blur' }],
-
+    title: [
+        { required: true, message: '标题是必填项', trigger: 'blur' },
+        { min: 3, message: '标题不能少于三个字', trigger: 'blur' }
+    ],
+    content: [
+        { required: true, message: '内容是必填项', trigger: 'blur' }
+    ],
 })
 
 onMounted(() => {
@@ -136,7 +140,7 @@ onMounted(() => {
         <div id="container">
             <h1 id="header-line">你好,{{ username }}</h1>
             <el-form :rules="rules" :model="form" label-width="120px" ref="ruleFormRef">
-                <el-form-item label="标题">
+                <el-form-item label="标题" prop="title">
                     <el-input v-model="form.title" />
                 </el-form-item>
                 <el-form-item label="类型">
@@ -159,7 +163,7 @@ onMounted(() => {
                         </el-icon>
                     </el-upload>
                 </el-form-item>
-                <el-form-item label="内容">
+                <el-form-item label="内容" prop="content">
                     <keep-alive>
                         <textEditor ref="contents" style="resize: none;" />
                     </keep-alive>

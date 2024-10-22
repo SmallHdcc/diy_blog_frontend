@@ -130,16 +130,17 @@ const removeComments = async (index) => {
     }
 
 }
-const showDetailVisible = inject('showDetailVisible')
-const flag = inject('flag')
-//当updateArticle变化时，更新article
-watch(flag, () => {
-    article.value = JSON.parse(localStorage.getItem("article"))
-    if (JSON.parse(localStorage.getItem("baseInfo")))
-        fetchComments()
-    console.log("文章更新")
-    showDetailVisible.value = true;
-})
+// const showDetailVisible = inject('showDetailVisible')
+
+// const flag = inject('flag')
+// //当updateArticle变化时，更新article
+// watch(flag, () => {
+//     article.value = JSON.parse(localStorage.getItem("article"))
+//     if (JSON.parse(localStorage.getItem("baseInfo")))
+//         fetchComments()
+//     console.log("文章更新")
+//     showDetailVisible.value = true;
+// })
 
 
 onMounted(() => {
