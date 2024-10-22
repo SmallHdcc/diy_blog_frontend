@@ -3,7 +3,7 @@ import { ref, onMounted, provide, watch } from 'vue'
 import { getPublicBlogDetail, getHeatList } from '@/api/blog.js'
 import { getDevLog } from '@/api/index.js'
 import { useArticleStore } from '@/stores/article.js'
-import showArticle from '@/components/article/showArticle.vue';
+import showArticle from '@/components/article/articles.vue';
 import showDetail from '@/components/article/showArticleDetail.vue'
 import router from '../../router';
 

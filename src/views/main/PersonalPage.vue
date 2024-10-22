@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive, provide } from 'vue';
 /*--引入博客相关接口--*/
-import { getBlogs, getSingleBlogDetail, deleteSingleBlog } from "@/api/blog.js"
+import { getBlogs, getSingleBlogDetail } from "@/api/blog.js"
 /*--引入用户相关接口--*/
 import { uploadAvatar, changeSign } from "@/api/index.js"
 import { encrypt } from "@/utils"
@@ -10,7 +10,7 @@ import router from '@/router'
 //element-plus
 import { ElMessage } from 'element-plus'
 // import personalArticle from '@/components/article/showPersonalArticle.vue'
-import showArticle from '@/components/article/showArticle.vue';
+import showArticle from '@/components/article/articles.vue';
 import showArticleDetail from '@/components/article/showArticleDetail.vue';
 
 
@@ -29,6 +29,11 @@ let user = ref({
     avatar: BASE_INFO_KEY ? BASE_INFO_KEY.avatar : "",
     signature: BASE_INFO_KEY ? BASE_INFO_KEY.signature : "",
 })
+
+const content_types = reactive([
+    '发布', '评论', '草稿', '动态'
+])
+
 
 
 //校验个人博客数量是否为0
@@ -182,15 +187,6 @@ const ChangePrivate = (info, data, isPrivate, index) => {
     })
 }
 
-// 修改日记的公开状态
-const handlePrivate = (event, index) => {
-    event.stopPropagation()
-    let data = blogArray.value[index]
-    let status = data.isPrivate == 1 ? "私密" : "公开"
-    let isPrivate = data.isPrivate != 1
-    //如果已经是公开的了，那就变为私密
-    ChangePrivate(status, data, isPrivate, index)
-}
 
 /*---控制详情页与主页---*/
 const showDetailVisible = ref(false) // Flag to control visibility
@@ -199,6 +195,10 @@ provide('showDetailVisible', showDetailVisible) // Provide the flag to all child
 const handleArticleShow = ref(false)
 provide('handleArticleShow', handleArticleShow)
 
+const articlesCount = ref(0)
+const getArticlesCount = (value) => {
+    articlesCount.value = value
+}
 
 onMounted(() => {
 })
@@ -206,15 +206,16 @@ onMounted(() => {
 </script>
 
 <template>
-    <div id="PersonalPageTest">
+    <div id="PersonalPage">
         <div id="container">
             <div id="showContent">
                 <div class="left-main_content">
                     <div class="content_type">
+                        <span v-for="(type, index) in content_types">
+                            {{ type }}<span v-if="type === '发布'">({{ articlesCount }})</span>
+                        </span>
                     </div>
-                    <div class="content-detail">
-                        <showArticle></showArticle>
-                    </div>
+                    <showArticle @get-articles-count="getArticlesCount"></showArticle>
                     <el-dialog v-model="showDetailVisible" width="900px" style="display: flex;flex-direction: column;">
                         <showArticleDetail v-if="showDetailVisible"></showArticleDetail>
                     </el-dialog>
@@ -262,7 +263,8 @@ onMounted(() => {
 </template>
 
 <style lang="less" scoped>
-#PersonalPageTest {
+#PersonalPage {
+    position: relative;
     display: flex;
     justify-content: center;
     width: 100%;
@@ -274,34 +276,40 @@ onMounted(() => {
         flex-direction: column;
         width: 80%;
         height: 100%;
-        // background-color: white;
 
         #showContent {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            flex-grow: 1;
-            margin-top: 10px;
 
             .left-main_content {
+                display: flex;
+                flex-direction: column;
                 width: 69%;
                 border-radius: 10px 10px 0 0;
+                margin: 5px 0 10px 0;
 
                 .content_type {
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: center;
                     width: 100%;
                     height: 50px;
                     border-radius: 10px 10px 0 0;
                     background-color: white;
                     margin-bottom: 10px;
                     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+                    font-size: 20px;
+
+                    span {
+                        cursor: pointer;
+                    }
+
+                    span:hover {
+                        color: #409EFF;
+                    }
                 }
 
-                .content-detail {
-                    display: flex;
-                    width: 100%;
-                    flex-grow: 1;
-
-                }
             }
 
             //用户信息相对于浏览器定位
@@ -321,7 +329,7 @@ onMounted(() => {
                     height: 100%;
                     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
                     //渐变色 从上到下
-                    background: linear-gradient(to bottom, rgba(0, 161, 214, 0.5), white);
+                    background: linear-gradient(to bottom, rgba(0, 161, 214), white);
 
 
                     #avatar {

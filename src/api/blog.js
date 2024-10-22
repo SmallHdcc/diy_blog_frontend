@@ -40,10 +40,10 @@ export function getSingleBlogDetail(id, userId, sign) {
 }
 
 // 删除单个博客
-export function deleteSingleBlog(id, userId) {
+export function deleteArticle(id) {
     return service({
         method: "DELETE",
-        url: `/article?id=${id}&userId=${userId}`,
+        url: `/article?id=${id}`,
     })
 }
 
