@@ -37,6 +37,8 @@ const onSubmit = async () => {
     form.content = localStorage.getItem("content") || ''
     if (examineBeforeSubmit()) {
         form.userId = JSON.parse(localStorage.getItem("baseInfo") || '').id
+        //将内容的前50个字符作为简介,但是不包含标签
+        form.profile = form.content.replace(/<[^>]+>/g, "").substring(0, 50)
         const result = await uploadArticle(form)
         if (result.data.code == 1) {
             ElMessage.success({ message: "发布成功" })
@@ -168,9 +170,6 @@ onMounted(() => {
                         <textEditor ref="contents" style="resize: none;" />
                     </keep-alive>
                 </el-form-item>
-                <el-form-item label="简介">
-                    <el-input v-model="form.profile" />
-                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">发布</el-button>
                     <el-button @click="resetForm(ruleFormRef)">取消</el-button>
@@ -206,7 +205,7 @@ onMounted(() => {
             margin-bottom: 10px;
             //文字渐变色
             background: linear-gradient(to right, #409EFF, #FFD700);
-            -webkit-background-clip: text;
+            background-clip: text;
             /* 仅对文字应用背景裁剪 */
             color: transparent;
             overflow: hidden;

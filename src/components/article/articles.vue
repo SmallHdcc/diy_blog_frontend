@@ -1,6 +1,8 @@
 <script setup>
-import { ref, onMounted, inject } from 'vue'
-import { getPublicBlogDetail, getBlogsByPage } from '@/api/blog.js'
+import { ref, onMounted, inject, reactive } from 'vue'
+import { getPublicBlogDetail, getBlogsByPage, deleteArticle } from '@/api/blog.js'
+import { ElMessage } from 'element-plus';
+import { remove } from 'lodash';
 
 const article_content = ref()
 /* 定义每次滚动获取的帖子数目 */
@@ -32,12 +34,16 @@ const dateFormat = (date_parm) => {
 const loading = ref(false)
 const userId = inject('userId')
 
+const emit = defineEmits(['get-articles-count'])
+
 /*--- 获取文章 ---*/
 const fetchArticles = async () => {
     loading.value = true
     const result = await getBlogsByPage(currentPage.value, pageSize.value, userId)
     if (result.data.code === 1) {
         let articles = result.data.data.records
+        //将文章总数传递给父组件
+        emit('get-articles-count', result.data.data.total)
         //将字符串 转化为数组
         articles.forEach(item => {
             item.tags = toStringArray(item.tags)
@@ -106,37 +112,65 @@ const load = async () => {
 
 }
 
+const removeArticle = async (index, event) => {
+    event.stopPropagation()
+    const result = await deleteArticle(article_content.value[index].id)
+    if (result.data.code === 1) {
+        article_content.value.splice(index, 1)
+        ElMessage.success("删除成功")
+    }
+}
+const editArticle = async (index, event) => {
+    event.stopPropagation()
+    console.log("编辑")
+}
+
+// 修改日记的公开状态
+const handlePrivate = (event, index) => {
+    event.stopPropagation()
+    let data = article_content.value[index]
+    let status = data.isPrivate === 1 ? "私密" : "公开"
+    let isPrivate = data.isPrivate != 1
+    //如果已经是公开的了，那就变为私密
+    ChangePrivate(status, data, isPrivate, index)
+}
+
+
+
+
 onMounted(() => {
     fetchArticles()
 })
-
-
 
 </script>
 
 <template>
     <transition name="fade">
-        <div v-infinite-scroll="load" id="showArticle">
+        <div v-infinite-scroll="load" infinite-scroll-immediate-check="true" id="showArticle">
             <div class="article" v-for="(article, index) in article_content" @click="fetchArticleDetail(index)">
-                <div class="article-cover">
-                    <img :src=article.filePath alt="">
-                </div>
                 <div class="article-info">
                     <div class="article-info-top">
                         <div class="article-info-top-left">
                             <h3 class="info-title">{{ article.title }}</h3>
-                            <span class="info-profile">{{ article.profile }}</span>
                             <div class="info-tags">
                                 <el-tag style="margin-right: 5px;" v-for="(tag) in article.tags">
                                     {{ tag }}
                                 </el-tag>
                             </div>
+                            <span class="info-profile">{{ article.profile }}</span>
                         </div>
                         <div class="article-info-top-right">
-                            {{ article.createTime }}
+                            状态: 公开
                         </div>
                     </div>
                     <div class="article-info-bottom">
+                        <div class="article-option">
+                            <div v-show="userId === 0 ? false : true">
+                                <span @click="removeArticle(index, $event)">删除</span>
+                                <span @click="editArticle(index, $event)">编辑</span>
+                                <span>公开</span>
+                            </div>
+                        </div>
                         <div class="info-author">
                             <div class="article-views">
                                 <el-icon style="margin-right: 5px;" size="20px">
@@ -147,12 +181,14 @@ onMounted(() => {
                                 </span>
                             </div>
                             <div class="author-avatar"><img :src="article.avatar" alt=""></div>
-                            <div class="author-username">{{ article.username }}</div>
+                            <div class="author-username">
+                                <span>{{ article.username }}</span>
+                                <span>{{ article.createTime }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div v-if="loading" class="bottom-content">
                 <el-icon size="20px" class="is-loading">
                     <Loading />
@@ -188,7 +224,7 @@ onMounted(() => {
             position: relative;
             display: flex;
             flex-direction: column;
-            width: 60%;
+            width: 100%;
             height: 100%;
 
             .article-info-top {
@@ -211,9 +247,12 @@ onMounted(() => {
                     }
 
                     .info-profile {
+                        width: 100%;
                         font-size: 14px;
                         color: #666;
-                        margin: 10px, 0;
+                        margin-top: 20px;
+                        text-indent: 2em;
+                        text-align: left;
                     }
                 }
 
@@ -228,8 +267,9 @@ onMounted(() => {
                 right: 0;
                 bottom: 0;
                 display: flex;
-                flex-direction: column;
+                justify-content: space-between;
                 text-align: right;
+                width: 100%;
 
                 .info-author {
                     display: flex;
@@ -251,6 +291,14 @@ onMounted(() => {
                     .article-views {
                         display: flex;
                         align-items: center;
+                        align-self: flex-end;
+                    }
+
+                    .author-username {
+                        display: flex;
+                        flex-direction: column;
+                        text-align: left;
+                        font-size: 14px;
                     }
                 }
 
@@ -260,6 +308,25 @@ onMounted(() => {
                     color: #666;
                 }
 
+                .article-option {
+                    width: 25%;
+                    font-size: 14px;
+                    align-self: flex-end;
+
+                    div {
+                        width: 100%;
+                        text-align: left;
+
+                        span {
+                            margin-right: 10px;
+                        }
+
+                        span:hover {
+                            color: #409EFF;
+                        }
+                    }
+
+                }
             }
 
         }
