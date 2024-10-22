@@ -11,6 +11,7 @@ import router from '@/router'
 import { ElMessage } from 'element-plus'
 // import personalArticle from '@/components/article/showPersonalArticle.vue'
 import showArticle from '@/components/article/showArticle.vue';
+import showArticleDetail from '@/components/article/showArticleDetail.vue';
 
 
 
@@ -191,6 +192,13 @@ const handlePrivate = (event, index) => {
     ChangePrivate(status, data, isPrivate, index)
 }
 
+/*---控制详情页与主页---*/
+const showDetailVisible = ref(false) // Flag to control visibility
+
+provide('showDetailVisible', showDetailVisible) // Provide the flag to all children components
+const handleArticleShow = ref(false)
+provide('handleArticleShow', handleArticleShow)
+
 
 onMounted(() => {
 })
@@ -207,6 +215,9 @@ onMounted(() => {
                     <div class="content-detail">
                         <showArticle></showArticle>
                     </div>
+                    <el-dialog v-model="showDetailVisible" width="900px" style="display: flex;flex-direction: column;">
+                        <showArticleDetail v-if="showDetailVisible"></showArticleDetail>
+                    </el-dialog>
                 </div>
                 <div class="right-userInfo">
                     <div class="el-card">
@@ -234,7 +245,6 @@ onMounted(() => {
                     </div>
                     <el-dialog v-model="dialogVisible" title="更换头像" width="30%">
                         <avatarCropper style="display: flex; justify-content: center;" ref='avatar'></avatarCropper>
-
                         <template #footer>
                             <span class="dialog-footer">
                                 <el-button @click="dialogVisible = false">取消</el-button>

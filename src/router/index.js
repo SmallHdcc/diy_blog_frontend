@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/personal',
       name: "personal",
-      component: () => import('../views/main/PersonalPageTest.vue'),
+      component: () => import('../views/main/PersonalPage.vue'),
       meta: { title: baseInfo.username + '- 个人主页' }
     },
     {

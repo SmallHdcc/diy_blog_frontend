@@ -35,7 +35,6 @@ const userId = inject('userId')
 /*--- 获取文章 ---*/
 const fetchArticles = async () => {
     loading.value = true
-    console.log(userId)
     const result = await getBlogsByPage(currentPage.value, pageSize.value, userId)
     if (result.data.code === 1) {
         let articles = result.data.data.records
@@ -76,7 +75,6 @@ const endOfContent = ref(false)
 
 /*--- 滚动加载 ---*/
 const load = async () => {
-    console.log("开始执行", loading.value)
     if (loading.value || article_content.value === null) {
         return
     }
@@ -105,7 +103,6 @@ const load = async () => {
     } finally {
         loading.value = false
     }
-    console.log("执行结束")
 
 }
 

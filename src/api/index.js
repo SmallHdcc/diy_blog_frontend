@@ -84,6 +84,21 @@ export function checkToken() {
     })
 }
 
+//获取开发日志
+export function getDevLog() {
+    return service({
+        method: "GET",
+        url: `/common/devLog`,
+    })
+}
+//更新开发日志
+export function updateDevLog(devLog) {
+    return service({
+        method: "POST",
+        url: `/common/devLog`,
+        data: devLog
+    })
+}
 
 
 

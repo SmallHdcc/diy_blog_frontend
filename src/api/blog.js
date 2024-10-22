@@ -12,7 +12,6 @@ export function uploadArticle(data) {
 export function uploadCover(data) {
     const formData = new FormData();
     formData.append('file', data)
-
     return service({
         method: 'POST',
         url: "/common/upload",
@@ -20,7 +19,6 @@ export function uploadCover(data) {
             'Content-Type': 'multipart/form-data' // 设置请求头为multipart/form-data  
         },
         data: formData
-
     })
 
 }
