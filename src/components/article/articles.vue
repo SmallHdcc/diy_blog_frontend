@@ -159,7 +159,7 @@ onMounted(() => {
                             </div>
                             <span class="info-profile">{{ article.profile }}</span>
                         </div>
-                        <div class="article-info-top-right">
+                        <div v-show="userId === 0 ? false : true" class="article-info-top-right">
                             状态: 公开
                         </div>
                     </div>
@@ -172,6 +172,14 @@ onMounted(() => {
                             </div>
                         </div>
                         <div class="info-author">
+                            <div class="article-commentCount">
+                                <el-icon style="margin-right: 5px;" size="20px">
+                                    <ChatDotSquare />
+                                </el-icon>
+                                <span>
+                                    {{ article.commentCount }}
+                                </span>
+                            </div>
                             <div class="article-views">
                                 <el-icon style="margin-right: 5px;" size="20px">
                                     <View />
@@ -183,7 +191,7 @@ onMounted(() => {
                             <div class="author-avatar"><img :src="article.avatar" alt=""></div>
                             <div class="author-username">
                                 <span>{{ article.username }}</span>
-                                <span>{{ article.createTime }}</span>
+                                <span style="color:gray;font-size: 12px;">{{ article.createTime }}</span>
                             </div>
                         </div>
                     </div>
@@ -288,6 +296,13 @@ onMounted(() => {
                         }
                     }
 
+                    .article-commentCount {
+                        display: flex;
+                        align-items: center;
+                        align-self: flex-end;
+                        margin-right: 20px;
+                    }
+
                     .article-views {
                         display: flex;
                         align-items: center;
@@ -298,7 +313,7 @@ onMounted(() => {
                         display: flex;
                         flex-direction: column;
                         text-align: left;
-                        font-size: 14px;
+                        font-size: 16px;
                     }
                 }
 

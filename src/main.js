@@ -10,6 +10,10 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 // about wow.js
 import 'wow.js/css/libs/animate.css'
+// 引入图标
+import './assets/icon/iconfont.css'
+import './assets/icon/iconfont.js'
+
 
 const app = createApp(App)
 

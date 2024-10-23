@@ -120,3 +120,14 @@ a:hover {
 }
 
 /* 为所有 Element Plus 组件取消轮廓 */
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+.el-tooltip__trigger:focus-visible {
+  outline: unset;
+}

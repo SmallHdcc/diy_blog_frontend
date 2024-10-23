@@ -125,19 +125,26 @@ onUnmounted(() => {
         <div id="container" :class="{ scrolled: isScrolled }">
             <div id="setWidth">
                 <div id="navigation">
-                    <div id="web-name"><img src="/img/logo.png" alt=""></div>
+                    <router-link active-class="link-hover" to="/" id="web-name">
+                        <img src="/img/logo.png" alt="">
+                    </router-link>
                     <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">
                         {{ item.name }}
                     </router-link>
-                    <img v-if="isLogin" @click="dialog = true" id="navigation-user-avatar" :src="userAvatar" alt="">
-                    <WebFunction />
-                    <!-- <div id="Search_input">
-                        <el-select v-model="input_value" @keydown.enter="show_search_result(input_value, 0)"
-                            @input="search_article()" filterable placeholder="点击搜索..." style="width: 240px">
-                            <el-option v-for="(item, index) in select_article_name" :key="index" :value="item.title"
-                                v-html="item.title" @click="show_search_result('1', index)" />
-                        </el-select>
-                    </div> -->
+                    <div id="navigation-user-avatar">
+                        <el-dropdown style="width: 100%;height: 100%;" lacement="bottom">
+                            <!-- <span style=" width: 100%; height: 100%;" class="el-dropdown-link"> -->
+                            <img id="user_avatar" class="el-dropdown-link"
+                                style="width: 100%;transition: all 0.5s;border-radius: 100%;" v-if="isLogin"
+                                :src="userAvatar" alt="">
+                            <!-- </span> -->
+                            <template #dropdown>
+                                <el-dropdown-menu style="position: relative; width: 300px;height: 300px; padding: 0;">
+                                    <WebFunction />
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </div>
                     <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
                 </div>
                 <Login v-show="isHaveAccount" />
@@ -180,9 +187,17 @@ onUnmounted(() => {
                     right: 20px;
                     width: 2.5vw;
                     height: 5vh;
-                    border-radius: 100%;
-                    transition: all 0.5s;
                     cursor: pointer;
+
+                    .example-showcase .el-dropdown-link,
+                    #user_avatar {
+                        cursor: pointer;
+                        color: var(--el-color-primary);
+                        display: flex;
+                        align-items: center;
+                        border-radius: 100%;
+                    }
+
                 }
 
 

@@ -86,7 +86,10 @@ const checkIsLogin = () => {
         router.push("/login")
     }
 }
-const devLog = ref('')
+const devLog = ref({
+    content: "",
+    createTime: ""
+})
 /*--- 获取开发日志 ---*/
 const fetchDevLog = async () => {
     const result = await getDevLog()
@@ -119,27 +122,30 @@ onMounted(() => {
                         <div class="left-content">
                             <template v-if="currentHoverIndex === 0">
                                 <p style="text-indent: 2em;">
-                                    {{ devLog }}
+                                    {{ devLog.content }}
                                 </p>
                                 <br />
                                 <p style="text-indent: 2em;">
                                     新UI持续更新中......
                                 </p>
+                                <p style="text-align: right;">于 {{ devLog.createTime }} 更新</p>
                             </template>
                             <template v-else-if="currentHoverIndex === 1">
-                                <ul>
-                                    <li>昵称:smallhdcc</li>
-                                    <li>院校:武汉工程大学</li>
-                                    <li>专业:数据科学与大数据技术专业</li>
-                                </ul>
-                                <ul>
-                                    <li>籍贯:河南新乡人</li>
-                                    <li>学院:光能数理学院</li>
-                                    <li>QQ:804678776</li>
-                                </ul>
+                                <div class="left-content_author">
+                                    <ul class="author-info-detail">
+                                        <li>昵称:smallhdcc</li>
+                                        <li>院校:武汉工程大学</li>
+                                        <li>专业:数据科学与大数据技术</li>
+                                    </ul>
+                                    <ul class="author-info-detail">
+                                        <li>籍贯:河南新乡人</li>
+                                        <li>学院:光能数理学院</li>
+                                        <li>QQ:804678776</li>
+                                    </ul>
+                                </div>
                             </template>
                             <template v-else-if="currentHoverIndex === 2">
-                                <p style="text-indent: 2em;">一个前期是博客的论坛项目,因为作者实在是不懂UI设计,所以只能阉割一些内容,受制于作者的水平,
+                                <p style="text-indent: 2em;">一个简单的论坛项目,因为作者实在是不懂UI设计,所以只能阉割一些内容,受制于作者的水平,
                                     网站存在的BUG还希望大家能见谅,作者会尽快修复,希望大家能够喜欢这个项目,如果有什么问题,可以联系作者.
                                 </p>
                             </template>
@@ -213,6 +219,7 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
+            <el-backtop :right="100" :bottom="100" />
         </div>
     </div>
 </template>
@@ -288,6 +295,25 @@ onMounted(() => {
                         padding: 20px;
                         /* 添加圆角 */
                         border-radius: 0 5px 5px 0;
+
+                        .left-content_author {
+                            display: flex;
+                            justify-content: space-around;
+                            align-items: center;
+                            width: 100%;
+                            height: 100%;
+
+                            .author-info-detail {
+                                height: 100%;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+
+                                li {
+                                    margin: 10px 0;
+                                }
+                            }
+                        }
                     }
                 }
 

@@ -1,5 +1,5 @@
 <script setup>
-import { inject, nextTick, onMounted } from 'vue'
+import { inject, nextTick, onMounted, ref } from 'vue'
 import router from '../../router';
 //父组件拿值
 const dialog = inject('dialog')
@@ -39,120 +39,114 @@ onMounted(() => {
 </script>
 <template>
     <div id="WebFunction">
-        <el-drawer v-model="dialog" direction="rtl" size="20%">
-            <template #header="{ titleId, titleClass }">
-                <div :id="titleId" :class="titleClass">
-                    <img @click="dialog = true" :src="avatar" alt="">
-                    <span>{{ username }}</span>
-                </div>
-            </template>
-            <!-- 分割线 -->
-            <div style="height: 1px; background-color: #ebeef5; margin: 10px 0px;"></div>
+        <div class="user-base-info">
+            <div id="user_name">{{ username }}</div>
+        </div>
+        <div class="func-write">
+            <router-link class="after_touch" active-class="link-hover" :to="'/writeArticle'">
+                <svg class="icon icon_special" aria-hidden="true">
+                    <use xlink:href="#icon-gerenshezhi"></use>
+                </svg>
+                个人中心
+            </router-link>
+            <router-link class="after_touch" active-class="link-hover" :to="'/writeArticle'">
+                <svg class="icon icon_special" aria-hidden="true">
+                    <use xlink:href="#icon-dialog"></use>
+                </svg>
+                消息中心
+            </router-link>
+        </div>
+        <div class="func-write">
+            <router-link class="after_touch" active-class="link-hover" :to="'/writeArticle'">
+                <svg class="icon icon_special" aria-hidden="true">
+                    <use xlink:href="#icon-tianjia"></use>
+                </svg>
+                添加新帖
+            </router-link>
 
-            <div class="after_touch">
-                <el-icon>
-                    <User />
-                </el-icon>
-                <router-link active-class="link-hover" :to="'/personal'">个人中心</router-link>
+            <router-link class="after_touch" active-class="link-hover" :to="'/feedback'">
+                <svg class="icon icon_special" aria-hidden="true">
+                    <use xlink:href="#icon-yijianfankui"></use>
+                </svg>
+                反馈
+            </router-link>
+            <div class="after_touch" style="text-align: right;" @click="exitAccount" id="exit-account">
+                <svg class="icon icon_special" aria-hidden="true">
+                    <use xlink:href="#icon--_tuichu"></use>
+                </svg>
+                退出
             </div>
-
-            <div class="after_touch">
-                <el-icon>
-                    <ChatSquare />
-                </el-icon>
-                <router-link active-class="link-hover" :to="'/message'">消息中心</router-link>
-            </div>
-
-            <div style="height: 1px; background-color: #ebeef5; margin: 10px 0px;"></div>
-
-            <div class="after_touch">
-                <el-icon>
-                    <CirclePlus />
-                </el-icon>
-                <router-link active-class="link-hover" :to="'/writeArticle'">添加新帖</router-link>
-            </div>
-
-            <div class="after_touch" style="height: 1px; background-color: #ebeef5; margin: 10px 0px;"></div>
-
-            <div class="after_touch" id="feedback">
-                <el-icon>
-                    <Message />
-                </el-icon>
-                <router-link active-class="link-hover" :to="'/feedback'">反馈</router-link>
-            </div>
-
-            <div class="after_touch" style="height: 1px; background-color: #ebeef5; margin: 10px 0px;"></div>
-
-            <div class="after_touch" @click="exitAccount" id="exit-account">退出</div>
-        </el-drawer>
+        </div>
     </div>
 </template>
 <style lang="less" scoped>
 #WebFunction {
     position: relative;
-    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 0px 20px;
+    background-color: rgb(242, 242, 248);
+    z-index: 1;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
-    .el-drawer.rtl {
-        .el-drawer__header {
-            height: 40px !important;
-            margin-bottom: 0px !important;
-            padding-top: 20px;
-            z-index: 1;
+    .user-base-info {
+        width: 100%;
+        font-size: 24px;
+        margin: 10px 0;
+        text-align: center;
 
-            .el-drawer__title {
-                display: flex;
-                align-items: center;
-                height: 40px;
-
-                img {
-                    height: 100%;
-                    margin-right: 20px;
-                    border-radius: 100%;
-                    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-                }
-
-                span {
-                    font-size: 16px;
-                    color: black;
-                }
-            }
+        #user_name {
+            color: #409EFF;
         }
+    }
 
-        .el-drawer__body {
-            display: flex;
-            flex-direction: column;
+    .func-write {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 10px 0;
+        border-radius: 5px;
+        background-color: white;
+    }
 
-            #exit-account {
-                cursor: pointer;
-            }
+    #exit-account {
+        text-align: right;
+        cursor: pointer;
+    }
 
-            #feedback {
-                cursor: pointer;
-            }
+    .after_touch {
+        display: flex;
+        align-items: center;
+        // justify-content: center;
+        // border-radius: 5px;
+        width: 100%;
+        height: 100%;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: rgb(242, 242, 248);
+        padding-left: 20px;
+        border-radius: 5px;
+        background-color: white;
 
-            .after_touch {
-                display: flex;
-                align-items: center;
-                border-radius: 5px;
+    }
 
-                .el-icon {
-                    width: 20%;
-                    margin-right: 10px;
-                }
-
-                a {
-                    width: 80%;
-                }
-            }
-
-            .after_touch:hover {
-                background-color: #dfe3e8;
-            }
-        }
+    .after_touch:hover {
+        background-color: #dfe3e8;
     }
 
     .link-hover {
         color: rgb(135, 200, 238);
+    }
+
+    .icon_special {
+        width: 1.5em;
+        height: 1.5em;
+        margin-right: 10px;
     }
 
 }
