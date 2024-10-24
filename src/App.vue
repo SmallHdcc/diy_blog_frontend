@@ -8,9 +8,9 @@ import navigation from '@/components/navigation/navigation simple.vue';
     <navigation />
     <video src="/img/ghibliLofiCoffee.mp4" autoplay="autoplay" loop="loop" muted="muted"></video>
     <router-view v-slot="{ Component }">
-      <transition name="slide-fade">
-        <component :is="Component" />
-      </transition>
+      <!-- <transition name="slide-fade"> -->
+      <component :is="Component" />
+      <!-- </transition> -->
     </router-view>
   </div>
 </template>

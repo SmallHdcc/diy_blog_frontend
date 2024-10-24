@@ -33,10 +33,11 @@ watch(() => userStore.isLogin, (newVal, oldVal) => {
 
 const article = ref({
     title: '',
-    username: '',
+    author: '',
     date: '',
     heat: '',
-    content: ''
+    content: '',
+    authorAvatar: '',
 })
 
 const handleArticleShow = inject('handleArticleShow')
@@ -142,11 +143,38 @@ const removeComments = async (index) => {
 //     showDetailVisible.value = true;
 // })
 
+const dateFormat = (date_parm) => {
+    let date = new Date(date_parm)
+    let now = new Date()
+    let time = now - date
+    let day = Math.floor(time / (24 * 3600 * 1000))
+    //如果是今年就省略年份
+    let year = now.getFullYear() - date.getFullYear()
+    if (year === 0) {
+        if (day === 0) {
+            return "今天 " + date.getHours() + ":" + date.getMinutes()
+        } else if (day === 1) {
+            return "昨天 " + date.getHours() + ":" + date.getMinutes()
+        } else {
+            return (date.getMonth() + 1) + "-" + date.getDate()
+        }
+    }
+    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
+
+}
+
+const doWhileEnter = () => {
+    article.value = JSON.parse(localStorage.getItem("article"))
+    const baseInfo = JSON.parse(localStorage.getItem("baseInfo"))
+    if (baseInfo) {
+        article.value.authorAvatar = baseInfo.avatar
+        fetchComments()
+    }
+    article.value.createTime = dateFormat(article.value.createTime)
+}
 
 onMounted(() => {
-    article.value = JSON.parse(localStorage.getItem("article"))
-    if (JSON.parse(localStorage.getItem("baseInfo")))
-        fetchComments()
+    doWhileEnter()
     setTimeout(() => {
         Prism.highlightAll()// 全局代码高亮
     }, 100)
@@ -159,39 +187,40 @@ onMounted(() => {
     <el-scrollbar height="625px">
         <div id="detailPage">
             <div id="container">
+                <div id="author-info">
+                    <div id="author-avatar">
+                        <img :src="article.authorAvatar" alt="">
+                    </div>
+                    <div id="author-name">
+                        <span>{{ article.username }}</span>
+                    </div>
+                    <el-button type="primary">关注+</el-button>
+                </div>
                 <div id="main">
                     <h1 id="title">{{ article.title }}</h1>
+
+                    <div id="content" style="white-space: pre-wrap;padding: 10px; text-indent: 2em;"
+                        v-html="article.content">
+                    </div>
                     <div id="baseInfo">
                         <span id="date">
-                            <el-icon style="margin-right: 10px;">
-                                <Calendar />
-                            </el-icon>
                             <span>{{ article.createTime }}</span>
                         </span>
-                        <span id="heat">
-                            <el-icon style="margin-right: 10px;">
-                                <View />
-                            </el-icon>
-                            <span>{{ article.views + 1 }}</span>
+                        <span id="view">
+                            <svg class="icon icon_special" aria-hidden="true">
+                                <use xlink:href="#icon-yanjing"></use>
+                            </svg>
+                            {{ article.views }}
                         </span>
-                        <span id="username">
-                            <el-icon style="margin-right: 10px;">
-                                <User />
-                            </el-icon>
-                            <span>{{ article.username }}</span>
+                        <span id="share">
+                            <svg class="icon icon_special" aria-hidden="true">
+                                <use xlink:href="#icon-fenxiang"></use>
+                            </svg>
                         </span>
-                    </div>
-                    <!--  柔和分割线-->
-                    <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
-
-                    <div id="content" style="white-space: pre-wrap;padding: 10px;" v-html="article.content">
                     </div>
                     <div class="comment">
-                        <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;">
-                        </div>
-
                         <div id="comment-font-box">
-                            <h2>评论</h2>
+                            <h2>全部评论{{ article.commentNumber }}</h2>
                             <span>{{ commentNumber }}</span>
                         </div>
                         <div id="comment-input-box">
@@ -253,36 +282,69 @@ onMounted(() => {
         width: 100%;
         height: 100%;
 
+        #author-info {
+            display: flex;
+            align-items: center;
+            position: relative;
+            width: 100%;
+
+            #author-avatar {
+                width: 40px;
+                height: 40px;
+                margin-right: 5px;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 100%;
+                }
+            }
+
+            #author-name {
+                align-self: flex-start;
+                color: black;
+            }
+
+            .el-button {
+                position: absolute;
+                right: 10px;
+                background-color: rgb(0, 161, 214);
+            }
+        }
+
         #main {
             position: relative;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            // align-items: center;
             width: 100%;
             background-color: rgba(255, 255, 255);
             border-radius: 10px;
-            margin: 10px 0 30px 0;
+            margin: 0 0 10px 0;
             z-index: 0;
 
 
             #baseInfo {
                 display: flex;
-                align-items: center;
-                justify-content: space-between;
-                font-size: 20px;
-                width: 60%;
+                justify-content: left;
+                width: 100%;
+                font-size: 14px;
+                margin-top: 10px;
 
-                #heat,
+                #view,
                 #date,
                 #username {
                     display: flex;
                     align-items: center;
+                    margin-right: 20px;
+                    color: gray;
                 }
             }
 
 
             #title {
-                margin: 50px 0px 50px 0px;
+                text-align: center;
+                font-weight: 700;
             }
 
 
@@ -290,7 +352,7 @@ onMounted(() => {
                 width: 85%;
                 height: 100%;
                 margin: 0px 20px;
-                font-size: 20px;
+                font-size: 16px;
 
                 code {
                     font-size: 14px;
@@ -301,12 +363,15 @@ onMounted(() => {
                 display: flex;
                 flex-direction: column;
                 width: 100%;
-                margin-top: 70px;
+                margin-top: 30px;
 
                 #comment-font-box {
                     display: flex;
-                    // justify-content: center;
                     align-items: center;
+
+                    h2 {
+                        font-weight: 700;
+                    }
 
                     span {
                         margin-left: 10px;
@@ -320,8 +385,8 @@ onMounted(() => {
                     margin-top: 30px;
 
                     #username-avatar {
-                        width: 70px;
-                        height: 70px;
+                        width: 40px;
+                        height: 40px;
                         border-radius: 100%;
                         margin-right: 30px;
                         margin-left: 20px;
@@ -392,8 +457,8 @@ onMounted(() => {
                         width: 100%;
 
                         .commenter-avatar {
-                            width: 70px;
-                            height: 70px;
+                            width: 40px;
+                            height: 40px;
                             margin-right: 30px;
                             margin-left: 20px;
                             border-radius: 100%;
@@ -407,16 +472,16 @@ onMounted(() => {
 
                         .commenter-info {
                             width: 70%;
-                            border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                             margin: 10px 0px;
 
                             .coomenter-nickname {
                                 font-size: 16px;
-                                color: rgb(99, 204, 131);
+                                color: black;
                             }
 
                             .commenter-content {
-                                font-size: 20px;
+                                font-size: 14px;
                                 margin-bottom: 10px;
 
                             }
@@ -450,6 +515,12 @@ onMounted(() => {
 
         }
 
+    }
+
+    .icon_special {
+        width: 1.5em;
+        height: 1.5em;
+        margin-right: 5px;
     }
 }
 </style>

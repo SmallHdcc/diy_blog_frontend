@@ -72,7 +72,7 @@ onMounted(() => {
                 <svg class="icon icon_special" aria-hidden="true">
                     <use xlink:href="#icon-tianjia"></use>
                 </svg>
-                添加新帖
+                捐赠
             </router-link>
 
             <router-link class="after_touch" active-class="link-hover" :to="'/feedback'">

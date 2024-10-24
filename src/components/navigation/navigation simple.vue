@@ -21,6 +21,21 @@ const linkList = ref([
         link: "/",
     },
 ])
+const navigationList = ref([
+    {
+        icon: "#icon-tianjia",
+        link: "/writeArticle",
+    },
+    {
+        icon: "#icon-dialog",
+        link: "/message",
+    },
+    {
+        icon: "#icon-yijianfankui",
+        link: "/feedback",
+    }
+])
+
 
 
 //父子组件共同控制登录框的显示与隐藏
@@ -92,14 +107,25 @@ onUnmounted(() => {
                     <router-link active-class="link-hover" to="/" id="web-name" class="web-common_style">
                         <img src="/img/零玖网.png" alt="">
                     </router-link>
-                    <router-link active-class="link-hover" v-for="item in linkList" :to="item.link" id="web-page"
-                        class="web-common_style">
-                        <span>{{ item.name }}</span>
-                    </router-link>
+                    <div id="web-page" class="web-common_style">
+                        <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">
+                            <svg class="icon icon_special" aria-hidden="true">
+                                <use xlink:href="#icon-shouye"></use>
+                            </svg>
+                            <span>{{ item.name }}</span>
+                        </router-link>
+                    </div>
                     <div id="navigation-user" class="web-common_style">
-                        <div id="navigation-user-avatar">
+
+                        <router-link v-if="isLogin" class="navigation-other" active-class="link-hover"
+                            :to="navigation.link" v-for="navigation in navigationList">
+                            <svg class="icon icon_special" aria-hidden="true">
+                                <use :xlink:href="navigation.icon"></use>
+                            </svg>
+                        </router-link>
+                        <div id="navigation-user-avatar" v-if="isLogin">
                             <el-dropdown style="width: 100%;height: 100%;" lacement="bottom">
-                                <span style=" width: 100%; height: 100%;" class="el-dropdown-link">
+                                <span class="el-dropdown-link">
                                     <img id="user_avatar" style="width: 100%;border-radius: 100%;" v-if="isLogin"
                                         :src="userAvatar" alt="">
                                 </span>
@@ -111,8 +137,8 @@ onUnmounted(() => {
                                 </template>
                             </el-dropdown>
                         </div>
+                        <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
                     </div>
-                    <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
                 </div>
                 <Login v-show="isHaveAccount" />
                 <Register v-show="!isHaveAccount" />
@@ -146,6 +172,7 @@ onUnmounted(() => {
             background-color: transparent;
 
             #navigation {
+                position: relative;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -177,9 +204,15 @@ onUnmounted(() => {
                     width: 10%;
                     height: 100%;
 
+                    span {
+                        margin: 0 auto;
+                        font-weight: 600;
+                        padding: 5px;
+                    }
+
                     span:hover {
                         transition: all 0.5s;
-                        border-radius: 5px;
+                        border-radius: 10px;
                         background-color: rgb(205, 208, 210);
                     }
                 }
@@ -187,44 +220,67 @@ onUnmounted(() => {
                 #navigation-user {
                     position: absolute;
                     right: 20px;
-                    width: 25%;
+                    align-items: center;
+                    //宽度自适应
+                    max-width: 25%;
+                    min-width: 80px;
                     height: 100%;
-                    overflow: hidden;
+                    transition: all 0.5s;
 
                     #navigation-user-avatar {
-                        position: absolute;
-                        left: 10px;
-                        width: 2.5vw;
-                        height: 5vh;
+                        width: 40px;
+                        height: 100%;
                         cursor: pointer;
-                        background-color: white;
+                        margin-right: 10px;
 
-                        .example-showcase .el-dropdown-link,
-                        #user_avatar {
-                            cursor: pointer;
+                        .el-dropdown-link {
                             color: var(--el-color-primary);
                             display: flex;
                             align-items: center;
-                            border-radius: 100%;
+                            width: 100%;
+                            height: 100%;
                         }
 
                     }
 
+                    .navigation-other {
+                        display: flex;
+                        justify-content: center;
+                        width: 40px;
+                        height: 40px;
+                        margin: 0 15px;
+                        transition: all 0.5s;
+
+                        .icon_special {
+                            width: 1.5em;
+                            height: 100%;
+                        }
+                    }
+
+                    .navigation-other:hover {
+
+                        background-color: rgb(205, 208, 210);
+                        border-radius: 100%;
+                    }
+
+
+                    #not_login_in {
+                        position: relative;
+                        left: 20px;
+                        width: 40px;
+                        height: 40px;
+                        font-size: 16px;
+                        border-radius: 100%;
+                        line-height: 40px;
+                        color: white;
+                        text-align: center;
+                        cursor: pointer;
+                        background-color: rgb(0, 161, 214);
+                    }
+
                 }
 
-                #not_login_in {
-                    position: absolute;
-                    right: 20px;
-                    width: 40px;
-                    height: 40px;
-                    font-size: 16px;
-                    border-radius: 100%;
-                    line-height: 40px;
-                    color: white;
-                    text-align: center;
-                    cursor: pointer;
-                    background-color: rgb(0, 161, 214);
-                }
+
 
                 #Search_input {
                     position: absolute;

@@ -38,7 +38,7 @@ const onSubmit = async () => {
     if (examineBeforeSubmit()) {
         form.userId = JSON.parse(localStorage.getItem("baseInfo") || '').id
         //将内容的前50个字符作为简介,但是不包含标签
-        form.profile = form.content.replace(/<[^>]+>/g, "").substring(0, 50)
+        form.profile = form.content.replace(/<[^>]+>/g, "").substring(0, 50) + '...'
         const result = await uploadArticle(form)
         if (result.data.code == 1) {
             ElMessage.success({ message: "发布成功" })

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, inject, reactive } from 'vue'
+import { ref, onMounted, inject, reactive, watch } from 'vue'
 import { getPublicBlogDetail, getBlogsByPage, deleteArticle } from '@/api/blog.js'
 import { ElMessage } from 'element-plus';
 import { remove } from 'lodash';
@@ -38,6 +38,13 @@ const emit = defineEmits(['get-articles-count'])
 
 //从父组件获得排序方式
 const sortType = inject('sortType')
+//监听
+watch(sortType, () => {
+    currentPage.value = 1
+    fetchArticles()
+})
+
+
 /*--- 获取文章 ---*/
 const fetchArticles = async () => {
     loading.value = true
@@ -139,6 +146,7 @@ const handlePrivate = (event, index) => {
 
 
 
+
 onMounted(() => {
     fetchArticles()
 })
@@ -177,17 +185,17 @@ onMounted(() => {
                     </div>
                     <div class="info-author">
                         <div class="article-commentCount">
-                            <el-icon style="margin-right: 5px;" size="20px">
-                                <ChatDotSquare />
-                            </el-icon>
+                            <svg class="icon icon_special" aria-hidden="true">
+                                <use xlink:href="#icon-dialog"></use>
+                            </svg>
                             <span>
                                 {{ article.commentCount }}
                             </span>
                         </div>
                         <div class="article-views">
-                            <el-icon style="margin-right: 5px;" size="20px">
-                                <View />
-                            </el-icon>
+                            <svg class="icon icon_special" aria-hidden="true">
+                                <use xlink:href="#icon-yanjing"></use>
+                            </svg>
                             <span>
                                 {{ article.views }}
                             </span>

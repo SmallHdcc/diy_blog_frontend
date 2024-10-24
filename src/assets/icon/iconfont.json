@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "6544531",
+      "name": "眼睛",
+      "font_class": "yanjing",
+      "unicode": "e706",
+      "unicode_decimal": 59142
+    },
+    {
+      "icon_id": "3759622",
+      "name": "首页",
+      "font_class": "shouye",
+      "unicode": "e698",
+      "unicode_decimal": 59032
+    },
+    {
+      "icon_id": "38487109",
+      "name": "公告",
+      "font_class": "a-Group1313",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
       "icon_id": "3769201",
       "name": "dialog",
       "font_class": "dialog",

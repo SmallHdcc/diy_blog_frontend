@@ -101,6 +101,10 @@ const fetchDevLog = async () => {
 const sortType = ref(0)
 provide('sortType', sortType)
 
+const handleSortType = (index) => {
+    sortType.value = index
+}
+
 
 onMounted(() => {
     fetchHeatList()
@@ -199,8 +203,8 @@ onMounted(() => {
                                 </div>
                                 <div id="left-bottom-wrapper">
                                     <ul class="bottom-wrapper-header">
-                                        <li v-for="(item, index) in ['关注', '推荐', '最新']" :key="index"
-                                            class="bottom-wrapper-header-element">
+                                        <li v-for="(item, index) in ['推荐', '最新', '关注']" :key="index"
+                                            @click="handleSortType(index)" class="bottom-wrapper-header-element">
                                             {{ item }}
                                         </li>
                                     </ul>
