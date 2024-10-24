@@ -6,7 +6,7 @@ import { useArticleStore } from '@/stores/article.js'
 import showArticle from '@/components/article/articles.vue';
 import showDetail from '@/components/article/showArticleDetail.vue'
 import router from '../../router';
-
+import navigation from '../../components/navigation/navigation simple.vue';
 const userId = 0
 provide('userId', userId)
 
@@ -19,7 +19,6 @@ const heat_list = ref([])
 
 const fetchHeatList = async () => {
     const result = await getHeatList()
-    console.log(result.data)
     if (result.data.code === 1) {
         //获取前10个
         heat_list.value = result.data.data.slice(0, 10)
@@ -98,6 +97,11 @@ const fetchDevLog = async () => {
     }
 }
 
+/* 文章排序方式控制变量 */
+const sortType = ref(0)
+provide('sortType', sortType)
+
+
 onMounted(() => {
     fetchHeatList()
     fetchDevLog()
@@ -108,118 +112,122 @@ onMounted(() => {
 
 <template>
     <div id="Community">
-        <div class="container">
-            <div class="middle">
-                <div id="container-top">
-                    <div id="container-top-left">
-                        <ul class="top-left-list">
-                            <li @mouseover="handleMouseOver(index)" v-for="(item, index) in ['更新公告', '关于作者', '关于网站']"
-                                :key="index"
-                                :class="{ 'hovered': currentHoverIndex === index || lastHoverIndex === index }">
-                                {{ item }}
-                            </li>
-                        </ul>
-                        <div class="left-content">
-                            <template v-if="currentHoverIndex === 0">
-                                <p style="text-indent: 2em;">
-                                    {{ devLog.content }}
-                                </p>
-                                <br />
-                                <p style="text-indent: 2em;">
-                                    新UI持续更新中......
-                                </p>
-                                <p style="text-align: right;">于 {{ devLog.createTime }} 更新</p>
-                            </template>
-                            <template v-else-if="currentHoverIndex === 1">
-                                <div class="left-content_author">
-                                    <ul class="author-info-detail">
-                                        <li>昵称:smallhdcc</li>
-                                        <li>院校:武汉工程大学</li>
-                                        <li>专业:数据科学与大数据技术</li>
-                                    </ul>
-                                    <ul class="author-info-detail">
-                                        <li>籍贯:河南新乡人</li>
-                                        <li>学院:光能数理学院</li>
-                                        <li>QQ:804678776</li>
-                                    </ul>
+        <div style="width: 100%;height: 100%;">
+            <el-scrollbar>
+                <div class="container">
+                    <div class="middle">
+                        <div id="container-top">
+                            <div id="container-top-left">
+                                <ul class="top-left-list">
+                                    <li @mouseover="handleMouseOver(index)"
+                                        v-for="(item, index) in ['更新公告', '关于作者', '关于网站']" :key="index"
+                                        :class="{ 'hovered': currentHoverIndex === index || lastHoverIndex === index }">
+                                        {{ item }}
+                                    </li>
+                                </ul>
+                                <div class="left-content">
+                                    <template v-if="currentHoverIndex === 0">
+                                        <p style="text-indent: 2em;">
+                                            {{ devLog.content }}
+                                        </p>
+                                        <br />
+                                        <p style="text-indent: 2em;">
+                                            新UI持续更新中......
+                                        </p>
+                                        <p style="text-align: right;">于 {{ devLog.createTime }} 更新</p>
+                                    </template>
+                                    <template v-else-if="currentHoverIndex === 1">
+                                        <div class="left-content_author">
+                                            <ul class="author-info-detail">
+                                                <li>昵称:smallhdcc</li>
+                                                <li>院校:武汉工程大学</li>
+                                                <li>专业:数据科学与大数据技术</li>
+                                            </ul>
+                                            <ul class="author-info-detail">
+                                                <li>籍贯:河南新乡人</li>
+                                                <li>学院:光能数理学院</li>
+                                                <li>QQ:804678776</li>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                    <template v-else-if="currentHoverIndex === 2">
+                                        <p style="text-indent: 2em;">一个简单的论坛项目,因为作者实在是不懂UI设计,所以只能阉割一些内容,受制于作者的水平,
+                                            网站存在的BUG还希望大家能见谅,作者会尽快修复,希望大家能够喜欢这个项目,如果有什么问题,可以联系作者.
+                                        </p>
+                                    </template>
                                 </div>
-                            </template>
-                            <template v-else-if="currentHoverIndex === 2">
-                                <p style="text-indent: 2em;">一个简单的论坛项目,因为作者实在是不懂UI设计,所以只能阉割一些内容,受制于作者的水平,
-                                    网站存在的BUG还希望大家能见谅,作者会尽快修复,希望大家能够喜欢这个项目,如果有什么问题,可以联系作者.
-                                </p>
-                            </template>
-                        </div>
-                    </div>
-                    <div id="container-top-right">
-                        <div style="width: 100%;
+                            </div>
+                            <div id="container-top-right">
+                                <div style="width: 100%;
                             height: 50px;
                             font-size: 30px; 
                             line-height: 50px;
                             border-radius:10px 10px 0 0;
                             background-color: rgb(0, 161, 214);
                             text-align: center;">
-                            {{ month }}月
-                        </div>
-                        <div style="width: 100%;
+                                    {{ month }}月
+                                </div>
+                                <div style="width: 100%;
                                 height: 200px;
                                 font-size: 60px;
                                 line-height: 200px;
                                 text-align: center;
                                 border-radius:0 0 10px 10px;">
-                            {{ day }}
-                        </div>
-                        <!-- <h2 style="text-align: center;">希望今天是美好的😂</h2> -->
-                    </div>
-                </div>
-                <div id="container-bottom">
-                    <div id="left-wrapper">
-                        <div id="left-top-wrapper">
-                            <div class="top-wrapper-header">
-                                <div class="top-wrapper-header-element">发动态</div>
-                                <router-link @click="checkIsLogin()" to="/writeArticle"
-                                    class="top-wrapper-header-element">写文章</router-link>
-                            </div>
-                            <div class="top-wrapper-input">
-                                <el-input v-model="text" style="width: 100%; border: none;" maxlength="10"
-                                    placeholder="标题,最多10个字" show-word-limit type="text" />
-                                <div style="margin: 20px 0" />
-                                <el-input v-model="textarea" maxlength="100" resize="none" rows="6"
-                                    style="width: 100%; height:80%; background-color: rgb(248, 248, 248);"
-                                    placeholder="分享一下你的想法吧" show-word-limit type="textarea" />
-                            </div>
-                            <div class="more-element">
-                                <el-button type="primary" color="rgb(0, 161, 214)">发布</el-button>
+                                    {{ day }}
+                                </div>
                             </div>
                         </div>
-                        <div id="left-bottom-wrapper">
-                            <ul class="bottom-wrapper-header">
-                                <li v-for="(item, index) in ['关注', '推荐', '最新']" :key="index"
-                                    class="bottom-wrapper-header-element">
-                                    {{ item }}
-                                </li>
-                            </ul>
-                            <showArticle></showArticle>
-                        </div>
-                        <el-dialog v-model="showDetailVisible" width="900px"
-                            style="display: flex;flex-direction: column;">
-                            <showDetail v-if="showDetailVisible"></showDetail>
-                        </el-dialog>
-                    </div>
-                    <div id="right-wrapper">
-                        <div class="side-list side-common">
-                            <h2>热门帖🔥</h2>
-                            <div v-for="(item, index) in heat_list" @click="fetchArticleDetail(item.articleId)">
-                                <div class="side-list-element" :class="getColor(index)">
-                                    <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1 }}.</span>
-                                    {{ item.articleTitle }}
+                        <div id="container-bottom">
+                            <div id="left-wrapper">
+                                <div id="left-top-wrapper">
+                                    <div class="top-wrapper-header">
+                                        <div class="top-wrapper-header-element">发动态</div>
+                                        <router-link @click="checkIsLogin()" to="/writeArticle"
+                                            class="top-wrapper-header-element">写文章</router-link>
+                                    </div>
+                                    <div class="top-wrapper-input">
+                                        <el-input v-model="text" style="width: 100%; border: none;" maxlength="10"
+                                            placeholder="标题,最多10个字" show-word-limit type="text" />
+                                        <div style="margin: 20px 0" />
+                                        <el-input v-model="textarea" maxlength="100" resize="none" rows="6"
+                                            style="width: 100%; height:80%; background-color: rgb(248, 248, 248);"
+                                            placeholder="分享一下你的想法吧" show-word-limit type="textarea" />
+                                    </div>
+                                    <div class="more-element">
+                                        <el-button type="primary" color="rgb(0, 161, 214)">发布</el-button>
+                                    </div>
+                                </div>
+                                <div id="left-bottom-wrapper">
+                                    <ul class="bottom-wrapper-header">
+                                        <li v-for="(item, index) in ['关注', '推荐', '最新']" :key="index"
+                                            class="bottom-wrapper-header-element">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                    <showArticle></showArticle>
+                                </div>
+                                <el-dialog v-model="showDetailVisible" width="900px" top="0vh"
+                                    style="display: flex;flex-direction: column;height:700px;">
+                                    <showDetail v-if="showDetailVisible"></showDetail>
+                                </el-dialog>
+                            </div>
+                            <div id="right-wrapper">
+                                <div class="side-list side-common">
+                                    <h2>热门帖🔥</h2>
+                                    <div v-for="(item, index) in heat_list" @click="fetchArticleDetail(item.articleId)">
+                                        <div class="side-list-element" :class="getColor(index)">
+                                            <span style="font-weight: 700;" :class="getColor(index)"> {{ index + 1
+                                                }}.</span>
+                                            {{ item.articleTitle }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <el-backtop :right="100" :bottom="100" />
                 </div>
-            </div>
-            <el-backtop :right="100" :bottom="100" />
+            </el-scrollbar>
         </div>
     </div>
 </template>
@@ -230,10 +238,10 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 94vh;
-    z-index: 0;
+    height: 100%;
 
     .container {
+        position: relative;
         width: 100%;
 
         .middle {
@@ -241,7 +249,7 @@ onMounted(() => {
             flex-direction: column;
             align-items: center;
             width: 1200px;
-            margin: 20px auto;
+            margin: 65px auto;
 
             #container-top {
                 display: flex;
@@ -412,7 +420,7 @@ onMounted(() => {
                     position: sticky;
                     width: 30%;
                     height: 300px;
-                    top: 7vh;
+                    top: 65px;
                     z-index: 0;
 
                     .side-common {

@@ -200,6 +200,9 @@ const getArticlesCount = (value) => {
     articlesCount.value = value
 }
 
+const sortType = ref(0)
+provide('sortType', sortType)
+
 onMounted(() => {
 })
 
@@ -207,58 +210,63 @@ onMounted(() => {
 
 <template>
     <div id="PersonalPage">
-        <div id="container">
-            <div id="showContent">
-                <div class="left-main_content">
-                    <div class="content_type">
-                        <span v-for="(type, index) in content_types">
-                            {{ type }}<span v-if="type === '发布'">({{ articlesCount }})</span>
-                        </span>
-                    </div>
-                    <showArticle @get-articles-count="getArticlesCount"></showArticle>
-                    <el-dialog v-model="showDetailVisible" width="900px" style="display: flex;flex-direction: column;">
-                        <showArticleDetail v-if="showDetailVisible"></showArticleDetail>
-                    </el-dialog>
-                </div>
-                <div class="right-userInfo">
-                    <div class="el-card">
-                        <div id="avatar" @click="dialogVisible = true">
-                            <img :src=user.avatar alt="">
-                        </div>
-                        <div id="userInfo">
-                            <div id="username">
-                                <el-icon>
-                                    <User />
-                                </el-icon>
-                                <span style="padding-left: 10px;">{{ user.username }}</span>
+        <div style="width: 100%;height: 100%;">
+            <el-scrollbar>
+                <div id="container">
+                    <div id="showContent">
+                        <div class="left-main_content">
+                            <div class="content_type">
+                                <span v-for="(type, index) in content_types">
+                                    {{ type }}<span v-if="type === '发布'">({{ articlesCount }})</span>
+                                </span>
                             </div>
-                            <div id="signature">
-                                <span v-if="signature">{{ user.signature }}</span>
-                                <input @blur="handleSignature(user.signature, user.id)" v-model="user.signature"
-                                    v-if="!signature"
-                                    style="outline: none;border: none;font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
-                                    type="text" placeholder="编辑个性签名吧！">
-                                <el-icon @click="signature = !signature">
-                                    <EditPen />
-                                </el-icon>
+                            <showArticle @get-articles-count="getArticlesCount"></showArticle>
+                            <el-dialog v-model="showDetailVisible" width="900px" top="0vh" close-on-press-escape
+                                style="display: flex;flex-direction: column; height: 700px;margin-bottom: 10px;">
+                                <showArticleDetail v-if="showDetailVisible"></showArticleDetail>
+                            </el-dialog>
+                        </div>
+                        <div class="right-userInfo">
+                            <div class="el-card">
+                                <div id="avatar" @click="dialogVisible = true">
+                                    <img :src=user.avatar alt="">
+                                </div>
+                                <div id="userInfo">
+                                    <div id="username">
+                                        <el-icon>
+                                            <User />
+                                        </el-icon>
+                                        <span style="padding-left: 10px;">{{ user.username }}</span>
+                                    </div>
+                                    <div id="signature">
+                                        <span v-if="signature">{{ user.signature }}</span>
+                                        <input @blur="handleSignature(user.signature, user.id)" v-model="user.signature"
+                                            v-if="!signature"
+                                            style="outline: none;border: none;font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+                                            type="text" placeholder="编辑个性签名吧！">
+                                        <el-icon @click="signature = !signature">
+                                            <EditPen />
+                                        </el-icon>
+                                    </div>
+                                </div>
                             </div>
+                            <el-dialog v-model="dialogVisible" title="更换头像" width="30%">
+                                <avatarCropper style="display: flex; justify-content: center;" ref='avatar'>
+                                </avatarCropper>
+                                <template #footer>
+                                    <span class="dialog-footer">
+                                        <el-button @click="dialogVisible = false">取消</el-button>
+                                        <el-button type="primary" @click="getSonHander">
+                                            确定
+                                        </el-button>
+                                    </span>
+                                </template>
+                            </el-dialog>
                         </div>
                     </div>
-                    <el-dialog v-model="dialogVisible" title="更换头像" width="30%">
-                        <avatarCropper style="display: flex; justify-content: center;" ref='avatar'></avatarCropper>
-                        <template #footer>
-                            <span class="dialog-footer">
-                                <el-button @click="dialogVisible = false">取消</el-button>
-                                <el-button type="primary" @click="getSonHander">
-                                    确定
-                                </el-button>
-                            </span>
-                        </template>
-                    </el-dialog>
                 </div>
-            </div>
+            </el-scrollbar>
         </div>
-
     </div>
 </template>
 
@@ -268,7 +276,7 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 94vh;
+    height: 100%;
 
     #container {
         position: relative;
@@ -276,6 +284,7 @@ onMounted(() => {
         flex-direction: column;
         width: 80%;
         height: 100%;
+        margin: 65px auto;
 
         #showContent {
             display: flex;
@@ -287,7 +296,7 @@ onMounted(() => {
                 flex-direction: column;
                 width: 69%;
                 border-radius: 10px 10px 0 0;
-                margin: 5px 0 10px 0;
+                margin: 0 0 10px 0;
 
                 .content_type {
                     display: flex;
@@ -315,7 +324,7 @@ onMounted(() => {
             //用户信息相对于浏览器定位
             .right-userInfo {
                 position: sticky; //这里是相对于浏览器定位的，所以宽度都是针对浏览器的，不能搞混
-                top: 7vh;
+                top: 65px;
                 width: 30%;
                 height: 400px;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);

@@ -36,10 +36,12 @@ const userId = inject('userId')
 
 const emit = defineEmits(['get-articles-count'])
 
+//从父组件获得排序方式
+const sortType = inject('sortType')
 /*--- 获取文章 ---*/
 const fetchArticles = async () => {
     loading.value = true
-    const result = await getBlogsByPage(currentPage.value, pageSize.value, userId)
+    const result = await getBlogsByPage(currentPage.value, pageSize.value, userId, sortType.value)
     if (result.data.code === 1) {
         let articles = result.data.data.records
         //将文章总数传递给父组件
@@ -47,12 +49,10 @@ const fetchArticles = async () => {
         //将字符串 转化为数组
         articles.forEach(item => {
             item.tags = toStringArray(item.tags)
+            item.createTime = dateFormat(item.createTime)
+            item.isPrivate = item.isPrivate === 1 ? "私密" : "公开"
         })
         article_content.value = articles
-        //将article_content.value中的时间转化为今天昨天+时间,如果不可以再标为具体日期
-        article_content.value.forEach(item => {
-            item.createTime = dateFormat(item.createTime)
-        })
     }
     loading.value = false
     currentPage.value++
@@ -86,7 +86,9 @@ const load = async () => {
     }
     loading.value = true
     try {
-        const result = await getBlogsByPage(currentPage.value, pageSize.value, userId)
+        if (endOfContent.value)
+            return
+        const result = await getBlogsByPage(currentPage.value, pageSize.value, userId, sortType.value)
         loading.value = false
         if (result.data.code === 1) {
             let articles = result.data.data.records
@@ -98,9 +100,8 @@ const load = async () => {
             //将字符串 转化为数组
             articles.forEach(item => {
                 item.tags = toStringArray(item.tags)
-            })
-            articles.forEach(item => {
                 item.createTime = dateFormat(item.createTime)
+                item.isPrivate = item.isPrivate === 1 ? "私密" : "公开"
             })
             //将新的文章添加到原来的文章中
             article_content.value = article_content.value.concat(articles)
@@ -145,67 +146,69 @@ onMounted(() => {
 </script>
 
 <template>
-    <transition name="fade">
-        <div v-infinite-scroll="load" infinite-scroll-immediate-check="true" id="showArticle">
-            <div class="article" v-for="(article, index) in article_content" @click="fetchArticleDetail(index)">
-                <div class="article-info">
-                    <div class="article-info-top">
-                        <div class="article-info-top-left">
-                            <h3 class="info-title">{{ article.title }}</h3>
-                            <div class="info-tags">
-                                <el-tag style="margin-right: 5px;" v-for="(tag) in article.tags">
-                                    {{ tag }}
-                                </el-tag>
-                            </div>
-                            <span class="info-profile">{{ article.profile }}</span>
+    <div v-infinite-scroll="load" infinite-scroll-immediate-check="true" id="showArticle">
+        <div class="article" v-for="(article, index) in article_content" @click="fetchArticleDetail(index)">
+            <div class="article-info">
+                <div class="article-info-top">
+                    <div class="article-info-top-left">
+                        <h3 class="info-title">{{ article.title }}</h3>
+                        <div class="info-tags">
+                            <el-tag style="margin-right: 5px;" v-for="(tag) in article.tags">
+                                {{ tag }}
+                            </el-tag>
                         </div>
-                        <div v-show="userId === 0 ? false : true" class="article-info-top-right">
-                            状态: 公开
+                        <span class="info-profile">{{ article.profile }}</span>
+                    </div>
+                    <div v-show="userId === 0 ? false : true" class="article-info-top-right">
+                        状态: {{ article.isPrivate }}
+                    </div>
+                </div>
+                <div class="article-info-bottom">
+                    <div class="article-option">
+                        <div v-show="userId === 0 ? false : true">
+                            <el-popconfirm @confirm.stop="removeArticle(index, $event)" title="确定删除吗?">
+                                <template #reference>
+                                    <span @click.stop="">删除</span>
+                                </template>
+                            </el-popconfirm>
+                            <span @click="editArticle(index, $event)">编辑</span>
+                            <span>公开</span>
                         </div>
                     </div>
-                    <div class="article-info-bottom">
-                        <div class="article-option">
-                            <div v-show="userId === 0 ? false : true">
-                                <span @click="removeArticle(index, $event)">删除</span>
-                                <span @click="editArticle(index, $event)">编辑</span>
-                                <span>公开</span>
-                            </div>
+                    <div class="info-author">
+                        <div class="article-commentCount">
+                            <el-icon style="margin-right: 5px;" size="20px">
+                                <ChatDotSquare />
+                            </el-icon>
+                            <span>
+                                {{ article.commentCount }}
+                            </span>
                         </div>
-                        <div class="info-author">
-                            <div class="article-commentCount">
-                                <el-icon style="margin-right: 5px;" size="20px">
-                                    <ChatDotSquare />
-                                </el-icon>
-                                <span>
-                                    {{ article.commentCount }}
-                                </span>
-                            </div>
-                            <div class="article-views">
-                                <el-icon style="margin-right: 5px;" size="20px">
-                                    <View />
-                                </el-icon>
-                                <span>
-                                    {{ article.views }}
-                                </span>
-                            </div>
-                            <div class="author-avatar"><img :src="article.avatar" alt=""></div>
-                            <div class="author-username">
-                                <span>{{ article.username }}</span>
-                                <span style="color:gray;font-size: 12px;">{{ article.createTime }}</span>
-                            </div>
+                        <div class="article-views">
+                            <el-icon style="margin-right: 5px;" size="20px">
+                                <View />
+                            </el-icon>
+                            <span>
+                                {{ article.views }}
+                            </span>
+                        </div>
+                        <div class="author-avatar"><img :src="article.avatar" alt=""></div>
+                        <div class="author-username">
+                            <span>{{ article.username }}</span>
+                            <span style="color:gray;font-size: 12px;">{{ article.createTime }}</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div v-if="loading" class="bottom-content">
-                <el-icon size="20px" class="is-loading">
-                    <Loading />
-                </el-icon>
-                <span>加载中...</span>
-            </div>
-            <div v-if="endOfContent" class="bottom-content">已经到底了...😓</div>
         </div>
-    </transition>
+        <div v-if="loading" class="bottom-content">
+            <el-icon size="20px" class="is-loading">
+                <Loading />
+            </el-icon>
+            <span>加载中...</span>
+        </div>
+        <div v-if="endOfContent" class="bottom-content">已经到底了...😓</div>
+    </div>
 </template>
 
 <style lang="less" scoped>
@@ -367,15 +370,5 @@ onMounted(() => {
         align-items: center;
         color: white;
     }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity .5s;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
 }
 </style>

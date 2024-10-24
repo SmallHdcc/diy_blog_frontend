@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-
 const message_type = ref(
     [
         {
@@ -25,26 +24,30 @@ const message_type = ref(
 </script>
 <template>
     <div id="MessageCenter">
-        <div id="container">
-            <div class="left-message-navigation">
-                <div class="left-message-navigation-head">
-                    <el-icon style="margin-right: 10px;" size="25px">
-                        <Position />
-                    </el-icon>
-                    <h2>消息中心</h2>
+        <div style="width: 100%;height: 100%;">
+            <el-scrollbar height="100vh">
+                <div id="container">
+                    <div class="left-message-navigation">
+                        <div class="left-message-navigation-head">
+                            <el-icon style="margin-right: 10px;" size="25px">
+                                <Position />
+                            </el-icon>
+                            <h2>消息中心</h2>
+                        </div>
+                        <ul class="left-message-navigation-list">
+                            <li v-for="(item, key) in message_type" :key="key">
+                                <router-link :to="item.link" active-class="link-hover">
+                                    {{ item.message_title }}
+                                </router-link>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right-message-content">
+                        <div class="title">标头</div>
+                        <router-view></router-view>
+                    </div>
                 </div>
-                <ul class="left-message-navigation-list">
-                    <li v-for="(item, key) in message_type" :key="key">
-                        <router-link :to="item.link" active-class="link-hover">
-                            {{ item.message_title }}
-                        </router-link>
-                    </li>
-                </ul>
-            </div>
-            <div class="right-message-content">
-                <div class="title">标头</div>
-                <router-view></router-view>
-            </div>
+            </el-scrollbar>
         </div>
     </div>
 </template>
@@ -52,7 +55,7 @@ const message_type = ref(
 #MessageCenter {
     display: flex;
     justify-content: center;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 
     #container {
@@ -60,6 +63,8 @@ const message_type = ref(
         justify-content: space-around;
         width: 70%;
         height: 100%;
+        background-color: white;
+        margin: 65px auto;
 
         .left-message-navigation {
             display: flex;

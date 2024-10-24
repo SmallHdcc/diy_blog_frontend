@@ -45,18 +45,6 @@ const router = createRouter({
     //   name: "testPage",
     //   meta: { isAuth: false, title: '测试页面' },
     //   component: () => import('@/views/test/test08.vue'),
-    //   children: [
-    //     {
-    //       path: 'reply',
-    //       name: "reply",
-    //       component: () => import('@/components/message/ReplyMe.vue')
-    //     },
-    //     {
-    //       path: 'sys',
-    //       name: "sys",
-    //       component: () => import('@/components/message/ReplyMe.vue')
-    //     },
-    //   ],
     // },
     {
       path: "/:pathMatch(.*)*", // 必备

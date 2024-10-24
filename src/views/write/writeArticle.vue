@@ -139,42 +139,46 @@ onMounted(() => {
 
 <template>
     <div id="writeArticle">
-        <div id="container">
-            <h1 id="header-line">你好,{{ username }}</h1>
-            <el-form :rules="rules" :model="form" label-width="120px" ref="ruleFormRef">
-                <el-form-item label="标题" prop="title">
-                    <el-input v-model="form.title" />
-                </el-form-item>
-                <el-form-item label="类型">
-                    <el-tag v-for="tag in form.tags" :key="tag" class="mx-1" closable :disable-transitions="false"
-                        @close="handleClose(tag)">
-                        {{ tag }}
-                    </el-tag>
-                    <el-input v-if="inputVisible" ref="InputRef" v-model="inputValue" class="ml-1 w-20" size="small"
-                        @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
-                    <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput">
-                        + 新标签
-                    </el-button>
-                </el-form-item>
-                <el-form-item label="封面">
-                    <el-upload class="avatar-uploader" :show-file-list="false" :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload">
-                        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-                        <el-icon v-else class="avatar-uploader-icon">
-                            <Plus />
-                        </el-icon>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item label="内容" prop="content">
-                    <keep-alive>
-                        <textEditor ref="contents" style="resize: none;" />
-                    </keep-alive>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">发布</el-button>
-                    <el-button @click="resetForm(ruleFormRef)">取消</el-button>
-                </el-form-item>
-            </el-form>
+        <div style="width: 100%;height: 100%;">
+            <el-scrollbar>
+                <div id="container">
+                    <h1 id="header-line">你好,{{ username }}</h1>
+                    <el-form :rules="rules" :model="form" label-width="120px" ref="ruleFormRef">
+                        <el-form-item label="标题" prop="title">
+                            <el-input v-model="form.title" />
+                        </el-form-item>
+                        <el-form-item label="类型">
+                            <el-tag v-for="tag in form.tags" :key="tag" class="mx-1" closable
+                                :disable-transitions="false" @close="handleClose(tag)">
+                                {{ tag }}
+                            </el-tag>
+                            <el-input v-if="inputVisible" ref="InputRef" v-model="inputValue" class="ml-1 w-20"
+                                size="small" @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
+                            <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput">
+                                + 新标签
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="封面">
+                            <el-upload class="avatar-uploader" :show-file-list="false" :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload">
+                                <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                                <el-icon v-else class="avatar-uploader-icon">
+                                    <Plus />
+                                </el-icon>
+                            </el-upload>
+                        </el-form-item>
+                        <el-form-item label="内容" prop="content">
+                            <keep-alive>
+                                <textEditor ref="contents" style="resize: none;" />
+                            </keep-alive>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="onSubmit">发布</el-button>
+                            <el-button @click="resetForm(ruleFormRef)">取消</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </el-scrollbar>
         </div>
     </div>
 </template>
@@ -186,14 +190,14 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    height: 94vh;
+    height: 100vh;
 
     #container {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
         width: 1000px;
-        margin-top: 50px;
+        margin: 65px auto;
         background-color: white;
         padding: 20px;
         border-radius: 10px;

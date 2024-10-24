@@ -50,10 +50,10 @@ export function deleteArticle(id) {
 
 
 //分页查询博客
-export function getBlogsByPage(page, PageSize, userId) {
+export function getBlogsByPage(page, PageSize, userId, sortType) {
     return service({
         method: "GET",
-        url: `/article?page=${page}&PageSize=${PageSize}&userId=${userId}`,
+        url: `/article?page=${page}&PageSize=${PageSize}&userId=${userId}&sortType=${sortType}`,
     })
 
 }

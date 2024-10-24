@@ -1,5 +1,5 @@
 <script setup>
-import navigation from '@/components/navigation/navigation.vue';
+import navigation from '@/components/navigation/navigation simple.vue';
 
 </script>
 
@@ -18,7 +18,7 @@ import navigation from '@/components/navigation/navigation.vue';
 <style lang="less" scoped>
 #app {
   width: 100%;
-  height: 10vh;
+  height: 100vh;
 }
 
 video {

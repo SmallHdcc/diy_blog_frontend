@@ -89,24 +89,28 @@ onUnmounted(() => {
         <div id="container" :class="{ scrolled: isScrolled }">
             <div id="setWidth">
                 <div id="navigation">
-                    <router-link active-class="link-hover" to="/" id="web-name">
+                    <router-link active-class="link-hover" to="/" id="web-name" class="web-common_style">
                         <img src="/img/零玖网.png" alt="">
                     </router-link>
-                    <router-link active-class="link-hover" v-for="item in linkList" :to="item.link">
-                        {{ item.name }}
+                    <router-link active-class="link-hover" v-for="item in linkList" :to="item.link" id="web-page"
+                        class="web-common_style">
+                        <span>{{ item.name }}</span>
                     </router-link>
-                    <div id="navigation-user-avatar">
-                        <el-dropdown style="width: 100%;height: 100%;" lacement="bottom">
-                            <span style=" width: 100%; height: 100%;" class="el-dropdown-link">
-                                <img id="user_avatar" style="width: 100%;border-radius: 100%;" v-if="isLogin"
-                                    :src="userAvatar" alt="">
-                            </span>
-                            <template #dropdown>
-                                <el-dropdown-menu style="position: relative; width: 300px;height: 400px; padding: 0;">
-                                    <WebFunction />
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
+                    <div id="navigation-user" class="web-common_style">
+                        <div id="navigation-user-avatar">
+                            <el-dropdown style="width: 100%;height: 100%;" lacement="bottom">
+                                <span style=" width: 100%; height: 100%;" class="el-dropdown-link">
+                                    <img id="user_avatar" style="width: 100%;border-radius: 100%;" v-if="isLogin"
+                                        :src="userAvatar" alt="">
+                                </span>
+                                <template #dropdown>
+                                    <el-dropdown-menu
+                                        style="position: relative; width: 300px;height: 400px; padding: 0;">
+                                        <WebFunction />
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </div>
                     </div>
                     <div @click="dialogVisable = true" v-if="!isLogin" id="not_login_in">登录</div>
                 </div>
@@ -118,9 +122,10 @@ onUnmounted(() => {
 </template>
 <style lang="less" scoped>
 #header {
-    position: relative;
+    position: fixed;
     height: 6vh;
-    // z-index: 1;
+    background-color: transparent;
+    z-index: 1;
 
     #container {
         position: fixed;
@@ -128,59 +133,83 @@ onUnmounted(() => {
         justify-content: center;
         width: 100%;
         height: 6vh;
-        background-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
+        // background-color: rgba(255, 255, 255, 0.2);
+        // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
+        //背景透明
+        background-color: transparent;
         transition: all 0.5s;
 
         #setWidth {
             position: relative;
-            width: 80%;
+            width: 100%;
             height: 100%;
+            background-color: transparent;
 
             #navigation {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 80%;
+                width: 100%;
                 height: 6vh;
                 font-size: 20px;
+                margin-top: 15px;
 
-                #navigation-user-avatar {
-                    position: absolute;
-                    right: 20px;
-                    width: 2.5vw;
-                    height: 5vh;
-                    cursor: pointer;
-
-                    .example-showcase .el-dropdown-link,
-                    #user_avatar {
-                        cursor: pointer;
-                        color: var(--el-color-primary);
-                        display: flex;
-                        align-items: center;
-                        border-radius: 100%;
-                    }
-
-                }
-
-
-                #web-name {
+                .web-common_style {
                     display: flex;
                     align-items: center;
+                    background-color: white;
+                    border-radius: 30px;
+                    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+                }
+
+                #web-name {
                     position: absolute;
                     left: 10px;
+                    height: 100%;
 
                     img {
                         width: 5em;
                     }
                 }
 
+                #web-page {
+                    justify-content: center;
+                    width: 10%;
+                    height: 100%;
+
+                    span:hover {
+                        transition: all 0.5s;
+                        border-radius: 5px;
+                        background-color: rgb(205, 208, 210);
+                    }
+                }
+
                 #navigation-user {
                     position: absolute;
                     right: 20px;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 100%;
+                    width: 25%;
+                    height: 100%;
+                    overflow: hidden;
+
+                    #navigation-user-avatar {
+                        position: absolute;
+                        left: 10px;
+                        width: 2.5vw;
+                        height: 5vh;
+                        cursor: pointer;
+                        background-color: white;
+
+                        .example-showcase .el-dropdown-link,
+                        #user_avatar {
+                            cursor: pointer;
+                            color: var(--el-color-primary);
+                            display: flex;
+                            align-items: center;
+                            border-radius: 100%;
+                        }
+
+                    }
+
                 }
 
                 #not_login_in {

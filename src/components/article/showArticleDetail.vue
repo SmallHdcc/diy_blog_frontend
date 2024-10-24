@@ -156,74 +156,76 @@ onMounted(() => {
 </script>
 
 <template>
-    <div id="detailPage">
-        <div id="container">
-            <div id="main">
-                <h1 id="title">{{ article.title }}</h1>
-                <div id="baseInfo">
-                    <span id="date">
-                        <el-icon style="margin-right: 10px;">
-                            <Calendar />
-                        </el-icon>
-                        <span>{{ article.createTime }}</span>
-                    </span>
-                    <span id="heat">
-                        <el-icon style="margin-right: 10px;">
-                            <View />
-                        </el-icon>
-                        <span>{{ article.views + 1 }}</span>
-                    </span>
-                    <span id="username">
-                        <el-icon style="margin-right: 10px;">
-                            <User />
-                        </el-icon>
-                        <span>{{ article.username }}</span>
-                    </span>
-                </div>
-                <!--  柔和分割线-->
-                <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
+    <el-scrollbar height="625px">
+        <div id="detailPage">
+            <div id="container">
+                <div id="main">
+                    <h1 id="title">{{ article.title }}</h1>
+                    <div id="baseInfo">
+                        <span id="date">
+                            <el-icon style="margin-right: 10px;">
+                                <Calendar />
+                            </el-icon>
+                            <span>{{ article.createTime }}</span>
+                        </span>
+                        <span id="heat">
+                            <el-icon style="margin-right: 10px;">
+                                <View />
+                            </el-icon>
+                            <span>{{ article.views + 1 }}</span>
+                        </span>
+                        <span id="username">
+                            <el-icon style="margin-right: 10px;">
+                                <User />
+                            </el-icon>
+                            <span>{{ article.username }}</span>
+                        </span>
+                    </div>
+                    <!--  柔和分割线-->
+                    <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;"></div>
 
-                <div id="content" style="white-space: pre-wrap;padding: 10px;" v-html="article.content">
-                </div>
-                <div class="comment">
-                    <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;">
+                    <div id="content" style="white-space: pre-wrap;padding: 10px;" v-html="article.content">
                     </div>
+                    <div class="comment">
+                        <div style="width: 70%;height: 1px;background-color: rgba(0, 0, 0, 0.1);margin: 20px 0px;">
+                        </div>
 
-                    <div id="comment-font-box">
-                        <h2>评论</h2>
-                        <span>{{ commentNumber }}</span>
-                    </div>
-                    <div id="comment-input-box">
-                        <div id="username-avatar">
-                            <img v-if="isLogin" :src=userAvatar alt="">
-                            <div v-if="!isLogin">请先登录</div>
+                        <div id="comment-font-box">
+                            <h2>评论</h2>
+                            <span>{{ commentNumber }}</span>
                         </div>
-                        <div id="input-container">
-                            <textarea v-model="commentInput" style=" resize: none;font-family: -apple-system;" name=""
-                                placeholder="发表一条评论吧" cols="30" rows="10"></textarea>
+                        <div id="comment-input-box">
+                            <div id="username-avatar">
+                                <img v-if="isLogin" :src=userAvatar alt="">
+                                <div v-if="!isLogin">请先登录</div>
+                            </div>
+                            <div id="input-container">
+                                <textarea v-model="commentInput" style=" resize: none;font-family: -apple-system;"
+                                    name="" placeholder="发表一条评论吧" cols="30" rows="10"></textarea>
+                            </div>
+                            <div :disabled="isLogin" id="input-commit-button" @click="uploadCommentData">发布</div>
                         </div>
-                        <div :disabled="isLogin" id="input-commit-button" @click="uploadCommentData">发布</div>
-                    </div>
-                    <div id="comment-list-box">
-                        <div class="comment-list" v-for="(item, key) in commentArray">
-                            <div class="commenter-avatar"><img :src=item.avatar alt=""></div>
-                            <div class="commenter-info">
-                                <div class="coomenter-nickname">{{ item.username }}</div>
-                                <div class="commenter-content">{{ item.content }}</div>
-                                <div class="comment-interaction">
-                                    <div class="release-time">{{ item.createTime }}</div>
-                                    <div class="thumbs" @click="toggleCommentLike(key)">
-                                        <thumbsUp :fill="item.isLiked ? 'green' : '#666666'" :id="key + 'like-btn'"
-                                            style="width: 100%;height: 100%; color: green;" />
-                                        <span>{{ item.likeCount }}</span>
+                        <div id="comment-list-box">
+                            <div class="comment-list" v-for="(item, key) in commentArray">
+                                <div class="commenter-avatar"><img :src=item.avatar alt=""></div>
+                                <div class="commenter-info">
+                                    <div class="coomenter-nickname">{{ item.username }}</div>
+                                    <div class="commenter-content">{{ item.content }}</div>
+                                    <div class="comment-interaction">
+                                        <div class="release-time">{{ item.createTime }}</div>
+                                        <div class="thumbs" @click="toggleCommentLike(key)">
+                                            <thumbsUp :fill="item.isLiked ? 'green' : '#666666'" :id="key + 'like-btn'"
+                                                style="width: 100%;height: 100%; color: green;" />
+                                            <span>{{ item.likeCount }}</span>
+                                        </div>
+                                        <div>回复</div>
+                                        <el-popconfirm title="你确定你要删除吗?" confirm-button-text="确认"
+                                            cancel-button-text="取消" @confirm="removeComments(key)">
+                                            <template #reference>
+                                                <div>删除</div>
+                                            </template>
+                                        </el-popconfirm>
                                     </div>
-                                    <div>回复</div>
-                                    <el-popconfirm title="你确定你要删除吗?" confirm-button-text="确认" cancel-button-text="取消"
-                                        @confirm="removeComments(key)">
-                                        <template #reference>
-                                            <div>删除</div>
-                                        </template>
-                                    </el-popconfirm>
                                 </div>
                             </div>
                         </div>
@@ -231,8 +233,7 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-    </div>
-
+    </el-scrollbar>
 </template>
 
 <style lang="less" scoped>
